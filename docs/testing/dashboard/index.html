@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GALASH Test Ledger</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">GALASH / QUALITY DESK</p>
+        <h1>Test Ledger</h1>
+        <p class="dek">Execution evidence, reduced to facts.</p>
+      </div>
+      <div class="controls">
+        <label for="events-file">Load events.ndjson</label>
+        <input id="events-file" type="file" accept=".ndjson,.json,.txt">
+        <button id="reload" type="button">Reload source</button>
+      </div>
+    </header>
+
+    <p id="message" class="message">Loading events...</p>
+
+    <section class="kpis" aria-label="Summary statistics">
+      <table><tbody><tr>
+        <th>Tests</th><td id="tests-count">0</td>
+        <th>Runs</th><td id="runs-count">0</td>
+        <th>Results</th><td id="results-count">0</td>
+      </tr><tr>
+        <th>Pass rate</th><td id="pass-rate">0%</td>
+        <th>Evidence</th><td id="evidence-rate">0%</td>
+        <th>Open defects</th><td id="open-defects">0</td>
+      </tr></tbody></table>
+    </section>
+
+    <section class="grid">
+      <article>
+        <h2>Latest run</h2>
+        <table class="data-table"><tbody id="latest-run"><tr><td>No runs recorded.</td></tr></tbody></table>
+      </article>
+      <article class="chart-box">
+        <h2>Result signal</h2>
+        <canvas id="status-chart" width="320" height="150" aria-label="Result status chart"></canvas>
+        <p id="status-legend" class="legend">No results.</p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article>
+        <h2>Results by area</h2>
+        <table class="data-table"><thead><tr><th>Area</th><th>Pass</th><th>Fail</th><th>Block</th><th>Total</th><th>Rate</th></tr></thead><tbody id="area-results"></tbody></table>
+      </article>
+      <article class="chart-box">
+        <h2>Area preview</h2>
+        <canvas id="area-chart" width="320" height="150" aria-label="Results by area chart"></canvas>
+        <p class="legend">Bright bars show passed cases.</p>
+      </article>
+    </section>
+
+    <section>
+      <h2>Open defects</h2>
+      <table class="data-table"><thead><tr><th>ID</th><th>Severity</th><th>Test</th><th>Run</th><th>Description</th></tr></thead><tbody id="defects"></tbody></table>
+    </section>
+
+    <footer>Source: <code>docs/testing/events.ndjson</code> · Generated in browser · <span id="updated">Not loaded</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
