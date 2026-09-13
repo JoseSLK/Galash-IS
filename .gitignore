@@ -1,0 +1,8 @@
+/historias_usuario_galash.md
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+coverage/
