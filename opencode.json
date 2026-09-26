@@ -9,6 +9,7 @@
       ".opencode/skills"
     ]
   },
+  "shell": "bash",
   "default_agent": "implementer",
   "compaction": {
     "auto": true,

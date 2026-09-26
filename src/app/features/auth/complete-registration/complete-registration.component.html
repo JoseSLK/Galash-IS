@@ -1,0 +1,72 @@
+<main class="complete-registration-page">
+  <section class="registration-card" aria-labelledby="registration-title">
+    <a class="back-link" routerLink="/login">← Volver al inicio de sesión</a>
+    <p class="eyebrow">GALASH · UPTC</p>
+    <h1 id="registration-title">Termina tu registro</h1>
+    <p class="intro">Completa tus datos para activar tu perfil en la plataforma.</p>
+
+    <form [formGroup]="registrationForm" (ngSubmit)="submit()" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" formControlName="nombre" autocomplete="given-name" />
+          @if (submitted && registrationForm.controls.nombre.invalid) {
+            <small class="error">El nombre es obligatorio.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="apellido">Apellido</label>
+          <input id="apellido" type="text" formControlName="apellido" autocomplete="family-name" />
+          @if (submitted && registrationForm.controls.apellido.invalid) {
+            <small class="error">El apellido es obligatorio.</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="tipo_dni">Tipo de documento</label>
+          <select id="tipo_dni" formControlName="tipo_dni">
+            <option value="">Selecciona una opción</option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="CE">Cédula de extranjería</option>
+            <option value="TI">Tarjeta de identidad</option>
+            <option value="PAS">Pasaporte</option>
+          </select>
+          @if (submitted && registrationForm.controls.tipo_dni.invalid) {
+            <small class="error">Selecciona el tipo de documento.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="dni">Número de documento</label>
+          <input id="dni" type="text" formControlName="dni" autocomplete="off" />
+          @if (submitted && registrationForm.controls.dni.invalid) {
+            <small class="error">Ingresa un número de documento válido.</small>
+          }
+        </div>
+      </div>
+
+      <label for="email">Correo electrónico</label>
+      <input id="email" type="email" formControlName="email" autocomplete="email" />
+      @if (submitted && registrationForm.controls.email.invalid) {
+        <small class="error">Ingresa un correo electrónico válido.</small>
+      }
+
+      <label for="estado">Estado de la cuenta</label>
+      <select id="estado" formControlName="estado">
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+
+      @if (errorMessage) {
+        <p class="error" role="alert">{{ errorMessage }}</p>
+      }
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Guardando…' : 'Completar registro' }}
+      </button>
+    </form>
+  </section>
+</main>

@@ -1,0 +1,26 @@
+<main class="dashboard-page">
+  <header class="dashboard-header">
+    <a class="brand" routerLink="/" aria-label="Ir al inicio">GALASH · UPTC</a>
+
+    @if (authService.currentUser(); as user) {
+      <div class="profile" aria-label="Usuario autenticado">
+        <span class="profile-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21c.8-4 3.4-6 8-6s7.2 2 8 6"></path>
+          </svg>
+        </span>
+        <span class="profile-name">{{ user.displayName || user.email || 'Usuario' }}</span>
+        <button class="logout-button" type="button" (click)="logout()">Cerrar sesión</button>
+      </div>
+    } @else {
+      <a class="login-link" routerLink="/login">Iniciar sesión</a>
+    }
+  </header>
+
+  <section class="dashboard-content" aria-labelledby="dashboard-title">
+    <p class="eyebrow">PLATAFORMA ACADÉMICA</p>
+    <h1 id="dashboard-title">Bienvenido a GALASH</h1>
+    <p>Un espacio para gestionar actividades, proyectos y oportunidades académicas.</p>
+  </section>
+</main>
