@@ -2,7 +2,10 @@
 .env
 .env.*
 !.env.example
+src/environments/environment.ts
+firebase-service-account*.json
 node_modules/
+.angular/
 dist/
 build/
 coverage/
