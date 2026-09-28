@@ -40,7 +40,8 @@ export class AuthService {
   }
 
   loginWithGoogle(): Promise<void> {
-    return signInWithPopup(firebaseAuth, new GoogleAuthProvider()).then(() => undefined);
+    return signInWithPopup(firebaseAuth, new GoogleAuthProvider())
+      .then(({ user }) => this.syncUserWithBackend(user));
   }
 
   logout(): Promise<void> {
@@ -92,9 +93,7 @@ export class AuthService {
     });
 
     try {
-      await firstValueFrom(this.http.post<void>(endpoint, payload, {
-        headers
-      }).pipe(timeout(10000)));
+      await firstValueFrom(this.http.post<void>(endpoint, payload, { headers }).pipe(timeout(10000)));
       console.info(`${logPrefix} Servicio Auth respondió correctamente.`);
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse) {
@@ -109,6 +108,17 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  private async syncUserWithBackend(user: User): Promise<void> {
+    const token = await user.getIdToken();
+    const [nombre = '', ...apellidos] = (user.displayName ?? '').trim().split(/\s+/).filter(Boolean);
+    await firstValueFrom(this.http.post<void>(`${API_BASE_URL}/auth/register`, {
+      nombre,
+      apellido: apellidos.join(' ')
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(timeout(10000)));
   }
 
   async completeRegistration(data: CompleteRegistrationData): Promise<void> {

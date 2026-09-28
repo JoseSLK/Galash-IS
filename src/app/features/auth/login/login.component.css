@@ -1,18 +1,177 @@
-.login-page { min-height: 100vh; display: grid; place-items: center; padding: 1.5rem; }
-.login-card { width: min(100%, 28rem); border: 1px solid #000; padding: 2rem; }
-.eyebrow { margin: 0 0 2rem; font-size: .75rem; font-weight: 700; letter-spacing: .12em; }
-h1 { margin: 0; font-size: 2rem; }
-.intro { margin: .75rem 0 2rem; line-height: 1.5; }
-form { display: grid; gap: .5rem; }
-label { font-weight: 700; margin-top: .5rem; }
-input { width: 100%; border: 1px solid #000; border-radius: 0; padding: .75rem; background: #fff; color: #000; }
-input:focus { outline: 2px solid #000; outline-offset: 2px; }
-button { margin-top: 1rem; border: 1px solid #000; border-radius: 0; padding: .75rem; background: #000; color: #fff; cursor: pointer; }
-button:hover { background: #fff; color: #000; }
-button:disabled { cursor: wait; opacity: .6; }
-.separator { display: flex; align-items: center; gap: .75rem; margin: 1.5rem 0; }
-.separator::before, .separator::after { content: ''; height: 1px; flex: 1; background: #000; }
-.separator span { font-size: .875rem; }
-.google-button { width: 100%; margin-top: 0; background: #fff; color: #000; }
-.register-link { display: block; margin-top: 1.5rem; color: #000; text-align: center; }
-.error { color: #000; font-weight: 700; }
+:host {
+  --login-bg: #10141f;
+  --login-panel: #34374e;
+  --login-line: #a5e6ba;
+  --login-diagonal: #5f6685;
+  display: block;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: #1e1a17;
+}
+
+.login-shell {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 60% 40%;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  border: 0;
+  background: var(--login-bg);
+}
+
+.login-shell::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: '';
+  background: var(--login-diagonal);
+  /* Two straight, parallel edges matching the reference: top-left to bottom-right. */
+  clip-path: polygon(20% 0, 32% 0, 78% 100%, 66% 100%);
+  pointer-events: none;
+}
+
+.login-form-panel,
+.welcome-panel { position: relative; z-index: 2; }
+
+.login-form-panel {
+  overflow: visible;
+  position: relative;
+  padding: 2rem clamp(1.75rem, 5vw, 3rem);
+  background: transparent;
+}
+
+.login-form-panel::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  /* The left grid track is 60% of the full-screen shell, so the panel and
+     stripe share the same coordinate system. */
+  width: 166.67%;
+  content: '';
+  background: var(--login-panel);
+  clip-path: polygon(0 0, 20% 0, 66% 100%, 0 100%);
+  pointer-events: none;
+}
+
+.login-form-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.panel-title {
+  margin: 0;
+  color: #f5f3f0;
+  font: 700 1.125rem/1.2 "Signika Negative", "Arial Narrow", sans-serif;
+}
+.menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0;
+  background: transparent;
+  color: #f5f3f0;
+  font: 700 1.125rem/1.2 "Signika Negative", "Arial Narrow", sans-serif;
+  text-align: left;
+  text-decoration: none;
+}
+.menu-trigger:hover { background: transparent; color: #fff; }
+
+form {
+  display: grid;
+  width: min(100%, 26rem);
+  gap: .35rem;
+  margin-top: clamp(7rem, 19vh, 10rem);
+  margin-left: 0;
+  margin-right: auto;
+}
+label { margin-top: 1.35rem; color: var(--login-line); font: 300 .8125rem/1.2 "Open Sans", Arial, sans-serif; }
+input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .45rem .5rem;
+  border: 0;
+  border-bottom: 2px solid var(--login-line);
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: #f5f3f0;
+  font: 300 1rem/1.2 "Open Sans", Arial, sans-serif;
+}
+input:focus { box-shadow: 0 2px 0 #f7c500; }
+
+button {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 0;
+  font: 700 .875rem/1.2 "Signika Negative", "Arial Narrow", sans-serif;
+  cursor: pointer;
+}
+button:disabled { cursor: wait; opacity: .55; }
+.submit-button { margin-top: 1.5rem; background: #000; color: #fff; }
+.submit-button:hover { background: #171d2b; }
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  width: min(100%, 15rem);
+  margin: 1.25rem 0 0 5.5rem;
+  align-self: center;
+  padding: 0 .6rem;
+  border: 2px solid #a8a8a8;
+  border-radius: 999px;
+  background: #fff;
+  color: #222;
+  font: 700 .875rem/1.2 "Signika Negative", "Arial Narrow", sans-serif;
+}
+.google-mark { font: 700 1.35rem/1 Arial, sans-serif; }
+.register-link { display: block; width: min(100%, 26rem); margin-top: 1rem; color: #c6c8d4; font: 300 .875rem/1.3 "Open Sans", Arial, sans-serif; text-align: center; }
+.error { margin: .3rem 0 0; color: #ffb4ab; font: 300 .75rem/1.3 "Open Sans", Arial, sans-serif; }
+
+.welcome-panel { min-width: 0; color: #f5f3f0; }
+.welcome-panel::before { position: absolute; top: 1.45rem; left: 0; width: 100%; height: 2px; content: ''; background: var(--login-line); }
+.welcome-copy { position: absolute; top: 6.5rem; right: 5.5rem; max-width: 17rem; text-align: right; }
+.welcome-copy h1 { margin: 0; color: #fff; font: 700 3.5rem/1.05 "Signika Negative", "Arial Narrow", sans-serif; }
+.welcome-copy h1 .welcome-highlight { color: #f7c500; }
+.welcome-copy p { margin: 2.25rem 0 0 auto; max-width: 18rem; color: #fff; font: 300 1rem/1.4 "Open Sans", Arial, sans-serif; }
+.brand-vertical {
+  position: absolute;
+  top: 2.7rem;
+  right: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  color: rgb(119 133 172 / .22);
+  font: 700 3rem/1.05 "Signika Negative", "Arial Narrow", sans-serif;
+  letter-spacing: 0;
+}
+.corner-mark { position: absolute; right: 2.5rem; bottom: 3.2rem; width: 2.85rem; height: 1.9rem; border-right: .65rem solid var(--login-line); border-bottom: .65rem solid var(--login-line); }
+
+@media (max-width: 700px) {
+  .login-page { padding: 0; }
+  .login-shell { grid-template-columns: 1fr; min-height: 100vh; border: 0; }
+  .login-shell::before { display: none; }
+  .login-form-panel { padding: 2rem 1.5rem 3rem; }
+  .login-form-panel::before { width: 100%; clip-path: none; }
+  form { margin-top: 4rem; }
+  .welcome-panel { min-height: 19rem; order: -1; }
+  .welcome-panel::before { top: 1rem; left: 1.5rem; width: calc(100% - 3rem); }
+  .welcome-copy { top: 4rem; right: 3.5rem; }
+  .welcome-copy h1 { font-size: 2.25rem; }
+  .welcome-copy p { margin-top: 1.25rem; font-size: .8125rem; }
+  .google-button { margin: 1.25rem auto 0; }
+  label, input { font-size: 1rem; }
+  .panel-title { font-size: 1.125rem; }
+  .submit-button { font-size: .875rem; }
+  .register-link { font-size: .875rem; }
+  .brand-vertical { top: 2rem; right: 1rem; font-size: 1.7rem; }
+  .corner-mark { right: 1.5rem; bottom: 1.75rem; }
+}
