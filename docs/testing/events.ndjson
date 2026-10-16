@@ -4,6 +4,35 @@
 {"v":1,"id":"T002","t":"test","area":"authentication","p":"must","name":"Registration frontend emits safe correlated diagnostic logs"}
 {"v":1,"id":"R002","t":"run","at":"2026-09-18T22:17:43Z","build":"working-tree","by":"agent","mode":"automated"}
 {"v":1,"id":"X002","t":"result","run":"R002","test":"T002","s":"pass"}
+{"v":1,"id":"T017","t":"test","area":"api","p":"must","name":"Angular /api proxy reaches GET /health"}
+{"v":1,"id":"T018","t":"test","area":"auth","p":"must","name":"POST /auth/register rejects a request without a Firebase ID token with 401"}
+{"v":1,"id":"T019","t":"test","area":"auth","p":"must","name":"POST /auth/sessions route exists and rejects missing credentials rather than returning 404"}
+{"v":1,"id":"T020","t":"test","area":"auth","p":"must","name":"GET /users/me route exists and requires a session cookie"}
+{"v":1,"id":"T021","t":"test","area":"auth","p":"must","name":"DELETE /auth/sessions/current route exists and requires a session"}
+{"v":1,"id":"T022","t":"test","area":"api","p":"must","name":"Public members search responds to a non-empty query"}
+{"v":1,"id":"T023","t":"test","area":"cors","p":"must","name":"CORS preflight allows local frontend origin, methods, and auth headers"}
+{"v":1,"id":"T024","t":"test","area":"cors","p":"must","name":"Cross-origin session responses allow credentialed cookies"}
+{"v":1,"id":"T025","t":"test","area":"cors","p":"must","name":"CORS rejects an unlisted origin"}
+{"v":1,"id":"T026","t":"test","area":"auth","p":"must","name":"A registered Google user receives a backend session cookie"}
+{"v":1,"id":"T027","t":"test","area":"auth","p":"must","name":"New-user registration completes before backend session creation"}
+{"v":1,"id":"E002","t":"env","os":"Windows","device":"Angular dev server localhost:4200 and Auth API localhost:8080 via curl"}
+{"v":1,"id":"R017","t":"run","at":"2026-10-16T21:18:25Z","build":"working-tree","env":"E002","by":"agent","mode":"manual"}
+{"v":1,"id":"X017","t":"result","run":"R017","test":"T017","s":"pass"}
+{"v":1,"id":"X018","t":"result","run":"R017","test":"T018","s":"pass"}
+{"v":1,"id":"X019","t":"result","run":"R017","test":"T019","s":"fail"}
+{"v":1,"id":"X020","t":"result","run":"R017","test":"T020","s":"fail"}
+{"v":1,"id":"X021","t":"result","run":"R017","test":"T021","s":"fail"}
+{"v":1,"id":"X022","t":"result","run":"R017","test":"T022","s":"fail"}
+{"v":1,"id":"X023","t":"result","run":"R017","test":"T023","s":"pass"}
+{"v":1,"id":"X024","t":"result","run":"R017","test":"T024","s":"fail"}
+{"v":1,"id":"X025","t":"result","run":"R017","test":"T025","s":"pass"}
+{"v":1,"id":"X026","t":"result","run":"R017","test":"T026","s":"block"}
+{"v":1,"id":"X027","t":"result","run":"R017","test":"T027","s":"block"}
+{"v":1,"id":"D001","t":"defect","test":"T019","run":"R017","sev":"high","s":"open","name":"Running API lacks session and profile routes used by frontend"}
+{"v":1,"id":"D002","t":"defect","test":"T024","run":"R017","sev":"medium","s":"open","name":"Credentialed cross-origin responses omit Access-Control-Allow-Credentials"}
+{"v":1,"id":"T028","t":"test","area":"auth","p":"must","name":"Angular production build succeeds with specific session 404 and connection error messages"}
+{"v":1,"id":"R018","t":"run","at":"2026-10-16T21:49:23Z","build":"working-tree","env":"E002","by":"agent","mode":"automated"}
+{"v":1,"id":"X028","t":"result","run":"R018","test":"T028","s":"pass"}
 {"v":1,"id":"T004","t":"test","area":"public-home","p":"must","name":"GALASH public home compiles with its responsive visual structure"}
 {"v":1,"id":"R004","t":"run","at":"2026-10-14T19:28:10Z","build":"working-tree","by":"agent","mode":"automated"}
 {"v":1,"id":"X004","t":"result","run":"R004","test":"T004","s":"pass"}
