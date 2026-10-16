@@ -1,6 +1,6 @@
-<div class="galash-site" [class.menu-is-open]="menuOpen">
+<div class="galash-site" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
-  <header class="site-header" [class.site-header--scrolled]="headerScrolled">
+  <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
     </a>
@@ -12,8 +12,36 @@
       <a href="#integrantes" [attr.aria-current]="activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     </nav>
     <div class="header-actions">
-      <a class="button button--outline button--login" routerLink="/login"><span aria-hidden="true">◯</span> Iniciar sesión</a>
-      <a class="button button--primary" routerLink="/registro">Quiero unirme</a>
+      <div #authMenu class="auth-menu">
+        <button #authMenuTrigger id="header-auth-button" class="button auth-trigger" type="button"
+          [attr.aria-expanded]="authMenuOpen" aria-controls="header-auth-dropdown"
+          [disabled]="authService.sessionStatus() === 'checking' || authLoading"
+          (click)="toggleAuthMenu()">
+          {{ authService.sessionStatus() === 'checking' ? 'Comprobando sesión…' : authService.isAuthenticated() ? 'Mi cuenta' : 'Iniciar sesión' }}
+          <span aria-hidden="true">⌄</span>
+        </button>
+        @if (authMenuOpen) {
+          <div id="header-auth-dropdown" class="auth-dropdown" aria-label="Opciones de acceso">
+            @if (authService.sessionStatus() === 'checking') {
+              <p class="auth-status" role="status">Comprobando la sesión…</p>
+            } @else if (authService.isAuthenticated()) {
+              <p class="auth-status">Sesión iniciada</p>
+              <button class="dropdown-action" type="button" [disabled]="authLoading" (click)="logout()">
+                {{ authLoading ? 'Cerrando…' : 'Cerrar sesión' }}
+              </button>
+            } @else {
+              <button class="google-login" type="button"
+                [disabled]="authLoading || authService.sessionStatus() === 'checking'" (click)="continueWithGoogle()">
+                <span class="google-mark" aria-hidden="true">G</span>
+                {{ authLoading ? 'Conectando…' : 'Iniciar sesión con Google' }}
+              </button>
+              @if (authErrorMessage) {
+                <p class="auth-error" role="alert">{{ authErrorMessage }}</p>
+              }
+            }
+          </div>
+        }
+      </div>
     </div>
     <button #menuToggle class="menu-toggle" type="button" [attr.aria-expanded]="menuOpen" aria-controls="site-navigation" [attr.aria-label]="menuOpen ? 'Cerrar menú' : 'Abrir menú'" (click)="toggleMenu()">
       <span></span><span></span><span></span>
@@ -25,7 +53,6 @@
     <a href="#semilleros" [attr.aria-current]="activeSection === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
     <a href="#noticias" [attr.aria-current]="activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
     <a href="#integrantes" [attr.aria-current]="activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
-    <div class="mobile-actions"><a class="button button--outline" routerLink="/login" (click)="closeMenu()">Iniciar sesión</a><a class="button button--primary" routerLink="/registro" (click)="closeMenu()">Quiero unirme</a></div>
   </nav>
 
   <main id="contenido">
@@ -60,7 +87,7 @@
         <p class="eyebrow">Convocatoria abierta</p>
         <h2 id="join-title">¿Tienes una pregunta por resolver? <em>Únete a GALASH</em></h2>
         <p>Encuentra una comunidad para investigar, aprender y convertir tus preguntas en proyectos con sentido.</p>
-        <div class="button-row"><a class="button button--primary" routerLink="/registro">Quiero unirme</a><a class="button button--outline" href="mailto:galash@uptc.edu.co">Escríbenos</a></div>
+        <div class="button-row"><a class="button button--primary" href="#semilleros">Explorar semilleros</a><a class="button button--outline" href="mailto:galash@uptc.edu.co">Escríbenos</a></div>
       </div>
       <div class="mosaic-stage" aria-label="Mosaico informativo de GALASH">
         <div class="mosaic-halo" aria-hidden="true"></div>
@@ -92,3 +119,7 @@
 
   <footer id="noticias" class="site-footer"><div><a class="site-logo" routerLink="/" aria-label="GALASH, inicio"><span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span></a><p>Semillero de investigación · [Universidad / Facultad] · © GALASH 2026</p></div><nav aria-label="Enlaces del pie"><a href="#unete">Únete</a><a href="#nosotros">Nosotros</a><a href="#semilleros">Semilleros</a><a id="integrantes" href="mailto:galash@uptc.edu.co">Contáctanos</a></nav></footer>
 </div>
+
+@if (registrationOpen) {
+  <app-register (completed)="onRegistrationComplete()" (cancelled)="cancelGoogleRegistration()" />
+}

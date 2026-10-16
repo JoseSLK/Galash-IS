@@ -1,25 +1,36 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
+import { RegisterComponent } from '../auth/register/register.component';
 import { carouselConfig, heroSlides, seedbeds, Seedbed, mosaicContent } from './dashboard-content';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, RegisterComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mobileNav') private mobileNav?: ElementRef<HTMLElement>;
   @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
+  @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;
+  @ViewChild('authMenuTrigger') private authMenuTrigger?: ElementRef<HTMLButtonElement>;
   private readonly changeDetector = inject(ChangeDetectorRef);
+  readonly authService = inject(AuthService);
   readonly heroSlides = heroSlides;
   readonly seedbeds = seedbeds;
   readonly mosaicContent = mosaicContent;
   activeSlide = 0;
   activeSeedbed = 0;
   menuOpen = false;
+  authMenuOpen = false;
+  registrationOpen = false;
+  authLoading = false;
+  authErrorMessage = '';
   headerScrolled = false;
+  headerCompact = false;
   carouselPaused = false;
   carouselProgress = 0;
   carouselLive: 'off' | 'polite' = 'off';
@@ -29,13 +40,18 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   private elapsed = 0;
   private focused = false;
   private touchStartX?: number;
+  private previousScrollY = 0;
 
   get currentSeedbed(): Seedbed { return this.seedbeds[this.activeSeedbed]; }
   get slideCounter(): string { return String(this.activeSlide + 1).padStart(2, '0'); }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    this.headerScrolled = window.scrollY > 80;
+    const currentScrollY = Math.max(0, window.scrollY);
+    if (currentScrollY === 0) this.headerCompact = false;
+    else if (currentScrollY !== this.previousScrollY) this.headerCompact = currentScrollY > this.previousScrollY;
+    this.previousScrollY = currentScrollY;
+    this.headerScrolled = currentScrollY > 80;
     this.updateActiveSection();
   }
 
@@ -68,6 +84,70 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     if (wasOpen) setTimeout(() => this.menuToggle?.nativeElement.focus(), 0);
   }
 
+  toggleAuthMenu(): void {
+    if (this.authService.sessionStatus() === 'checking' || this.authLoading) return;
+    this.authMenuOpen = !this.authMenuOpen;
+    if (this.authMenuOpen) this.authErrorMessage = '';
+  }
+
+  async continueWithGoogle(): Promise<void> {
+    if (this.authLoading || this.authService.sessionStatus() === 'checking' || this.authService.isAuthenticated()) return;
+
+    this.authLoading = true;
+    this.authErrorMessage = '';
+    try {
+      await this.authService.loginWithGoogle();
+      this.authMenuOpen = false;
+    } catch (error: unknown) {
+      if (error instanceof RegistrationRequiredError) {
+        this.authMenuOpen = false;
+        this.registrationOpen = true;
+        document.body.style.overflow = 'hidden';
+      } else if (error instanceof HttpErrorResponse && error.status === 404) {
+        this.authErrorMessage = 'El servicio de sesiones del backend no está disponible. Debe exponer POST /auth/sessions.';
+      } else if (error instanceof HttpErrorResponse && error.status === 0) {
+        this.authErrorMessage = 'No se pudo conectar con Auth. Revisa la API y, si usas otro origen, su CORS con credenciales.';
+      } else {
+        this.authErrorMessage = 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.';
+      }
+    } finally {
+      this.authLoading = false;
+    }
+  }
+
+  async cancelGoogleRegistration(): Promise<void> {
+    this.registrationOpen = false;
+    this.authMenuOpen = false;
+    document.body.style.overflow = '';
+    try {
+      await this.authService.cancelGoogleRegistration();
+    } catch {
+      this.authErrorMessage = 'No se pudo cerrar el acceso de Google. Inténtalo de nuevo.';
+    }
+    setTimeout(() => this.authMenuTrigger?.nativeElement.focus(), 0);
+  }
+
+  onRegistrationComplete(): void {
+    this.registrationOpen = false;
+    this.authMenuOpen = false;
+    document.body.style.overflow = '';
+    this.authErrorMessage = '';
+    setTimeout(() => this.authMenuTrigger?.nativeElement.focus(), 0);
+  }
+
+  async logout(): Promise<void> {
+    this.authLoading = true;
+    this.authErrorMessage = '';
+    try {
+      await this.authService.logout();
+      this.authMenuOpen = false;
+    } catch {
+      this.authErrorMessage = 'No se pudo cerrar la sesión correctamente. Inténtalo de nuevo.';
+    } finally {
+      this.authLoading = false;
+    }
+  }
+
   onTouchStart(event: TouchEvent): void { this.touchStartX = event.changedTouches[0]?.clientX; }
   onTouchEnd(event: TouchEvent): void {
     if (this.touchStartX === undefined) return;
@@ -81,11 +161,20 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   onVisibilityChange(): void { this.updateTimerState(); }
 
   @HostListener('document:keydown.escape')
-  onEscape(): void { if (this.menuOpen) this.closeMenu(); }
+  onEscape(): void {
+    if (this.registrationOpen) return;
+    if (this.authMenuOpen) {
+      this.authMenuOpen = false;
+      setTimeout(() => this.authMenuTrigger?.nativeElement.focus(), 0);
+    }
+    if (this.menuOpen) this.closeMenu();
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (this.menuOpen && this.mobileNav && !this.mobileNav.nativeElement.contains(event.target as Node) && !this.menuToggle?.nativeElement.contains(event.target as Node)) this.closeMenu();
+    const target = event.target as Node;
+    if (this.menuOpen && this.mobileNav && !this.mobileNav.nativeElement.contains(target) && !this.menuToggle?.nativeElement.contains(target)) this.closeMenu();
+    if (this.authMenuOpen && this.authMenu && !this.authMenu.nativeElement.contains(target)) this.authMenuOpen = false;
   }
 
   private changeSlide(index: number): void {

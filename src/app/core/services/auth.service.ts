@@ -1,144 +1,202 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import {
   GoogleAuthProvider,
-  createUserWithEmailAndPassword,
+  User,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   signInWithPopup,
-  signOut,
-  User
+  signOut
 } from 'firebase/auth';
 import { firebaseAuth } from '../config/firebase.config';
-import { API_BASE_URL } from '../config/api.config';
-import { firstValueFrom, timeout } from 'rxjs';
+import { ApiService } from './api.service';
 
-export interface CompleteRegistrationData {
+export type RegistrationRole = 'estudiante' | 'profesor';
+export type BackendSessionStatus = 'checking' | 'authenticated' | 'anonymous' | 'expired' | 'unavailable';
+
+export interface RegistrationData {
   nombre: string;
   apellido: string;
   tipo_dni: string;
   dni: string;
   email: string;
-  estado: string;
+  rol: RegistrationRole;
 }
+
+export interface SessionUser {
+  id: string;
+  name?: string;
+  last_name?: string;
+  role?: string;
+  status?: string;
+}
+
+interface BackendUser extends SessionUser {
+  email?: string;
+  document_type?: string;
+  document_number?: string;
+  firebase_uid?: string;
+}
+
+interface AuthSessionResponse {
+  user: BackendUser;
+}
+
+interface RegistrationResponse {
+  id: string;
+  firebase_uid: string;
+}
+
+export class RegistrationRequiredError extends Error {}
+export class RegistrationSaveError extends Error {}
+export class RegistrationSessionError extends Error {}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly http = inject(HttpClient);
-  readonly isAuthenticated = signal(false);
+  private readonly api = inject(ApiService);
+  private sessionRequestId = 0;
+  private resolveAuthInitialized!: () => void;
+  private readonly authInitialized = new Promise<void>(resolve => {
+    this.resolveAuthInitialized = resolve;
+  });
+
   readonly currentUser = signal<User | null>(null);
+  readonly backendUser = signal<SessionUser | null>(null);
+  readonly isAuthenticated = signal(false);
+  readonly sessionStatus = signal<BackendSessionStatus>('checking');
 
   constructor() {
     onAuthStateChanged(firebaseAuth, (user: User | null) => {
       this.currentUser.set(user);
-      this.isAuthenticated.set(user !== null);
+      this.resolveAuthInitialized();
+      void this.restoreBackendSession();
     });
   }
 
-  login(email: string, password: string): Promise<void> {
-    return signInWithEmailAndPassword(firebaseAuth, email.trim(), password).then(() => undefined);
+  waitForAuthInitialization(): Promise<void> {
+    return this.authInitialized;
   }
 
-  loginWithGoogle(): Promise<void> {
-    return signInWithPopup(firebaseAuth, new GoogleAuthProvider()).then(() => undefined);
-  }
-
-  logout(): Promise<void> {
-    return signOut(firebaseAuth);
-  }
-
-  async register(
-    nombre: string,
-    apellido: string,
-    email: string,
-    password: string,
-    traceId = createTraceId()
-  ): Promise<void> {
-    const logPrefix = `[AuthService][registro:${traceId}]`;
-    console.info(`${logPrefix} Iniciando flujo de registro Firebase.`);
-
-    let credential;
+  async loginWithGoogle(): Promise<void> {
+    const credential = await signInWithPopup(firebaseAuth, new GoogleAuthProvider());
+    this.currentUser.set(credential.user);
     try {
-      credential = await createUserWithEmailAndPassword(firebaseAuth, email.trim(), password);
-      console.info(`${logPrefix} Cuenta creada en Firebase. UID recibido.`);
+      await this.createBackendSession(credential.user);
     } catch (error: unknown) {
-      console.error(`${logPrefix} Firebase rechazó la creación de la cuenta.`, getFirebaseError(error));
-      throw error;
-    }
-
-    let token: string;
-    try {
-      token = await credential.user.getIdToken();
-      console.info(`${logPrefix} ID token obtenido. No se imprime por seguridad.`);
-    } catch (error: unknown) {
-      console.error(`${logPrefix} No se pudo obtener el ID token de Firebase.`, error);
-      throw error;
-    }
-
-    const endpoint = `${API_BASE_URL}/auth/register`;
-    const payload = {
-      nombre: nombre.trim(),
-      apellido: apellido.trim()
-    };
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      'X-Trace-Id': traceId
-    };
-
-    console.info(`${logPrefix} Enviando POST al servicio Auth.`, {
-      endpoint,
-      payload,
-      hasAuthorizationToken: Boolean(token)
-    });
-
-    try {
-      await firstValueFrom(this.http.post<void>(endpoint, payload, {
-        headers
-      }).pipe(timeout(10000)));
-      console.info(`${logPrefix} Servicio Auth respondió correctamente.`);
-    } catch (error: unknown) {
-      if (error instanceof HttpErrorResponse) {
-        console.error(`${logPrefix} Servicio Auth respondió con error HTTP.`, {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url,
-          response: error.error
-        });
-      } else {
-        console.error(`${logPrefix} No hubo respuesta del servicio Auth o la petición fue cancelada.`, error);
+      if (error instanceof HttpErrorResponse && error.status === 403) {
+        this.clearBackendSession('anonymous');
+        throw new RegistrationRequiredError();
       }
       throw error;
     }
   }
 
-  async completeRegistration(data: CompleteRegistrationData): Promise<void> {
-    const user = this.currentUser();
-    if (!user) throw new Error('No hay una sesión activa');
+  async logout(): Promise<void> {
+    let logoutError: unknown;
+
+    try {
+      await this.api.delete('/auth/sessions/current');
+    } catch (error: unknown) {
+      if (!(error instanceof HttpErrorResponse && error.status === 401)) {
+        logoutError = error;
+      }
+    }
+
+    try {
+      await signOut(firebaseAuth);
+    } finally {
+      this.clearBackendSession('anonymous');
+    }
+
+    if (logoutError) throw logoutError;
+  }
+
+  async registerGoogleUser(data: RegistrationData): Promise<void> {
+    const user = firebaseAuth.currentUser;
+    if (!user) throw new RegistrationRequiredError();
 
     const token = await user.getIdToken();
-    await firstValueFrom(this.http.post<void>(`${API_BASE_URL}/auth/register`, {
-      nombre: data.nombre.trim(),
-      apellido: data.apellido.trim(),
-      tipo_dni: data.tipo_dni,
-      dni: data.dni.trim(),
-      email: data.email.trim(),
-      estado: data.estado
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    }));
+    let result: unknown;
+    try {
+      result = await this.api.post<unknown, RegistrationData>('/auth/register', {
+        nombre: data.nombre.trim(),
+        apellido: data.apellido.trim(),
+        tipo_dni: data.tipo_dni,
+        dni: data.dni.trim(),
+        email: user.email?.trim() ?? data.email.trim(),
+        rol: data.rol
+      }, authorizationHeader(token));
+    } catch {
+      throw new RegistrationSaveError();
+    }
+    if (!isRegistrationResponse(result, user.uid)) throw new RegistrationSaveError();
+
+    try {
+      await this.createBackendSession(user, token);
+    } catch {
+      throw new RegistrationSessionError();
+    }
+  }
+
+  async cancelGoogleRegistration(): Promise<void> {
+    await this.logout();
+  }
+
+  private async createBackendSession(user: User, firebaseIdToken?: string): Promise<void> {
+    const token = firebaseIdToken ?? await user.getIdToken();
+    const response = await this.api.post<AuthSessionResponse, Record<string, never>>(
+      '/auth/sessions',
+      {},
+      authorizationHeader(token)
+    );
+    this.setBackendSession(response.user);
+  }
+
+  private async restoreBackendSession(): Promise<void> {
+    const requestId = ++this.sessionRequestId;
+    this.sessionStatus.set('checking');
+
+    try {
+      const user = await this.api.get<BackendUser>('/users/me');
+      if (requestId === this.sessionRequestId) this.setBackendSession(user);
+    } catch (error: unknown) {
+      if (requestId !== this.sessionRequestId) return;
+
+      const status = error instanceof HttpErrorResponse && error.status === 401
+        ? (this.currentUser() ? 'expired' : 'anonymous')
+        : 'unavailable';
+      this.clearBackendSession(status);
+    }
+  }
+
+  private setBackendSession(user: BackendUser): void {
+    this.sessionRequestId++;
+    this.backendUser.set({
+      id: user.id,
+      name: user.name,
+      last_name: user.last_name,
+      role: user.role,
+      status: user.status
+    });
+    this.isAuthenticated.set(true);
+    this.sessionStatus.set('authenticated');
+  }
+
+  private clearBackendSession(status: Exclude<BackendSessionStatus, 'checking' | 'authenticated'>): void {
+    this.sessionRequestId++;
+    this.backendUser.set(null);
+    this.isAuthenticated.set(false);
+    this.sessionStatus.set(status);
   }
 }
 
-function createTraceId(): string {
-  return globalThis.crypto?.randomUUID?.() ?? `registro-${Date.now()}`;
+function authorizationHeader(firebaseIdToken: string): Record<string, string> {
+  return { Authorization: `Bearer ${firebaseIdToken}` };
 }
 
-function getFirebaseError(error: unknown): { code?: string; message?: string } {
-  if (typeof error !== 'object' || error === null) return {};
-
-  const firebaseError = error as { code?: unknown; message?: unknown };
-  return {
-    code: typeof firebaseError.code === 'string' ? firebaseError.code : undefined,
-    message: typeof firebaseError.message === 'string' ? firebaseError.message : undefined
-  };
+function isRegistrationResponse(value: unknown, firebaseUid: string): value is RegistrationResponse {
+  if (typeof value !== 'object' || value === null) return false;
+  const response = value as Partial<RegistrationResponse>;
+  return typeof response.id === 'string'
+    && response.id.trim().length > 0
+    && response.firebase_uid === firebaseUid;
 }
