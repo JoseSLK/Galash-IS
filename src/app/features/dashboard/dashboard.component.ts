@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
@@ -103,12 +103,12 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
         this.authMenuOpen = false;
         this.registrationOpen = true;
         document.body.style.overflow = 'hidden';
-      } else if (error instanceof HttpErrorResponse && error.status === 404) {
-        this.authErrorMessage = 'El servicio de sesiones del backend no está disponible. Debe exponer POST /auth/sessions.';
-      } else if (error instanceof HttpErrorResponse && error.status === 0) {
-        this.authErrorMessage = 'No se pudo conectar con Auth. Revisa la API y, si usas otro origen, su CORS con credenciales.';
       } else {
-        this.authErrorMessage = 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.';
+        // Endpoint, status and CORS details stay out of the UI; they are only logged in development.
+        if (isDevMode()) console.warn('[auth] inicio de sesión fallido', error);
+        this.authErrorMessage = error instanceof HttpErrorResponse && error.status === 0
+          ? 'No hay conexión con el servicio de acceso. Inténtalo de nuevo.'
+          : 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.';
       }
     } finally {
       this.authLoading = false;

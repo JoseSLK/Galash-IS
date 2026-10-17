@@ -10,7 +10,6 @@ import {
 import { firebaseAuth } from '../config/firebase.config';
 import { ApiService } from './api.service';
 
-export type RegistrationRole = 'estudiante' | 'profesor';
 export type BackendSessionStatus = 'checking' | 'authenticated' | 'anonymous' | 'expired' | 'unavailable';
 
 export interface RegistrationData {
@@ -19,7 +18,6 @@ export interface RegistrationData {
   tipo_dni: string;
   dni: string;
   email: string;
-  rol: RegistrationRole;
 }
 
 export interface SessionUser {
@@ -83,22 +81,24 @@ export class AuthService {
       await this.createBackendSession(credential.user);
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === 403) {
+        // Firebase identity is kept on purpose: registration completes with it.
         this.clearBackendSession('anonymous');
         throw new RegistrationRequiredError();
       }
+      // The backend did not accept this login. Dropping the Firebase identity avoids a
+      // stale "expired" state where every later restore fails against the same identity.
+      await this.discardFirebaseSession();
       throw error;
     }
   }
 
   async logout(): Promise<void> {
-    let logoutError: unknown;
-
     try {
       await this.api.delete('/auth/sessions/current');
     } catch (error: unknown) {
-      if (!(error instanceof HttpErrorResponse && error.status === 401)) {
-        logoutError = error;
-      }
+      // 401 means there is no live backend session to revoke. Any other failure keeps the
+      // local state, so the UI never reports "anonymous" while the server session still exists.
+      if (!(error instanceof HttpErrorResponse && error.status === 401)) throw error;
     }
 
     try {
@@ -106,8 +106,6 @@ export class AuthService {
     } finally {
       this.clearBackendSession('anonymous');
     }
-
-    if (logoutError) throw logoutError;
   }
 
   async registerGoogleUser(data: RegistrationData): Promise<void> {
@@ -122,8 +120,7 @@ export class AuthService {
         apellido: data.apellido.trim(),
         tipo_dni: data.tipo_dni,
         dni: data.dni.trim(),
-        email: user.email?.trim() ?? data.email.trim(),
-        rol: data.rol
+        email: user.email?.trim() ?? data.email.trim()
       }, authorizationHeader(token));
     } catch {
       throw new RegistrationSaveError();
@@ -179,6 +176,11 @@ export class AuthService {
     });
     this.isAuthenticated.set(true);
     this.sessionStatus.set('authenticated');
+  }
+
+  private async discardFirebaseSession(): Promise<void> {
+    await signOut(firebaseAuth).catch(() => undefined);
+    this.clearBackendSession('anonymous');
   }
 
   private clearBackendSession(status: Exclude<BackendSessionStatus, 'checking' | 'authenticated'>): void {

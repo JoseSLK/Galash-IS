@@ -2,7 +2,6 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Outpu
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   AuthService,
-  RegistrationRole,
   RegistrationSaveError,
   RegistrationSessionError
 } from '../../../core/services/auth.service';
@@ -29,8 +28,7 @@ export class RegisterComponent implements AfterViewInit {
     apellido: [this.googleNameParts.slice(1).join(' '), [Validators.required, Validators.pattern(/\S/)]],
     tipo_dni: ['', [Validators.required]],
     dni: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9-]+$/)]],
-    email: [this.email, [Validators.required, Validators.email]],
-    rol: this.formBuilder.control<RegistrationRole>('estudiante', [Validators.required])
+    email: [this.email, [Validators.required, Validators.email]]
   });
 
   submitted = false;
