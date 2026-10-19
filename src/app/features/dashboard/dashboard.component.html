@@ -1,15 +1,15 @@
-<div class="galash-site" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+<div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
+  <a class="skip-link" [attr.href]="headerOnly ? '/semilleros#contenido' : '#contenido'">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
     </a>
     <nav class="site-nav" aria-label="Principal">
-      <a href="#unete" [attr.aria-current]="activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
-      <a href="#nosotros" [attr.aria-current]="activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
-      <a href="#semilleros" [attr.aria-current]="activeSection === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
-      <a href="#noticias" [attr.aria-current]="activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
-      <a href="#integrantes" [attr.aria-current]="activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
+      <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     </nav>
     <div class="header-actions">
       <div #authMenu class="auth-menu">
@@ -18,7 +18,6 @@
           [disabled]="authService.sessionStatus() === 'checking' || authLoading"
           (click)="toggleAuthMenu()">
           {{ authService.sessionStatus() === 'checking' ? 'Comprobando sesión…' : authService.isAuthenticated() ? 'Mi cuenta' : 'Iniciar sesión' }}
-          <span aria-hidden="true">⌄</span>
         </button>
         @if (authMenuOpen) {
           <div id="header-auth-dropdown" class="auth-dropdown" aria-label="Opciones de acceso">
@@ -48,18 +47,18 @@
     </button>
   </header>
   <nav #mobileNav id="site-navigation" class="mobile-nav" aria-label="Menú móvil">
-    <a href="#unete" [attr.aria-current]="activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
-    <a href="#nosotros" [attr.aria-current]="activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
-    <a href="#semilleros" [attr.aria-current]="activeSection === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
-    <a href="#noticias" [attr.aria-current]="activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
-    <a href="#integrantes" [attr.aria-current]="activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
+    <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
   </nav>
 
+  @if (!headerOnly) {
   <main id="contenido">
     <section #hero id="nosotros" class="hero-section" role="region" aria-roledescription="carousel" aria-label="Presentación del grupo" [attr.aria-live]="carouselLive" tabindex="0" (focusin)="onCarouselFocusIn()" (focusout)="onCarouselFocusOut($event)" (keydown)="onHeroKeydown($event)" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
       @for (slide of heroSlides; track slide.title; let i = $index) {
         <article class="hero-slide" role="group" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' de ' + heroSlides.length" [class.hero-slide--active]="i === activeSlide" [style.background-image]="slide.image ? 'url(' + slide.image + ')' : null" [attr.aria-hidden]="i !== activeSlide">
-          <div class="hero-scrim"></div>
           <div class="hero-copy">
             <p class="eyebrow">{{ slide.eyebrow }}</p>
             <h1>{{ slide.title }}</h1>
@@ -110,14 +109,15 @@
         }
       </div>
       <div class="seedbed-layout">
-        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">{{ currentSeedbed.label }}</p><h3>{{ currentSeedbed.title }}</h3><p class="seedbed-phrase">{{ currentSeedbed.phrase }}</p><p>{{ currentSeedbed.description }}</p><a class="text-link" href="#semilleros">Conoce el semillero →</a></article>
+        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">{{ currentSeedbed.label }}</p><h3>{{ currentSeedbed.title }}</h3><p class="seedbed-phrase">{{ currentSeedbed.phrase }}</p><p>{{ currentSeedbed.description }}</p><a class="text-link" routerLink="/semilleros">Conoce el semillero →</a></article>
         <div class="device-stage" aria-label="Vista previa del semillero"><div class="light-beam"></div><div class="monitor"><div class="monitor-screen">{{ currentSeedbed.captureLabel }}</div><span class="monitor-stand"></span></div><div class="device-tiles"><div class="device-photo">[FOTO]</div><div class="device-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div></div></div>
          <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h3>Preguntas que abren caminos</h3><ul>@for (topic of currentSeedbed.topics; track topic) {<li><span aria-hidden="true">✓</span>{{ topic }}</li>}</ul></aside>
       </div>
     </section>
   </main>
 
-  <footer id="noticias" class="site-footer"><div><a class="site-logo" routerLink="/" aria-label="GALASH, inicio"><span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span></a><p>Semillero de investigación · [Universidad / Facultad] · © GALASH 2026</p></div><nav aria-label="Enlaces del pie"><a href="#unete">Únete</a><a href="#nosotros">Nosotros</a><a href="#semilleros">Semilleros</a><a id="integrantes" href="mailto:galash@uptc.edu.co">Contáctanos</a></nav></footer>
+  <app-site-footer id="noticias" class="site-footer-anchor" />
+  }
 </div>
 
 @if (registrationOpen) {

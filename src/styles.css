@@ -15,5 +15,5 @@
 
 * { box-sizing: border-box; }
 html, body { min-width: 320px; }
-body { margin: 0; background: linear-gradient(180deg, #0a1420 0%, #0b2031 30%, #0b2b33 62%, #09171f 100%); color: #fff; }
+body { margin: 0; background: #0a1420; color: #fff; }
 button, input { font: inherit; }

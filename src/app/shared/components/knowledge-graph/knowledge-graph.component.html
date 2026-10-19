@@ -1,0 +1,17 @@
+<div #container class="graph" role="img" [attr.aria-label]="'Red de conocimiento del semillero ' + graphName + '. Nodos conectados: ' + titles" [class.reduced]="reducedMotion" [class.compact]="compact">
+  <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" [class.enter]="phase === 'enter'" [class.exit]="phase === 'exit'" [class.arriving]="arriving">
+    <g class="orbits" aria-hidden="true"><circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="orbitRadius"/><circle class="inner" [attr.cx]="cx" [attr.cy]="cy" [attr.r]="orbitRadius * .65"/></g>
+    @for (node of satellites; track node.id) {
+      <line class="link" [class.highlight]="activeId === node.id" [style.transform-origin]="cx + 'px ' + cy + 'px'" [attr.x1]="centerX" [attr.y1]="centerY" [attr.x2]="node.x" [attr.y2]="node.y" />
+    }
+    @if (centralNode; as center) { <g class="central draggable-center" [attr.transform]="'translate(' + centerX + ',' + centerY + ')'" (pointerdown)="pointerDown($event, center)" (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)" (pointercancel)="pointerUp($event)" aria-label="Arrastrar nodo central"><circle r="48"/><text text-anchor="middle" dominant-baseline="central">{{ abbreviation }}</text></g> }
+    @for (node of satellites; track node.id) {
+      <g class="satellite" [style.transform]="position(node)" tabindex="0" role="button" [attr.aria-label]="node.title" [attr.aria-expanded]="activeId === node.id" [attr.aria-describedby]="activeId === node.id ? tooltipId : null"
+        (pointerenter)="hovered = $event.pointerType === 'mouse' ? node.id : null" (pointerleave)="hovered = null" (focus)="focused = node.id" (blur)="focused = null" (click)="toggle(node)" (keydown)="keydown($event, node)" (pointerdown)="pointerDown($event, node)" (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)" (pointercancel)="pointerUp($event)">
+        <g class="node-visual" [class.active]="activeId === node.id"><circle class="hit-area" r="23"/><circle class="node-circle" [attr.r]="node.radius"/><circle class="yellow-dot" r="3.5"/></g>
+        <text class="node-label" [attr.x]="compact ? 0 : node.homeX < cx - 1 ? -22 : 22" [attr.y]="compact ? 32 : 4" [attr.text-anchor]="compact ? 'middle' : node.homeX < cx - 1 ? 'end' : 'start'">{{ node.title }}</text>
+      </g>
+    }
+  </svg>
+  @if (activeNode; as node) { <div class="tooltip" role="tooltip" [id]="tooltipId" [style.left.px]="tooltipLeft" [style.top.px]="tooltipTop" [style.width.px]="tooltipWidth"><strong>{{ node.title }}</strong><p>{{ node.phrase }}</p></div> }
+</div>

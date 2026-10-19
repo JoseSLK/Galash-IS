@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
 import { carouselConfig, heroSlides, seedbeds, Seedbed, mosaicContent } from './dashboard-content';
@@ -8,11 +9,12 @@ import { carouselConfig, heroSlides, seedbeds, Seedbed, mosaicContent } from './
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RegisterComponent],
+  imports: [RouterLink, RegisterComponent, SiteFooterComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
+  @Input() headerOnly = false;
   @ViewChild('mobileNav') private mobileNav?: ElementRef<HTMLElement>;
   @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;
@@ -187,8 +189,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private updateActiveSection(): void {
+    if (this.headerOnly) {
+      return;
+    }
     const viewportCenter = window.innerHeight / 2;
-    const sections = Array.from(document.querySelectorAll<HTMLElement>('#contenido > section, .site-footer'))
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('#contenido > section, .site-footer-anchor'))
       .filter(section => section.id);
     const current = sections.find(section => {
       const bounds = section.getBoundingClientRect();
@@ -205,7 +210,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private updateTimerState(): void {
-    const shouldRun = !this.carouselPaused && !document.hidden;
+    const shouldRun = !this.headerOnly && !this.carouselPaused && !document.hidden;
     this.carouselLive = shouldRun ? 'off' : 'polite';
     if (shouldRun) this.startTimer(); else this.stopTimer();
   }
