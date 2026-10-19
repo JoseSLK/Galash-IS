@@ -1,0 +1,20 @@
+:host { display: block; width: 100%; min-width: 0; }
+.graph { position: relative; width: 100%; height: 360px; isolation: isolate; touch-action: pan-y; }
+svg { display: block; width: 100%; height: 360px; overflow: hidden; }
+.orbits circle { fill: none; stroke: #9be8b8; stroke-opacity: .15; stroke-width: 1; stroke-dasharray: 2 6; }.orbits .inner { stroke-opacity: .25; }
+.link { stroke: #9be8b8; stroke-opacity: .35; stroke-width: 1; transition: stroke-opacity 150ms, opacity 400ms; }.link.highlight { stroke-opacity: 1; }
+.central circle { fill: #0b2b33; stroke: #9be8b8; stroke-width: 2.5; }.central text { fill: #fff; font: 700 18px 'Signika Negative', sans-serif; }
+.satellite { cursor: grab; outline: none; touch-action: none; transition: opacity 400ms; }.satellite:active { cursor: grabbing; }
+.node-visual { transform: scale(1); transition: transform 180ms; }.node-visual.active { transform: scale(1.15); }
+.node-circle { fill: #0f2433; stroke: #9be8b8; stroke-width: 1.5; }.yellow-dot { fill: #f5c518; }.hit-area { fill: transparent; stroke: none; }
+.node-label { fill: #daddf0; font: 600 13px 'Open Sans', sans-serif; pointer-events: none; }.compact .node-label { font-size: 12px; }
+.satellite:focus-visible .node-circle { stroke: #f5c518; stroke-width: 2.5; }
+.arriving .satellite { transition: transform 400ms ease-out, opacity 400ms; }.arriving .node-visual { transition-duration: 400ms; }
+.arriving .link { transition: transform 400ms ease-out, opacity 400ms, stroke-opacity 150ms; }.enter .link { transform: scale(0); }
+.exit .satellite { opacity: 0; }.exit .node-visual, .enter .node-visual { transform: scale(0); transition-duration: 400ms; }.exit .link, .enter .satellite, .enter .link { opacity: 0; }
+.tooltip { position: absolute; z-index: 3; box-sizing: border-box; padding: 14px; border: 1px solid #9be8b859; border-radius: 12px; background: #0f2433; color: #daddf0; pointer-events: none; font: 12px/1.5 'Open Sans', sans-serif; }.tooltip strong { color: #9be8b8; }.tooltip p { margin: 6px 0 0; }
+.reduced *, .reduced svg { transition: none !important; }
+@media (max-width: 480px) { .orbits { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.draggable-center { cursor: grab; touch-action: none; }.draggable-center:active { cursor: grabbing; }.draggable-center text { pointer-events: none; }

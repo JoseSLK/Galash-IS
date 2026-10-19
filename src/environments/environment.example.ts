@@ -1,6 +1,7 @@
 import { FirebaseOptions } from 'firebase/app';
 
-export const environment: { firebase: FirebaseOptions } = {
+export const environment: { firebase: FirebaseOptions; apiBaseUrl: string } = {
+  apiBaseUrl: '/api',
   firebase: {
     apiKey: 'YOUR_FIREBASE_API_KEY',
     authDomain: 'YOUR_FIREBASE_AUTH_DOMAIN',
