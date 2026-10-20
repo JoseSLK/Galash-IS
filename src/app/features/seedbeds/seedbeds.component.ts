@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KnowledgeGraphComponent, KnowledgeGraphData } from '../../shared/components/knowledge-graph/knowledge-graph.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
@@ -13,6 +15,9 @@ import { SiteFooterComponent } from '../../shared/components/site-footer/site-fo
 export class SeedbedsComponent {
   readonly seedbeds = ['RA', 'IA', 'Ciberseguridad'] as const;
   selectedSeedbed: typeof this.seedbeds[number] = 'Ciberseguridad';
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly seedbedIds = { RA: 'ra', IA: 'ia', Ciberseguridad: 'ciberseguridad' } as const;
   readonly knowledgeGraphs: Record<typeof this.seedbeds[number], KnowledgeGraphData> = {
     RA: { name: 'Realidad aumentada', abbreviation: 'RA', nodes: ['Experiencias', 'Entorno', 'Personas', 'Interacción'].map(title => ({ title, phrase: '[Texto de ejemplo]' })) },
     IA: { name: 'Inteligencia artificial', abbreviation: 'IA', nodes: ['Modelos', 'Datos', 'Personas', 'Aprendizaje'].map(title => ({ title, phrase: '[Texto de ejemplo]' })) },
@@ -98,7 +103,27 @@ export class SeedbedsComponent {
   get members() { return this.currentContent.members; }
   get events() { return this.currentContent.events; }
   get projects() { return this.currentContent.projects; }
+  get teamLink(): string {
+    return this.router.createUrlTree([], { relativeTo: this.route, queryParamsHandling: 'preserve', fragment: 'equipo' }).toString();
+  }
+  scrollToTeam(event: MouseEvent): void {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    document.getElementById('equipo')?.scrollIntoView({
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'start'
+    });
+  }
+  constructor() {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => {
+      const selected = this.seedbeds.find(seedbed => this.seedbedIds[seedbed] === params.get('id'));
+      this.applySelection(selected ?? 'Ciberseguridad');
+    });
+  }
   selectSeedbed(seedbed: typeof this.seedbeds[number]): void {
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { id: this.seedbedIds[seedbed] }, queryParamsHandling: 'merge' });
+  }
+  private applySelection(seedbed: typeof this.seedbeds[number]): void {
     this.selectedSeedbed = seedbed;
     this.memberOffset = 0;
     this.selectedStatus = 'Activos';

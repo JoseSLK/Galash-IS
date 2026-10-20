@@ -12,12 +12,12 @@
         <h1 id="seedbed-title">Semillero de <span>{{ selectedSeedbed }}</span></h1>
         <p class="overview-description">{{ currentContent.description }}</p>
         <p class="temporary">Información temporal de ejemplo</p>
-        <div class="overview-actions"><a class="join-action" href="/#unete">Quiero unirme</a><a class="members-action" href="/semilleros#equipo">Conocer integrantes</a></div>
+        <div class="overview-actions"><a class="join-action" href="/#unete">Quiero unirme</a><a class="members-action" [attr.href]="teamLink" (click)="scrollToTeam($event)">Conocer integrantes</a></div>
       </div>
       <app-knowledge-graph [data]="knowledgeGraphs[selectedSeedbed]" />
     </section>
     <section id="equipo" class="team-section" aria-labelledby="members-title">
-      <div class="team-heading"><h2 id="members-title">Equipo del semillero</h2><a href="/semilleros#equipo">Ver todos →</a></div>
+      <div class="team-heading"><h2 id="members-title">Equipo del semillero</h2><a [attr.href]="teamLink" (click)="scrollToTeam($event)">Ver todos →</a></div>
       <div class="team-grid">
         <article class="team-coordinator"><div class="coordinator-avatar" aria-hidden="true">CO</div><div><p class="team-eyebrow">Coordinación</p><h3>{{ currentContent.coordinator }}</h3><p class="coordinator-focus">{{ currentContent.focus }}</p><span class="coordinator-profile">Perfil CvLAC pendiente</span></div></article>
                 <div class="team-carousel" aria-label="Integrantes del semillero">

@@ -22,7 +22,7 @@ export const mosaicContent = { memberCount: '00' };
 
 export const seedbeds: Seedbed[] = [
   {
-    id: 'software',
+    id: 'ra',
     label: '[Semillero 1]',
     title: '[Nombre del semillero 1]',
     phrase: 'Construye, prueba y vuelve a preguntar.',
@@ -31,7 +31,7 @@ export const seedbeds: Seedbed[] = [
     captureLabel: '[Captura del semillero 1]'
   },
   {
-    id: 'data',
+    id: 'ia',
     label: '[Semillero 2]',
     title: '[Nombre del semillero 2]',
     phrase: 'Convierte datos en nuevas posibilidades.',
@@ -40,7 +40,7 @@ export const seedbeds: Seedbed[] = [
     captureLabel: '[Captura del semillero 2]'
   },
   {
-    id: 'hardware',
+    id: 'ciberseguridad',
     label: '[Semillero 3]',
     title: '[Nombre del semillero 3]',
     phrase: 'Experimenta con las manos y la mirada.',

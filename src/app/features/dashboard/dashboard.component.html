@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [attr.href]="headerOnly ? '/semilleros#contenido' : '#contenido'">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? '/semilleros' : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
@@ -109,7 +109,7 @@
         }
       </div>
       <div class="seedbed-layout">
-        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">{{ currentSeedbed.label }}</p><h3>{{ currentSeedbed.title }}</h3><p class="seedbed-phrase">{{ currentSeedbed.phrase }}</p><p>{{ currentSeedbed.description }}</p><a class="text-link" routerLink="/semilleros">Conoce el semillero →</a></article>
+        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">{{ currentSeedbed.label }}</p><h3>{{ currentSeedbed.title }}</h3><p class="seedbed-phrase">{{ currentSeedbed.phrase }}</p><p>{{ currentSeedbed.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: currentSeedbed.id }">Conoce el semillero →</a></article>
         <div class="device-stage" aria-label="Vista previa del semillero"><div class="light-beam"></div><div class="monitor"><div class="monitor-screen">{{ currentSeedbed.captureLabel }}</div><span class="monitor-stand"></span></div><div class="device-tiles"><div class="device-photo">[FOTO]</div><div class="device-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div></div></div>
          <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h3>Preguntas que abren caminos</h3><ul>@for (topic of currentSeedbed.topics; track topic) {<li><span aria-hidden="true">✓</span>{{ topic }}</li>}</ul></aside>
       </div>
