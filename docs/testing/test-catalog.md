@@ -43,16 +43,25 @@ spec name.
 
 |T ID|Domain|Test name|Purpose|Test file|Existing matrix ID(s)|
 |---|---|---|---|---|---|
+|T029|api-client|ApiService prefixes API base URL, strips leading slashes and sends credentials|Guard the shared HTTP client used by every backend call|`src/app/core/services/api.service.spec.ts`||
 
 ## End-to-end UI tests
 
 |T ID|Domain|Test name|Purpose|Test file|Existing matrix ID(s)|
 |---|---|---|---|---|---|
+|T030|public-home|public home renders main content|Smoke check of the public home on desktop, tablet and mobile with mocked backend|`e2e/home.spec.ts`|PT-NF-02|
+|T031|accessibility|public home has no WCAG 2 A/AA violations|Automated axe scan of the public home; covers only the automatable part of keyboard and screen-reader checks|`e2e/home.spec.ts`|PT-NF-06|
 
 ## Build tests
 
 |T ID|Domain|Test name|Purpose|Test file|Existing matrix ID(s)|
 |---|---|---|---|---|---|
+
+## Performance tests
+
+|T ID|Domain|Test name|Purpose|Test file|Existing matrix ID(s)|
+|---|---|---|---|---|---|
+|T032|performance|Lighthouse CI home budgets|Track production build performance, accessibility, best-practices and SEO scores|`lighthouserc.json`||
 
 ## Manual UI tests
 
