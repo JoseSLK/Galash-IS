@@ -86,6 +86,10 @@
 - Do not read `README.md`, `docs/contexto.md`, `docs/bitacora.ndjson`, source
   code, or unrelated testing files unless the testing task explicitly needs
   them.
+- Read `docs/testing/test-catalog.md` and `docs/testing/Matriz_de_pruebas_v1_1.md`
+  only when the user explicitly asks to create, add, or catalog tests. Do not
+  read them for any other task, including running existing tests. When creating
+  tests, follow the catalog workflow and filter the matrix by the relevant ID.
 
 ## Skill activation
 

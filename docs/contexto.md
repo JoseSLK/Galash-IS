@@ -22,6 +22,7 @@ GALASH-UPTC web system for academic management, research, and communication.
 - The public home now loads the supplied group photograph from `src/assets/fondo.png` through the shared `--galash-home-image` token.
 - Public home now contains three responsive screens: hero carousel, join CTA with editable mosaic, and editable seedbed tabs with footer; seedbed and mosaic copy lives in `dashboard-content.ts`.
 - Hero now uses a reusable accessible three-slide carousel with synchronized 6-second progress, pause-on-hover/focus/visibility/intersection controls, keyboard and touch navigation; the join and seedbed screens contain no robot assets.
+- Test tooling: Vitest unit tests (`npm test`), Playwright e2e with axe accessibility scans (`npm run test:e2e`), Lighthouse CI performance budgets (`npm run test:perf`), and GitHub Actions workflow `.github/workflows/tests.yml` running build and all suites on pull requests and pushes to `main`.
 - Private requirements excluded from version control.
 
 ## Conventions

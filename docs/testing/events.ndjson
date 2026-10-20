@@ -78,3 +78,14 @@
 {"v":1,"id":"T002","t":"test","area":"authentication","p":"must","name":"Angular production build succeeds with Firebase configuration loaded from local environment file"}
 {"v":1,"id":"R002","t":"run","at":"2026-09-18T21:30:57Z","build":"working-tree","by":"agent","mode":"automated"}
 {"v":1,"id":"X002","t":"result","run":"R002","test":"T002","s":"pass"}
+{"v":1,"id":"T029","t":"test","area":"api-client","p":"must","name":"ApiService prefixes API base URL, strips leading slashes and sends credentials"}
+{"v":1,"id":"T030","t":"test","area":"public-home","p":"must","name":"Public home renders main content on desktop, tablet and mobile (e2e)"}
+{"v":1,"id":"T031","t":"test","area":"accessibility","p":"must","name":"Public home has no axe WCAG 2 A/AA violations on desktop, tablet and mobile (e2e)"}
+{"v":1,"id":"T032","t":"test","area":"performance","p":"should","name":"Lighthouse CI scores production home build against warning budgets (performance 0.8, accessibility/best-practices/seo 0.9)"}
+{"v":1,"id":"E003","t":"env","browser":"Chromium 156 (Playwright 1.64)","os":"Linux","device":"desktop, Galaxy Tab S4, Pixel 7 emulation","node":"26.11.1"}
+{"v":1,"id":"R019","t":"run","at":"2026-10-20T01:33:42Z","build":"working-tree","env":"E003","by":"agent","mode":"automated"}
+{"v":1,"id":"X029","t":"result","run":"R019","test":"T029","s":"pass"}
+{"v":1,"id":"X030","t":"result","run":"R019","test":"T030","s":"pass"}
+{"v":1,"id":"X031","t":"result","run":"R019","test":"T031","s":"fail","defect":"D003"}
+{"v":1,"id":"X032","t":"result","run":"R019","test":"T032","s":"pass","note":"Assertions are warnings; performance median 0.75 is below the 0.8 target."}
+{"v":1,"id":"D003","t":"defect","test":"T031","run":"R019","sev":"medium","s":"open","name":"Home .device-photo text contrast 3.86:1 (#a3a8c6 on #1b4d6b, 9px) below WCAG AA 4.5:1"}

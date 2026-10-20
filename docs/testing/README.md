@@ -37,3 +37,26 @@ from events and must not be written manually.
 Open `dashboard/index.html`. For local file access, use **Load events.ndjson**
 or serve this directory with any static HTTP server. Dashboard has no runtime
 dependencies.
+
+## Running tests
+
+Command list per test: `comandos.md`.
+
+| Type | Tool | Command |
+|---|---|---|
+| Unit/component | Vitest via `@angular/build:unit-test` (jsdom) | `npm test` (`-- --watch=false` for a single run) |
+| End-to-end UI + accessibility | Playwright (Chromium: desktop, tablet, mobile) + `@axe-core/playwright` | `npm run test:e2e` |
+| Performance | Lighthouse CI on the production build | `npm run build && npm run test:perf` |
+| Build | Angular CLI | `npm run build` |
+
+- Unit specs live next to their source as `*.spec.ts`; e2e specs live in `e2e/`.
+- E2E tests mock the backend with `page.route()`; mocks must follow
+  `servicios.md` and the shared contract.
+- First-time setup: `npx playwright install chromium`. Lighthouse needs Chrome;
+  without a system Chrome set `CHROME_PATH` to Playwright's Chromium binary.
+- Reports: `playwright-report/` and `.lighthouseci/reports/` (both ignored by
+  git). Copy evidence worth keeping to `evidence/<run-id>/`.
+- Known defects stay visible: mark the test with `test.fail()` and the defect
+  ID; remove the mark when the defect is fixed.
+- CI: `.github/workflows/tests.yml` runs build, unit, e2e and Lighthouse on
+  every pull request and push to `main`, and uploads both reports.
