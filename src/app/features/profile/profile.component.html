@@ -1,0 +1,39 @@
+<app-dashboard #header [headerOnly]="true" activePage="perfil" />
+<div [attr.inert]="header.registrationOpen ? '' : null" [attr.aria-hidden]="header.registrationOpen ? 'true' : null">
+  <main id="contenido" class="profile-page">
+    @if (auth.sessionStatus() === 'checking') {
+      <p class="session-message" role="status">Comprobando tu sesión…</p>
+    } @else if (auth.isAuthenticated()) {
+      <div class="profile-cover" aria-hidden="true"><span class="cover-ring ring-one"></span><span class="cover-ring ring-two"></span><span class="cover-word">GALASH</span></div>
+      <div class="profile-content">
+        <section class="identity-card" aria-labelledby="profile-name">
+          <div class="profile-avatar" aria-hidden="true">{{ auth.profileInitials() }}</div>
+          <p class="eyebrow">Mi perfil · GALASH</p><span class="role-label">{{ auth.profileRole() }}</span>
+          <h1 id="profile-name">{{ auth.profileName() }}</h1><span class="identity-accent" aria-hidden="true"></span>
+          <p class="profile-email">{{ auth.profileEmail() || 'Correo no disponible' }}</p>
+          <div class="identity-bottom"><span>Sistema de información GALASH</span><span>UPTC · Seccional Sogamoso</span></div>
+        </section>
+        <div class="profile-grid">
+          <section class="information-card" aria-labelledby="personal-title">
+            <p class="eyebrow">Tu información</p><h2 id="personal-title">Datos personales</h2>
+            <dl>
+              <div><dt>Nombres</dt><dd>{{ auth.backendUser()?.name || 'No disponible' }}</dd></div>
+              <div><dt>Apellidos</dt><dd>{{ auth.backendUser()?.last_name || 'No disponible' }}</dd></div>
+              <div class="full-width"><dt>Correo electrónico</dt><dd>{{ auth.profileEmail() || 'No disponible' }}</dd></div>
+              <div><dt>Tipo de documento</dt><dd>{{ auth.backendUser()?.document_type || 'No disponible' }}</dd></div>
+              <div><dt>Número de documento</dt><dd>{{ auth.backendUser()?.document_number || 'No disponible' }}</dd></div>
+            </dl>
+          </section>
+          <section class="information-card account-card" aria-labelledby="account-title">
+            <p class="eyebrow">Tu acceso</p><h2 id="account-title">Cuenta GALASH</h2>
+            <dl><div><dt>Rol en la plataforma</dt><dd>{{ auth.profileRole() }}</dd></div><div><dt>Estado de la cuenta</dt><dd>{{ accountStatus() }}</dd></div><div><dt>Sesión</dt><dd class="session-active"><span aria-hidden="true"></span>Iniciada</dd></div></dl>
+            <p class="account-note">Tu rol determina las funciones autorizadas dentro de GALASH.</p>
+          </section>
+        </div>
+      </div>
+    } @else {
+      <div class="session-message" role="alert"><h1>No pudimos comprobar tu sesión</h1><p>Vuelve a iniciar sesión desde el menú para consultar tu perfil.</p></div>
+    }
+  </main>
+  <app-site-footer />
+</div>
