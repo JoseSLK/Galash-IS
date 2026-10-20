@@ -1,0 +1,39 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # environment.ts is gitignored; placeholder Firebase config is enough because tests mock the backend.
+      - run: cp src/environments/environment.example.ts src/environments/environment.ts
+      - name: Build
+        run: npm run build
+      - name: Unit tests
+        run: npm test -- --watch=false
+      - run: npx playwright install --with-deps chromium
+      - name: E2E tests
+        run: npm run test:e2e
+      - name: Performance (Lighthouse CI)
+        run: npm run test:perf
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: test-reports
+          path: |
+            playwright-report/
+            .lighthouseci/reports/
+          retention-days: 14

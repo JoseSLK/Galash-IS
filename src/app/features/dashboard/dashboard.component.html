@@ -1,26 +1,125 @@
-<main class="dashboard-page">
-  <header class="dashboard-header">
-    <a class="brand" routerLink="/" aria-label="Ir al inicio">GALASH · UPTC</a>
-
-    @if (authService.currentUser(); as user) {
-      <div class="profile" aria-label="Usuario autenticado">
-        <span class="profile-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" role="img">
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M4 21c.8-4 3.4-6 8-6s7.2 2 8 6"></path>
-          </svg>
-        </span>
-        <span class="profile-name">{{ user.displayName || user.email || 'Usuario' }}</span>
-        <button class="logout-button" type="button" (click)="logout()">Cerrar sesión</button>
+<div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
+  <a class="skip-link" [routerLink]="headerOnly ? '/semilleros' : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
+    <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
+      <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
+    </a>
+    <nav class="site-nav" aria-label="Principal">
+      <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
+      <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
+      <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
+    </nav>
+    <div class="header-actions">
+      <div #authMenu class="auth-menu">
+        <button #authMenuTrigger id="header-auth-button" class="button auth-trigger" type="button"
+          [attr.aria-expanded]="authMenuOpen" aria-controls="header-auth-dropdown"
+          [disabled]="authService.sessionStatus() === 'checking' || authLoading"
+          (click)="toggleAuthMenu()">
+          {{ authService.sessionStatus() === 'checking' ? 'Comprobando sesión…' : authService.isAuthenticated() ? 'Mi cuenta' : 'Iniciar sesión' }}
+        </button>
+        @if (authMenuOpen) {
+          <div id="header-auth-dropdown" class="auth-dropdown" aria-label="Opciones de acceso">
+            @if (authService.sessionStatus() === 'checking') {
+              <p class="auth-status" role="status">Comprobando la sesión…</p>
+            } @else if (authService.isAuthenticated()) {
+              <p class="auth-status">Sesión iniciada</p>
+              <button class="dropdown-action" type="button" [disabled]="authLoading" (click)="logout()">
+                {{ authLoading ? 'Cerrando…' : 'Cerrar sesión' }}
+              </button>
+            } @else {
+              <button class="google-login" type="button"
+                [disabled]="authLoading || authService.sessionStatus() === 'checking'" (click)="continueWithGoogle()">
+                <span class="google-mark" aria-hidden="true">G</span>
+                {{ authLoading ? 'Conectando…' : 'Iniciar sesión con Google' }}
+              </button>
+              @if (authErrorMessage) {
+                <p class="auth-error" role="alert">{{ authErrorMessage }}</p>
+              }
+            }
+          </div>
+        }
       </div>
-    } @else {
-      <a class="login-link" routerLink="/login">Iniciar sesión</a>
-    }
+    </div>
+    <button #menuToggle class="menu-toggle" type="button" [attr.aria-expanded]="menuOpen" aria-controls="site-navigation" [attr.aria-label]="menuOpen ? 'Cerrar menú' : 'Abrir menú'" (click)="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
   </header>
+  <nav #mobileNav id="site-navigation" class="mobile-nav" aria-label="Menú móvil">
+    <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
+    <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
+    <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
+  </nav>
 
-  <section class="dashboard-content" aria-labelledby="dashboard-title">
-    <p class="eyebrow">PLATAFORMA ACADÉMICA</p>
-    <h1 id="dashboard-title">Bienvenido a GALASH</h1>
-    <p>Un espacio para gestionar actividades, proyectos y oportunidades académicas.</p>
-  </section>
-</main>
+  @if (!headerOnly) {
+  <main id="contenido">
+    <section #hero id="nosotros" class="hero-section" role="region" aria-roledescription="carousel" aria-label="Presentación del grupo" [attr.aria-live]="carouselLive" tabindex="0" (focusin)="onCarouselFocusIn()" (focusout)="onCarouselFocusOut($event)" (keydown)="onHeroKeydown($event)" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+      @for (slide of heroSlides; track slide.title; let i = $index) {
+        <article class="hero-slide" role="group" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' de ' + heroSlides.length" [class.hero-slide--active]="i === activeSlide" [style.background-image]="slide.image ? 'url(' + slide.image + ')' : null" [attr.aria-hidden]="i !== activeSlide">
+          <div class="hero-copy">
+            <p class="eyebrow">{{ slide.eyebrow }}</p>
+            <h1>{{ slide.title }}</h1>
+            <p class="hero-description">{{ slide.description }}</p>
+            <p class="scroll-hint">Desliza ↓</p>
+          </div>
+        </article>
+      }
+      <div class="hero-controls" aria-label="Controles del carrusel">
+        <span class="hero-count">{{ slideCounter }} / 03</span>
+        <div class="hero-progress" role="tablist" aria-label="Diapositivas">
+          @for (slide of heroSlides; track slide.title; let i = $index) {
+            <button type="button" role="tab" [attr.aria-selected]="i === activeSlide" [attr.aria-label]="'Ir a la diapositiva ' + (i + 1)" (click)="selectSlide(i)"><span [class.is-active]="i === activeSlide" [class.is-complete]="i < activeSlide" [style.width.%]="i < activeSlide ? 100 : i === activeSlide ? carouselProgress * 100 : 0"></span></button>
+          }
+        </div>
+        <button class="arrow-button" type="button" aria-label="Diapositiva anterior" (click)="previousSlide()">←</button>
+        <button class="arrow-button" type="button" aria-label="Diapositiva siguiente" (click)="nextSlide()">→</button>
+        <button class="arrow-button pause-button" type="button" [attr.aria-label]="carouselPaused ? 'Reproducir carrusel' : 'Pausar carrusel'" (click)="toggleCarousel()">{{ carouselPaused ? '▶' : 'Ⅱ' }}</button>
+      </div>
+      @for (slide of heroSlides; track slide.title; let i = $index) { @if (slide.image) { <img class="carousel-preload" [src]="slide.image" [attr.loading]="i < 2 ? 'eager' : 'lazy'" alt="" aria-hidden="true"> } }
+    </section>
+
+    <section id="unete" class="join-section" aria-labelledby="join-title">
+      <div class="section-copy">
+        <p class="eyebrow">Convocatoria abierta</p>
+        <h2 id="join-title">¿Tienes una pregunta por resolver? <em>Únete a GALASH</em></h2>
+        <p>Encuentra una comunidad para investigar, aprender y convertir tus preguntas en proyectos con sentido.</p>
+        <div class="button-row"><a class="button button--primary" href="#semilleros">Explorar semilleros</a><a class="button button--outline" href="mailto:galash@uptc.edu.co">Escríbenos</a></div>
+      </div>
+      <div class="mosaic-stage" aria-label="Mosaico informativo de GALASH">
+        <div class="mosaic-halo" aria-hidden="true"></div>
+        <div class="mosaic-grid">
+          <div class="mosaic-tile mosaic-photo mosaic-photo--large">[FOTO DEL SEMILLERO]</div>
+          <div class="mosaic-tile mosaic-question" aria-hidden="true">?</div>
+          <div class="mosaic-tile mosaic-photo mosaic-photo--small">[FOTO]</div>
+          <div class="mosaic-tile mosaic-counter"><strong>{{ mosaicContent.memberCount }}</strong><span>INTEGRANTES</span></div>
+          <div class="mosaic-tile mosaic-message">¡Te estamos esperando!</div>
+          <div class="mosaic-tile mosaic-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="semilleros" class="seedbeds-section" aria-label="Semilleros">
+      <div class="section-heading"><p class="eyebrow">Explora nuestra comunidad</p></div>
+      <div class="seedbed-tabs" role="tablist" aria-label="Semilleros disponibles">
+        @for (seedbed of seedbeds; track seedbed.id; let i = $index) {
+          <button type="button" role="tab" [attr.aria-selected]="i === activeSeedbed" [class.is-active]="i === activeSeedbed" (click)="selectSeedbed(i)"><span aria-hidden="true">✦</span>{{ seedbed.label }}</button>
+        }
+      </div>
+      <div class="seedbed-layout">
+        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">{{ currentSeedbed.label }}</p><h3>{{ currentSeedbed.title }}</h3><p class="seedbed-phrase">{{ currentSeedbed.phrase }}</p><p>{{ currentSeedbed.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: currentSeedbed.id }">Conoce el semillero →</a></article>
+        <div class="device-stage" aria-label="Vista previa del semillero"><div class="light-beam"></div><div class="monitor"><div class="monitor-screen">{{ currentSeedbed.captureLabel }}</div><span class="monitor-stand"></span></div><div class="device-tiles"><div class="device-photo">[FOTO]</div><div class="device-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div></div></div>
+         <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h3>Preguntas que abren caminos</h3><ul>@for (topic of currentSeedbed.topics; track topic) {<li><span aria-hidden="true">✓</span>{{ topic }}</li>}</ul></aside>
+      </div>
+    </section>
+  </main>
+
+  <app-site-footer id="noticias" class="site-footer-anchor" />
+  }
+</div>
+
+@if (registrationOpen) {
+  <app-register (completed)="onRegistrationComplete()" (cancelled)="cancelGoogleRegistration()" />
+}

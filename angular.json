@@ -27,7 +27,8 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": { "builder": "@angular-devkit/build-angular:dev-server", "options": { "proxyConfig": "proxy.conf.json" }, "configurations": { "production": { "buildTarget": "src:build:production" }, "development": { "buildTarget": "src:build:development" } }, "defaultConfiguration": "development" }
+        "serve": { "builder": "@angular-devkit/build-angular:dev-server", "options": { "proxyConfig": "proxy.conf.json" }, "configurations": { "production": { "buildTarget": "src:build:production" }, "development": { "buildTarget": "src:build:development" } }, "defaultConfiguration": "development" },
+        "test": { "builder": "@angular/build:unit-test", "options": { "buildTarget": "src:build:development", "tsConfig": "tsconfig.spec.json", "runner": "vitest" } }
       }
     }
   },

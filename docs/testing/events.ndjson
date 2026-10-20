@@ -4,6 +4,74 @@
 {"v":1,"id":"T002","t":"test","area":"authentication","p":"must","name":"Registration frontend emits safe correlated diagnostic logs"}
 {"v":1,"id":"R002","t":"run","at":"2026-09-18T22:17:43Z","build":"working-tree","by":"agent","mode":"automated"}
 {"v":1,"id":"X002","t":"result","run":"R002","test":"T002","s":"pass"}
+{"v":1,"id":"T017","t":"test","area":"api","p":"must","name":"Angular /api proxy reaches GET /health"}
+{"v":1,"id":"T018","t":"test","area":"auth","p":"must","name":"POST /auth/register rejects a request without a Firebase ID token with 401"}
+{"v":1,"id":"T019","t":"test","area":"auth","p":"must","name":"POST /auth/sessions route exists and rejects missing credentials rather than returning 404"}
+{"v":1,"id":"T020","t":"test","area":"auth","p":"must","name":"GET /users/me route exists and requires a session cookie"}
+{"v":1,"id":"T021","t":"test","area":"auth","p":"must","name":"DELETE /auth/sessions/current route exists and requires a session"}
+{"v":1,"id":"T022","t":"test","area":"api","p":"must","name":"Public members search responds to a non-empty query"}
+{"v":1,"id":"T023","t":"test","area":"cors","p":"must","name":"CORS preflight allows local frontend origin, methods, and auth headers"}
+{"v":1,"id":"T024","t":"test","area":"cors","p":"must","name":"Cross-origin session responses allow credentialed cookies"}
+{"v":1,"id":"T025","t":"test","area":"cors","p":"must","name":"CORS rejects an unlisted origin"}
+{"v":1,"id":"T026","t":"test","area":"auth","p":"must","name":"A registered Google user receives a backend session cookie"}
+{"v":1,"id":"T027","t":"test","area":"auth","p":"must","name":"New-user registration completes before backend session creation"}
+{"v":1,"id":"E002","t":"env","os":"Windows","device":"Angular dev server localhost:4200 and Auth API localhost:8080 via curl"}
+{"v":1,"id":"R017","t":"run","at":"2026-10-16T21:18:25Z","build":"working-tree","env":"E002","by":"agent","mode":"manual"}
+{"v":1,"id":"X017","t":"result","run":"R017","test":"T017","s":"pass"}
+{"v":1,"id":"X018","t":"result","run":"R017","test":"T018","s":"pass"}
+{"v":1,"id":"X019","t":"result","run":"R017","test":"T019","s":"fail"}
+{"v":1,"id":"X020","t":"result","run":"R017","test":"T020","s":"fail"}
+{"v":1,"id":"X021","t":"result","run":"R017","test":"T021","s":"fail"}
+{"v":1,"id":"X022","t":"result","run":"R017","test":"T022","s":"fail"}
+{"v":1,"id":"X023","t":"result","run":"R017","test":"T023","s":"pass"}
+{"v":1,"id":"X024","t":"result","run":"R017","test":"T024","s":"fail"}
+{"v":1,"id":"X025","t":"result","run":"R017","test":"T025","s":"pass"}
+{"v":1,"id":"X026","t":"result","run":"R017","test":"T026","s":"block"}
+{"v":1,"id":"X027","t":"result","run":"R017","test":"T027","s":"block"}
+{"v":1,"id":"D001","t":"defect","test":"T019","run":"R017","sev":"high","s":"open","name":"Running API lacks session and profile routes used by frontend"}
+{"v":1,"id":"D002","t":"defect","test":"T024","run":"R017","sev":"medium","s":"open","name":"Credentialed cross-origin responses omit Access-Control-Allow-Credentials"}
+{"v":1,"id":"T028","t":"test","area":"auth","p":"must","name":"Angular production build succeeds with specific session 404 and connection error messages"}
+{"v":1,"id":"R018","t":"run","at":"2026-10-16T21:49:23Z","build":"working-tree","env":"E002","by":"agent","mode":"automated"}
+{"v":1,"id":"X028","t":"result","run":"R018","test":"T028","s":"pass"}
+{"v":1,"id":"T004","t":"test","area":"public-home","p":"must","name":"GALASH public home compiles with its responsive visual structure"}
+{"v":1,"id":"R004","t":"run","at":"2026-10-14T19:28:10Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X004","t":"result","run":"R004","test":"T004","s":"pass"}
+{"v":1,"id":"T005","t":"test","area":"authentication","p":"must","name":"Previous GALASH split-screen login compiles with authentication interactions"}
+{"v":1,"id":"R005","t":"run","at":"2026-10-14T19:36:18Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X005","t":"result","run":"R005","test":"T005","s":"pass"}
+{"v":1,"id":"T006","t":"test","area":"public-home","p":"must","name":"Corrected GALASH home composition compiles across responsive breakpoint styles"}
+{"v":1,"id":"R006","t":"run","at":"2026-10-14T19:54:28Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X006","t":"result","run":"R006","test":"T006","s":"pass"}
+{"v":1,"id":"T007","t":"test","area":"public-home","p":"must","name":"Supplied group photograph is referenced by the public home asset token"}
+{"v":1,"id":"R007","t":"run","at":"2026-10-14T20:00:00Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X007","t":"result","run":"R007","test":"T007","s":"pass"}
+{"v":1,"id":"T008","t":"test","area":"public-home","p":"must","name":"Masked decorative G compiles as clean outlined text"}
+{"v":1,"id":"R008","t":"run","at":"2026-10-14T20:10:00Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X008","t":"result","run":"R008","test":"T008","s":"pass"}
+{"v":1,"id":"T009","t":"test","area":"public-home","p":"must","name":"Desktop home menu and footer use the requested responsive viewport positions"}
+{"v":1,"id":"R009","t":"run","at":"2026-10-14T20:11:21Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X009","t":"result","run":"R009","test":"T009","s":"pass"}
+{"v":1,"id":"T010","t":"test","area":"public-home","p":"must","name":"Three-screen GALASH home builds with lazy robot chunk and accessible navigation interactions"}
+{"v":1,"id":"R010","t":"run","at":"2026-10-15T09:44:49Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X010","t":"result","run":"R010","test":"T010","s":"pass"}
+{"v":1,"id":"T011","t":"test","area":"public-home","p":"must","name":"Canvas space hero builds without carousel controls and exposes one accessible pause control"}
+{"v":1,"id":"R011","t":"run","at":"2026-10-15T09:57:00Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X011","t":"result","run":"R011","test":"T011","s":"pass"}
+{"v":1,"id":"T012","t":"test","area":"public-home","p":"must","name":"Carousel hero is restored while lazy GLTF robot remains available"}
+{"v":1,"id":"R012","t":"run","at":"2026-10-15T10:04:17Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X012","t":"result","run":"R012","test":"T012","s":"pass"}
+{"v":1,"id":"T013","t":"test","area":"public-home","p":"must","name":"Hero title stays below the header with responsive width and contrast overlays"}
+{"v":1,"id":"R013","t":"run","at":"2026-10-15T20:00:48Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X013","t":"result","run":"R013","test":"T013","s":"pass"}
+{"v":1,"id":"T014","t":"test","area":"public-home","p":"must","name":"Robot references are removed and join/seedbed mosaic tiles compile"}
+{"v":1,"id":"R014","t":"run","at":"2026-10-15T20:16:52Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X014","t":"result","run":"R014","test":"T014","s":"pass"}
+{"v":1,"id":"T015","t":"test","area":"public-home","p":"must","name":"Carousel progress and pause controls compile with accessible live semantics"}
+{"v":1,"id":"R015","t":"run","at":"2026-10-15T20:20:02Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X015","t":"result","run":"R015","test":"T015","s":"pass"}
+{"v":1,"id":"T016","t":"test","area":"public-home","p":"must","name":"Carousel completed indicators remain filled after the final progress correction"}
+{"v":1,"id":"R016","t":"run","at":"2026-10-15T20:22:14Z","build":"working-tree","by":"agent","mode":"automated"}
+{"v":1,"id":"X016","t":"result","run":"R016","test":"T016","s":"pass"}
 {"v":1,"id":"T004","t":"test","area":"authentication","p":"must","name":"Angular production build succeeds after login visual redesign"}
 {"v":1,"id":"R004","t":"run","at":"2026-09-28T02:29:10Z","build":"working-tree","by":"agent","mode":"automated"}
 {"v":1,"id":"X004","t":"result","run":"R004","test":"T004","s":"pass"}
@@ -88,3 +156,14 @@
 {"v":1,"id":"T002","t":"test","area":"authentication","p":"must","name":"Angular production build succeeds with Firebase configuration loaded from local environment file"}
 {"v":1,"id":"R002","t":"run","at":"2026-09-18T21:30:57Z","build":"working-tree","by":"agent","mode":"automated"}
 {"v":1,"id":"X002","t":"result","run":"R002","test":"T002","s":"pass"}
+{"v":1,"id":"T029","t":"test","area":"api-client","p":"must","name":"ApiService prefixes API base URL, strips leading slashes and sends credentials"}
+{"v":1,"id":"T030","t":"test","area":"public-home","p":"must","name":"Public home renders main content on desktop, tablet and mobile (e2e)"}
+{"v":1,"id":"T031","t":"test","area":"accessibility","p":"must","name":"Public home has no axe WCAG 2 A/AA violations on desktop, tablet and mobile (e2e)"}
+{"v":1,"id":"T032","t":"test","area":"performance","p":"should","name":"Lighthouse CI scores production home build against warning budgets (performance 0.8, accessibility/best-practices/seo 0.9)"}
+{"v":1,"id":"E003","t":"env","browser":"Chromium 156 (Playwright 1.64)","os":"Linux","device":"desktop, Galaxy Tab S4, Pixel 7 emulation","node":"26.11.1"}
+{"v":1,"id":"R019","t":"run","at":"2026-10-20T01:33:42Z","build":"working-tree","env":"E003","by":"agent","mode":"automated"}
+{"v":1,"id":"X029","t":"result","run":"R019","test":"T029","s":"pass"}
+{"v":1,"id":"X030","t":"result","run":"R019","test":"T030","s":"pass"}
+{"v":1,"id":"X031","t":"result","run":"R019","test":"T031","s":"fail","defect":"D003"}
+{"v":1,"id":"X032","t":"result","run":"R019","test":"T032","s":"pass","note":"Assertions are warnings; performance median 0.75 is below the 0.8 target."}
+{"v":1,"id":"D003","t":"defect","test":"T031","run":"R019","sev":"medium","s":"open","name":"Home .device-photo text contrast 3.86:1 (#a3a8c6 on #1b4d6b, 9px) below WCAG AA 4.5:1"}
