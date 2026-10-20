@@ -4,7 +4,6 @@
     @if (auth.sessionStatus() === 'checking') {
       <p class="session-message" role="status">Comprobando tu sesión…</p>
     } @else if (auth.isAuthenticated()) {
-      <div class="profile-cover" aria-hidden="true"><span class="cover-ring ring-one"></span><span class="cover-ring ring-two"></span><span class="cover-word">GALASH</span></div>
       <div class="profile-content">
         <section class="identity-card" aria-labelledby="profile-name">
           <div class="profile-avatar" aria-hidden="true">{{ auth.profileInitials() }}</div>
