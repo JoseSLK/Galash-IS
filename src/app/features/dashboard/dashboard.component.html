@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? '/semilleros' : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'unete' ? '/unete' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
@@ -7,7 +7,7 @@
     <nav class="site-nav" aria-label="Principal">
       <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
-      <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+      <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     </nav>
@@ -49,7 +49,7 @@
   <nav #mobileNav id="site-navigation" class="mobile-nav" aria-label="Menú móvil">
     <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
-    <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+    <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
   </nav>
