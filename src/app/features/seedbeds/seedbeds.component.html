@@ -12,7 +12,7 @@
         <h1 id="seedbed-title">Semillero de <span>{{ selectedSeedbed }}</span></h1>
         <p class="overview-description">{{ currentContent.description }}</p>
         <p class="temporary">Información temporal de ejemplo</p>
-        <div class="overview-actions"><a class="join-action" href="/#unete">Quiero unirme</a><a class="members-action" [attr.href]="teamLink" (click)="scrollToTeam($event)">Conocer integrantes</a></div>
+        <div class="overview-actions"><a class="join-action" routerLink="/unete" [queryParams]="{ id: joinSeedbedId }">Quiero unirme</a><a class="members-action" [attr.href]="teamLink" (click)="scrollToTeam($event)">Conocer integrantes</a></div>
       </div>
       <app-knowledge-graph [data]="knowledgeGraphs[selectedSeedbed]" />
     </section>
