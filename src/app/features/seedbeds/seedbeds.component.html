@@ -77,7 +77,7 @@
     </section>
   </div>
 </main>
-<app-site-footer [attr.inert]="homeHeader.registrationOpen ? '' : null" [attr.aria-hidden]="homeHeader.registrationOpen ? 'true' : null" />
+<app-site-footer [seedbedId]="joinSeedbedId" [attr.inert]="homeHeader.registrationOpen ? '' : null" [attr.aria-hidden]="homeHeader.registrationOpen ? 'true' : null" />
 
 <dialog #detailsDialog id="detalles" class="details-dialog" aria-labelledby="detail-title">
   <div class="dialog-heading"><span class="card-category">{{ selectedDetail?.kind }}</span><button type="button" aria-label="Cerrar detalles" (click)="detailsDialog.close()" autofocus>×</button></div>
