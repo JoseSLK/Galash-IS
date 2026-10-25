@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? '/semilleros' : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
@@ -7,7 +7,7 @@
     <nav class="site-nav" aria-label="Principal">
       <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
-      <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+      <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     </nav>
@@ -17,14 +17,25 @@
           [attr.aria-expanded]="authMenuOpen" aria-controls="header-auth-dropdown"
           [disabled]="authService.sessionStatus() === 'checking' || authLoading"
           (click)="toggleAuthMenu()">
-          {{ authService.sessionStatus() === 'checking' ? 'Comprobando sesión…' : authService.isAuthenticated() ? 'Mi cuenta' : 'Iniciar sesión' }}
+          @if (authService.isAuthenticated()) {
+            <span class="account-avatar" aria-hidden="true">{{ authService.profileInitials() }}</span>
+            <span class="account-name">{{ authService.profileName() }}</span>
+          } @else {
+            {{ authService.sessionStatus() === 'checking' ? 'Comprobando sesión…' : 'Iniciar sesión' }}
+          }
         </button>
         @if (authMenuOpen) {
           <div id="header-auth-dropdown" class="auth-dropdown" aria-label="Opciones de acceso">
             @if (authService.sessionStatus() === 'checking') {
               <p class="auth-status" role="status">Comprobando la sesión…</p>
             } @else if (authService.isAuthenticated()) {
-              <p class="auth-status">Sesión iniciada</p>
+                            <p class="account-caption">Sesión iniciada como</p>
+              <div class="account-summary">
+                <span class="account-avatar summary-avatar" aria-hidden="true">{{ authService.profileInitials() }}</span>
+                <div><strong>{{ authService.profileName() }}</strong><span>{{ authService.profileRole() }}</span><span class="account-email">{{ authService.profileEmail() || 'Correo no disponible' }}</span></div>
+              </div>
+              <a class="profile-menu-link" routerLink="/mi-perfil" (click)="authMenuOpen = false; closeMenu()">Mi perfil <span aria-hidden="true">↗</span></a>
+              @if (authErrorMessage) { <p class="auth-error" role="alert">{{ authErrorMessage }}</p> }
               <button class="dropdown-action" type="button" [disabled]="authLoading" (click)="logout()">
                 {{ authLoading ? 'Cerrando…' : 'Cerrar sesión' }}
               </button>
@@ -49,7 +60,7 @@
   <nav #mobileNav id="site-navigation" class="mobile-nav" aria-label="Menú móvil">
     <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
-    <a routerLink="/semilleros" [attr.aria-current]="headerOnly ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+    <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
   </nav>

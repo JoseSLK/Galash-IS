@@ -15,6 +15,7 @@ import { carouselConfig, heroSlides, seedbeds, Seedbed, mosaicContent } from './
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
   @Input() headerOnly = false;
+  @Input() activePage = 'semilleros';
   @ViewChild('mobileNav') private mobileNav?: ElementRef<HTMLElement>;
   @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;

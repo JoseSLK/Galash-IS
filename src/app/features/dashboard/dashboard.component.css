@@ -103,3 +103,13 @@ h3 { font-size: clamp(1.4rem, 2.4vw, 2.8rem); }
 .header-actions .auth-trigger:hover:not(:disabled), .header-actions .auth-trigger[aria-expanded='true'] { background: #9be8b8; border-color: #9be8b8; color: #0a1420; }
 .header-actions .auth-trigger:focus-visible { outline: 2px solid #f5c518; outline-offset: 4px; }
 @media (max-width: 480px) { .header-actions .auth-trigger { min-width: 112px; min-height: 36px; padding-inline: 12px; font-size: 11px; } }
+/* GSW-145: authenticated account menu. */
+.auth-dropdown { width: min(350px, calc(100vw - 32px)); padding: 18px; gap: 12px; border-color: #9be8b833; border-radius: 16px; background: #102332; box-shadow: 0 20px 45px #0005; }
+.header-actions .auth-trigger:has(.account-avatar) { max-width: 250px; gap: 10px; padding: 0 8px 0 0; border-color: transparent; background: transparent; color: #fff; }
+.header-actions .auth-trigger:has(.account-avatar):hover, .header-actions .auth-trigger:has(.account-avatar)[aria-expanded='true'] { color: #9be8b8; background: transparent; }
+.account-avatar { display: inline-grid; flex-shrink: 0; place-items: center; width: 36px; height: 36px; border: 1px solid #9be8b866; border-radius: 50%; background: #0b2b33; color: #f5c518; font: 700 15px var(--fuente-titulo); }
+.account-name { display: block; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.account-caption { margin: 0; color: #8da6b5; font-size: 12px; }
+.account-summary { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #9be8b873; border-radius: 12px; background: #15353c; }.summary-avatar { width: 58px; height: 58px; font-size: 20px; }.account-summary > div { display: grid; gap: 5px; min-width: 0; }.account-summary strong { font: 700 21px/1.15 var(--fuente-titulo); overflow-wrap: anywhere; }.account-summary span:not(.account-avatar) { color: #c3ccd4; font-size: 12px; overflow-wrap: anywhere; }.account-summary .account-email { font-size: 11px; color: #8da6b5; }
+.profile-menu-link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 8px; color: #9be8b8; font-size: 14px; font-weight: 600; text-decoration: none; }.profile-menu-link:hover { background: #9be8b80c; }
+.auth-dropdown .dropdown-action { border: 1px solid #9be8b826; border-radius: 8px; background: #1c3545; color: #fff; }.auth-dropdown .dropdown-action:hover:not(:disabled) { background: #264858; }
+@media (max-width: 480px) { .header-actions .auth-trigger:has(.account-avatar) { min-width: 0; }.account-name { max-width: 90px; font-size: 11px; }.auth-dropdown { padding: 14px; }.account-summary { padding: 12px; gap: 10px; } }
