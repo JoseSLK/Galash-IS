@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   GoogleAuthProvider,
   User,
@@ -26,6 +26,9 @@ export interface SessionUser {
   last_name?: string;
   role?: string;
   status?: string;
+  email?: string;
+  document_type?: string;
+  document_number?: string;
 }
 
 interface BackendUser extends SessionUser {
@@ -61,6 +64,19 @@ export class AuthService {
   readonly backendUser = signal<SessionUser | null>(null);
   readonly isAuthenticated = signal(false);
   readonly sessionStatus = signal<BackendSessionStatus>('checking');
+  readonly profileName = computed(() => {
+    if (!this.isAuthenticated()) return '';
+    const user = this.backendUser();
+    return [user?.name, user?.last_name].filter(Boolean).join(' ').trim() || this.currentUser()?.displayName || 'Mi cuenta';
+  });
+  readonly profileEmail = computed(() => this.isAuthenticated() ? this.backendUser()?.email || this.currentUser()?.email || '' : '');
+  readonly profileInitials = computed(() => this.profileName().split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase());
+  readonly profileRole = computed(() => {
+    if (!this.isAuthenticated()) return '';
+    const role = this.backendUser()?.role || '';
+    const labels: Record<string, string> = { admin: 'Administrador', administrador: 'Administrador', student: 'Estudiante', estudiante: 'Estudiante', teacher: 'Docente', docente: 'Docente', professor: 'Profesor', profesor: 'Profesor', visitor: 'Visitante', visitante: 'Visitante', solicitante: 'Solicitante', coordinador: 'Coordinador' };
+    return labels[role.toLowerCase()] || role || 'Rol no disponible';
+  });
 
   constructor() {
     onAuthStateChanged(firebaseAuth, (user: User | null) => {
@@ -172,6 +188,9 @@ export class AuthService {
       name: user.name,
       last_name: user.last_name,
       role: user.role,
+      email: user.email,
+      document_type: user.document_type,
+      document_number: user.document_number,
       status: user.status
     });
     this.isAuthenticated.set(true);
