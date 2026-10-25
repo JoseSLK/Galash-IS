@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import { firebaseAuth } from '../config/firebase.config';
 import { ApiService } from './api.service';
+import { parseUserRole, USER_ROLES, UserRole } from '../models/role.model';
 
 export type BackendSessionStatus = 'checking' | 'authenticated' | 'anonymous' | 'expired' | 'unavailable';
 
@@ -64,6 +65,13 @@ export class AuthService {
   readonly backendUser = signal<SessionUser | null>(null);
   readonly isAuthenticated = signal(false);
   readonly sessionStatus = signal<BackendSessionStatus>('checking');
+  readonly effectiveRole = computed(() => this.isAuthenticated() && this.sessionStatus() === 'authenticated'
+    ? parseUserRole(this.backendUser()?.role) : null);
+  readonly isAdmin = computed(() => this.hasRole('admin'));
+
+  hasRole(role: UserRole): boolean {
+    return this.effectiveRole() === role;
+  }
   readonly profileName = computed(() => {
     if (!this.isAuthenticated()) return '';
     const user = this.backendUser();
@@ -73,9 +81,7 @@ export class AuthService {
   readonly profileInitials = computed(() => this.profileName().split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase());
   readonly profileRole = computed(() => {
     if (!this.isAuthenticated()) return '';
-    const role = this.backendUser()?.role || '';
-    const labels: Record<string, string> = { admin: 'Administrador', administrador: 'Administrador', student: 'Estudiante', estudiante: 'Estudiante', teacher: 'Docente', docente: 'Docente', professor: 'Profesor', profesor: 'Profesor', visitor: 'Visitante', visitante: 'Visitante', solicitante: 'Solicitante', coordinador: 'Coordinador' };
-    return labels[role.toLowerCase()] || role || 'Rol no disponible';
+    return USER_ROLES.find(role => role.id === this.effectiveRole())?.label || 'Rol no disponible';
   });
 
   constructor() {

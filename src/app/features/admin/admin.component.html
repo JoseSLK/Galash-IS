@@ -1,0 +1,21 @@
+<app-dashboard #header [headerOnly]="true" activePage="admin" />
+<div [inert]="header.registrationOpen">
+  <main id="contenido" class="admin-page">
+    @if (auth.isAdmin()) {
+      <p class="eyebrow">GALASH · ADMINISTRACIÓN</p>
+      <h1>Acceso administrativo</h1>
+      <section aria-labelledby="identity-title">
+        <h2 id="identity-title">Tu identidad en GALASH</h2>
+        <dl>
+          <div><dt>Usuario</dt><dd>{{ auth.profileName() }}</dd></div>
+          <div><dt>Rol</dt><dd>{{ auth.profileRole() }}</dd></div>
+        </dl>
+        <p>La gestión de usuarios y permisos todavía no está disponible.</p>
+        <a routerLink="/mi-perfil">Ver mi perfil →</a>
+      </section>
+    } @else {
+      <p role="status">Comprobando acceso administrativo…</p>
+    }
+  </main>
+  <app-site-footer />
+</div>
