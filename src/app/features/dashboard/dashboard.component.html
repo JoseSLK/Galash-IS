@@ -2,7 +2,7 @@
   <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
-      <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>
+      <span>GALASH</span>
     </a>
     <nav class="site-nav" aria-label="Principal">
       <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
@@ -70,29 +70,22 @@
 
   @if (!headerOnly) {
   <main id="contenido">
-    <section #hero id="nosotros" class="hero-section" role="region" aria-roledescription="carousel" aria-label="Presentación del grupo" [attr.aria-live]="carouselLive" tabindex="0" (focusin)="onCarouselFocusIn()" (focusout)="onCarouselFocusOut($event)" (keydown)="onHeroKeydown($event)" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
-      @for (slide of heroSlides; track slide.title; let i = $index) {
-        <article class="hero-slide" role="group" aria-roledescription="slide" [attr.aria-label]="(i + 1) + ' de ' + heroSlides.length" [class.hero-slide--active]="i === activeSlide" [style.background-image]="slide.image ? 'url(' + slide.image + ')' : null" [attr.aria-hidden]="i !== activeSlide">
-          <div class="hero-copy">
-            <p class="eyebrow">{{ slide.eyebrow }}</p>
-            <h1>{{ slide.title }}</h1>
-            <p class="hero-description">{{ slide.description }}</p>
-            <p class="scroll-hint">Desliza ↓</p>
-          </div>
-        </article>
-      }
-      <div class="hero-controls" aria-label="Controles del carrusel">
-        <span class="hero-count">{{ slideCounter }} / 03</span>
-        <div class="hero-progress" role="tablist" aria-label="Diapositivas">
-          @for (slide of heroSlides; track slide.title; let i = $index) {
-            <button type="button" role="tab" [attr.aria-selected]="i === activeSlide" [attr.aria-label]="'Ir a la diapositiva ' + (i + 1)" (click)="selectSlide(i)"><span [class.is-active]="i === activeSlide" [class.is-complete]="i < activeSlide" [style.width.%]="i < activeSlide ? 100 : i === activeSlide ? carouselProgress * 100 : 0"></span></button>
-          }
-        </div>
-        <button class="arrow-button" type="button" aria-label="Diapositiva anterior" (click)="previousSlide()">←</button>
-        <button class="arrow-button" type="button" aria-label="Diapositiva siguiente" (click)="nextSlide()">→</button>
-        <button class="arrow-button pause-button" type="button" [attr.aria-label]="carouselPaused ? 'Reproducir carrusel' : 'Pausar carrusel'" (click)="toggleCarousel()">{{ carouselPaused ? '▶' : 'Ⅱ' }}</button>
+    <section id="nosotros" class="hero-section" aria-labelledby="welcome-title">
+      <div class="hero-copy">
+        <p class="eyebrow">UPTC · Sogamoso</p>
+        <h1 id="welcome-title">Bienvenido a <span>GALASH</span></h1>
+        <p class="hero-description">Grupo de investigación de la Universidad Pedagógica y Tecnológica de Colombia, seccional Sogamoso.</p>
       </div>
-      @for (slide of heroSlides; track slide.title; let i = $index) { @if (slide.image) { <img class="carousel-preload" [src]="slide.image" [attr.loading]="i < 2 ? 'eager' : 'lazy'" alt="" aria-hidden="true"> } }
+      <div class="hero-emblem">
+        <svg class="logo-filter" aria-hidden="true" focusable="false" width="0" height="0">
+          <defs>
+            <filter id="galash-white-linework" color-interpolation-filters="sRGB">
+              <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.5 0.5 0.5 0 -0.25" />
+            </filter>
+          </defs>
+        </svg>
+        <img src="/assets/galash-emblema.png" alt="Símbolo de GALASH: perfil humano con circuitos dentro de un hexágono" width="1372" height="1147" fetchpriority="high" decoding="async">
+      </div>
     </section>
 
     <section id="unete" class="join-section" aria-labelledby="join-title">
