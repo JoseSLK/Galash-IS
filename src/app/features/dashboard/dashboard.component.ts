@@ -1,10 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
-import { carouselConfig, heroSlides, seedbeds, Seedbed, mosaicContent } from './dashboard-content';
+import { seedbeds, Seedbed, mosaicContent } from './dashboard-content';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,12 +20,9 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;
   @ViewChild('authMenuTrigger') private authMenuTrigger?: ElementRef<HTMLButtonElement>;
-  private readonly changeDetector = inject(ChangeDetectorRef);
   readonly authService = inject(AuthService);
-  readonly heroSlides = heroSlides;
   readonly seedbeds = seedbeds;
   readonly mosaicContent = mosaicContent;
-  activeSlide = 0;
   activeSeedbed = 0;
   menuOpen = false;
   authMenuOpen = false;
@@ -34,19 +31,10 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   authErrorMessage = '';
   headerScrolled = false;
   headerCompact = false;
-  carouselPaused = false;
-  carouselProgress = 0;
-  carouselLive: 'off' | 'polite' = 'off';
   activeSection = 'nosotros';
-  private timerInterval = 0;
-  private timerStart = 0;
-  private elapsed = 0;
-  private focused = false;
-  private touchStartX?: number;
   private previousScrollY = 0;
 
   get currentSeedbed(): Seedbed { return this.seedbeds[this.activeSeedbed]; }
-  get slideCounter(): string { return String(this.activeSlide + 1).padStart(2, '0'); }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
@@ -60,21 +48,9 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.updateActiveSection();
-    this.updateTimerState();
   }
-  ngOnDestroy(): void { this.stopTimer(); document.body.style.overflow = ''; }
+  ngOnDestroy(): void { document.body.style.overflow = ''; }
 
-  nextSlide(): void { this.changeSlide((this.activeSlide + 1) % this.heroSlides.length); }
-  previousSlide(): void { this.changeSlide((this.activeSlide - 1 + this.heroSlides.length) % this.heroSlides.length); }
-  selectSlide(index: number): void { this.changeSlide(index); }
-  toggleCarousel(): void { this.carouselPaused = !this.carouselPaused; this.carouselLive = this.carouselPaused ? 'polite' : 'off'; this.updateTimerState(); }
-  onCarouselFocusIn(): void { this.focused = true; this.updateTimerState(); }
-  onCarouselFocusOut(event: FocusEvent): void {
-    if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) {
-      this.focused = false;
-      this.updateTimerState();
-    }
-  }
   selectSeedbed(index: number): void { this.activeSeedbed = index; }
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
@@ -151,18 +127,6 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  onTouchStart(event: TouchEvent): void { this.touchStartX = event.changedTouches[0]?.clientX; }
-  onTouchEnd(event: TouchEvent): void {
-    if (this.touchStartX === undefined) return;
-    const distance = event.changedTouches[0]?.clientX - this.touchStartX;
-    if (Math.abs(distance) > 45) distance < 0 ? this.nextSlide() : this.previousSlide();
-    this.touchStartX = undefined;
-  }
-  onHeroKeydown(event: KeyboardEvent): void { if (event.key === 'ArrowRight') this.nextSlide(); if (event.key === 'ArrowLeft') this.previousSlide(); }
-
-  @HostListener('document:visibilitychange')
-  onVisibilityChange(): void { this.updateTimerState(); }
-
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.registrationOpen) return;
@@ -180,15 +144,6 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     if (this.authMenuOpen && this.authMenu && !this.authMenu.nativeElement.contains(target)) this.authMenuOpen = false;
   }
 
-  private changeSlide(index: number): void {
-    this.activeSlide = index;
-    this.elapsed = 0;
-    this.carouselProgress = 0;
-    this.carouselLive = 'polite';
-    this.stopTimer();
-    this.updateTimerState();
-  }
-
   private updateActiveSection(): void {
     if (this.headerOnly) {
       return;
@@ -203,38 +158,4 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     if (current) this.activeSection = current.id;
   }
 
-  private advanceSlide(): void {
-    this.activeSlide = (this.activeSlide + 1) % this.heroSlides.length;
-    this.elapsed = 0;
-    this.carouselProgress = 0;
-    this.carouselLive = 'off';
-  }
-
-  private updateTimerState(): void {
-    const shouldRun = !this.headerOnly && !this.carouselPaused && !document.hidden;
-    this.carouselLive = shouldRun ? 'off' : 'polite';
-    if (shouldRun) this.startTimer(); else this.stopTimer();
-  }
-
-  private startTimer(): void {
-    if (this.timerInterval) return;
-    this.timerStart = performance.now() - this.elapsed;
-    this.timerInterval = window.setInterval(() => this.tickTimer(), 50);
-  }
-
-  private stopTimer(): void {
-    if (!this.timerInterval) return;
-    window.clearInterval(this.timerInterval);
-    this.timerInterval = 0;
-  }
-
-  private tickTimer = (): void => {
-    this.elapsed = performance.now() - this.timerStart;
-    if (this.elapsed >= carouselConfig.duration) {
-      this.advanceSlide();
-      this.timerStart = performance.now();
-    }
-    this.carouselProgress = Math.min(1, this.elapsed / carouselConfig.duration);
-    this.changeDetector.markForCheck();
-  }
 }

@@ -8,16 +8,6 @@ export interface Seedbed {
   captureLabel: string;
 }
 
-export interface HeroSlide { eyebrow: string; title: string; description: string; image: string; alt: string; }
-
-export const carouselConfig = { duration: 8000 };
-
-export const heroSlides: HeroSlide[] = [
-  { eyebrow: 'Semillero de investigación', title: 'Ideas que se convierten en soluciones', description: 'Aprendemos, investigamos y construimos tecnología con propósito.', image: '/assets/fondo.png', alt: 'Integrantes del semillero GALASH reunidos' },
-  { eyebrow: 'Comunidad que aprende', title: 'Investiga lo que te mueve', description: 'Encuentra un espacio para preguntar, probar y compartir.', image: '', alt: '' },
-  { eyebrow: 'Tecnología con sentido', title: 'Tu próxima pregunta empieza aquí', description: 'Conecta con personas que quieren transformar su entorno.', image: '', alt: '' }
-];
-
 export const mosaicContent = { memberCount: '00' };
 
 export const seedbeds: Seedbed[] = [
