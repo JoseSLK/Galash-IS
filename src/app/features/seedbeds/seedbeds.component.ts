@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KnowledgeGraphComponent, KnowledgeGraphData } from '../../shared/components/knowledge-graph/knowledge-graph.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
@@ -8,7 +8,7 @@ import { SiteFooterComponent } from '../../shared/components/site-footer/site-fo
 @Component({
   selector: 'app-seedbeds',
   standalone: true,
-  imports: [DashboardComponent, SiteFooterComponent, KnowledgeGraphComponent],
+  imports: [RouterLink, DashboardComponent, SiteFooterComponent, KnowledgeGraphComponent],
   templateUrl: './seedbeds.component.html',
   styleUrl: './seedbeds.component.css'
 })
@@ -103,6 +103,7 @@ export class SeedbedsComponent {
   get members() { return this.currentContent.members; }
   get events() { return this.currentContent.events; }
   get projects() { return this.currentContent.projects; }
+  get joinSeedbedId(): string { return this.seedbedIds[this.selectedSeedbed]; }
   get teamLink(): string {
     return this.router.createUrlTree([], { relativeTo: this.route, queryParamsHandling: 'preserve', fragment: 'equipo' }).toString();
   }

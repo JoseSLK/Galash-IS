@@ -1,0 +1,49 @@
+<app-dashboard #header [headerOnly]="true" activePage="unete" />
+<main id="contenido" class="join-page" [inert]="header.registrationOpen">
+  <div class="page-top"><span>ÚNETE A GALASH</span><button type="button" class="status-link" disabled aria-describedby="status-notice">¿Ya enviaste una solicitud? Consulta tu estado →</button></div>
+  <p id="status-notice" class="notice">La consulta de estado estará disponible próximamente.</p>
+  @if (receipt; as result) {
+    <section class="form-card confirmation">
+      <span class="eyebrow">SOLICITUD · DEMOSTRACIÓN</span>
+      <h1 #stepTitle tabindex="-1">Tu solicitud fue <em>radicada</em></h1>
+      <p>Este envío es simulado. Aún no se ha enviado una solicitud al grupo.</p>
+      <div class="receipt-code"><span>Código de seguimiento</span><strong>{{ result.code }}</strong><button type="button" class="secondary" (click)="copyCode()">{{ copied ? 'Copiado' : 'Copiar código' }}</button></div>
+      <p aria-live="polite">{{ copyError }}</p>
+      <dl class="receipt-details"><div><dt>Estado</dt><dd class="mint">● {{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
+      <p>Guarda este código para consultar el estado de tu solicitud.</p>
+      <div class="success-actions"><button type="button" class="secondary" disabled aria-describedby="status-notice">Consultar mi estado</button><a class="primary" routerLink="/">Volver al inicio</a></div>
+    </section>
+  } @else {
+    <section class="form-card">
+      <div class="step-top"><span class="eyebrow">PASO {{ step + 1 }} DE 4</span><span class="seedbed-chip">Semillero · {{ selectedSeedbed }}</span></div>
+      <ol class="progress" aria-label="Progreso de la solicitud">@for (section of steps; track section.label; let index = $index) {<li [class.reached]="index <= step" [class.current]="index === step" [attr.aria-current]="index === step ? 'step' : null"><span>{{ section.label }}</span></li>}</ol>
+      <div class="step-intro"><div><h1 #stepTitle tabindex="-1">{{ currentStep.title }} <em>{{ currentStep.accent }}</em></h1><p>{{ currentStep.help }}</p></div><span class="step-number" aria-hidden="true">0{{ step + 1 }}</span></div>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (step < 3) {
+          <fieldset class="fields" [disabled]="loading"><legend class="sr-only">{{ currentStep.label }}</legend>
+            @for (field of currentStep.fields; track field.key) {
+              <div class="field"><label [for]="'request-' + field.key">{{ field.label }} @if (!field.optional) {<span class="required" aria-hidden="true">*</span>} @else {<span class="optional">(opcional)</span>}</label>
+                <div class="input-wrap" [class.invalid]="!!error(field)" [class.valid]="control(field).valid && !!control(field).value">
+                  @if (field.type === 'select') {
+                    <select [id]="'request-' + field.key" [formControlName]="field.key" [attr.aria-required]="!field.optional" [attr.aria-invalid]="!!error(field)" [attr.aria-describedby]="error(field) ? 'error-' + field.key : null">@if (!field.optional) {<option value="" disabled>Selecciona una opción</option>}@for (option of field.options; track option.value) {<option [value]="option.value">{{ option.label }}</option>}</select><span class="chevron" aria-hidden="true">⌄</span>
+                  } @else {
+                    <input [id]="'request-' + field.key" [type]="field.type" [formControlName]="field.key" [attr.inputmode]="field.numeric ? 'numeric' : null" [attr.max]="field.type === 'date' ? maxDate : null" [attr.aria-required]="!field.optional" [attr.aria-invalid]="!!error(field)" [attr.aria-describedby]="error(field) ? 'error-' + field.key : null" />
+                  }
+                  @if (control(field).valid && control(field).value) {<span class="valid-check" [class.inset]="field.type === 'select' || field.type === 'date'" aria-hidden="true">✓</span>}
+                </div>
+                @if (error(field)) {<p class="error" [id]="'error-' + field.key">{{ error(field) }}</p>}
+              </div>
+            }
+          </fieldset>
+        } @else {
+          <div class="review">@for (section of steps.slice(0, 3); track section.label; let index = $index) {<section class="review-section"><div class="review-heading"><h2>{{ section.label }}</h2><button type="button" class="edit" (click)="edit(index)" [disabled]="loading" [attr.aria-label]="'Editar ' + section.label">Editar →</button></div><dl>@for (field of section.fields; track field.key) {<div><dt>{{ field.label }}</dt><dd>{{ valueLabel(field) }}</dd></div>}</dl></section>}</div>
+        }
+        @if (submitError) {<p class="error" role="alert">{{ submitError }}</p>}
+        <div class="form-actions"><div>@if (step > 0) {<button class="secondary" type="button" (click)="edit(step - 1)" [disabled]="loading">← Volver</button>}</div><div class="advance"><span class="missing" aria-live="polite">@if (step < 3) {{{ missing }} campos obligatorios por completar}</span><button type="submit" class="primary" [disabled]="loading">{{ loading ? 'Enviando…' : step === 3 ? 'Enviar solicitud' : 'Continuar →' }}</button></div></div>
+        <p class="privacy">Tus datos personales solo los verán quienes evalúan tu solicitud.</p>
+        <p class="notice">Demostración con catálogos temporales. El envío es simulado y los datos no se guardan al salir.</p>
+      </form>
+    </section>
+  }
+</main>
+<app-site-footer [inert]="header.registrationOpen" />

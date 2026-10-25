@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span class="logo-avatar" aria-hidden="true">G</span><span>GALASH</span>

@@ -20,7 +20,7 @@
     </section>
     <section class="join-panel" aria-label="Únete a GALASH">
       <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg>
-      <a href="/#unete">Quiero unirme</a>
+      <a routerLink="/unete" [queryParams]="seedbedId ? { id: seedbedId } : null">Quiero unirme</a>
     </section>
     <section class="social-panel">
       <h2>Síguenos</h2>
