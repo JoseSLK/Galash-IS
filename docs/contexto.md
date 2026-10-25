@@ -6,6 +6,10 @@ GALASH-UPTC web system for academic management, research, and communication.
 
 ## Implemented state
 
+- The admin demo section selector also opens fictional registration requests with reactive counters/filters, a centered review dialog, history and 15 form fields. Approve/reject update only memory; rejection requires a reason. Uses M3 statuses and no backend request endpoints.
+
+- A separately configured, verified test account can open `/administracion-demo`. The reusable people directory supports search, role/status/seedbed filters and pagination; its default public view hides emails and non-active accounts. The demo editor changes fictional roles/statuses only in route-scoped memory. Real Admin authorization and backend data remain unchanged; deployment must supply the ignored environment configuration. See `docs/admin-demo.md`.
+
 - Frontend role identity now uses only Visitante, Estudiante, Docente and Admin from the existing backend session `role` field. Unknown roles grant no administrative access. The account menu exposes `/administracion` only for Admin; its route waits for session restoration and the page leaves when access is lost. This is an identity/access screen, not user or permission management. The `/users/me` roles/permissions schema and role-update payload still need a backend handoff before implementing those operations; no API contract or endpoint was changed.
 
 - Versioned OpenCode configuration in `opencode.json`.
