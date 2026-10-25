@@ -3,6 +3,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, V
 import { RouterLink } from '@angular/router';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
+import { AdminDemoAccessService } from '../../core/services/admin-demo-access.service';
 import { RegisterComponent } from '../auth/register/register.component';
 import { seedbeds, Seedbed, mosaicContent } from './dashboard-content';
 
@@ -21,6 +22,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;
   @ViewChild('authMenuTrigger') private authMenuTrigger?: ElementRef<HTMLButtonElement>;
   readonly authService = inject(AuthService);
+  readonly adminDemo = inject(AdminDemoAccessService);
   readonly seedbeds = seedbeds;
   readonly mosaicContent = mosaicContent;
   activeSeedbed = 0;

@@ -1,0 +1,23 @@
+<section class="directory" aria-label="Directorio de personas">
+  <label class="search"><span aria-hidden="true">⌕</span><input type="search" [value]="query()" (input)="search($event)" [placeholder]="privateView() ? 'Buscar por nombre o correo electrónico' : 'Buscar por nombre'" [attr.aria-label]="privateView() ? 'Buscar por nombre o correo electrónico' : 'Buscar por nombre'" /></label>
+  <div class="filters" role="group" aria-label="Filtrar personas">
+    @for (item of filters(); track item.id) {<button type="button" [class.active]="filter() === item.id" [attr.aria-pressed]="filter() === item.id" (click)="chooseFilter(item.id)">{{ item.label }}</button>}
+  </div>
+  @if (seedbeds().length > 1) {
+    <label class="seedbed-filter">Semillero<select [value]="seedbed()" (change)="chooseSeedbed($event)"><option value="">Todos los semilleros</option>@for (item of seedbeds(); track item) {<option [value]="item">{{ item }}</option>}</select></label>
+  }
+  <div class="list-meta"><span aria-live="polite">{{ filtered().length }} de {{ visiblePeople().length }} personas</span><span>Orden: nombre A-Z</span></div>
+  <ul class="people-list">
+    @for (person of pagePeople(); track person.id) {
+      <li><button type="button" class="person-row" [class.selected]="selectedId() === person.id" [attr.aria-pressed]="selectedId() === person.id" (click)="selection.emit(person.id)">
+        <span class="avatar" aria-hidden="true">{{ initials(person.name) }}</span>
+        <span class="identity"><strong>{{ person.name }}</strong>@if (privateView()) {<small>{{ person.email || 'Sin correo' }}</small>}</span>
+        <span class="membership"><span>{{ roleLabel(person.role) }}</span><small>{{ person.seedbed || 'Sin asignar' }}</small></span>
+        @if (privateView()) {<span class="status" [class]="'status ' + person.status">{{ statusLabels[person.status] }}</span>}
+      </button></li>
+    } @empty {<li class="empty"><p>No hay personas con estos filtros.</p><button type="button" (click)="clear()">Limpiar filtros</button></li>}
+  </ul>
+  @if (pageCount() > 1) {
+    <nav class="pagination" aria-label="Paginación de personas"><button type="button" aria-label="Página anterior" [disabled]="currentPage() === 1" (click)="page.set(currentPage() - 1)">←</button><span aria-live="polite">{{ currentPage() }} / {{ pageCount() }}</span><button type="button" aria-label="Página siguiente" [disabled]="currentPage() === pageCount()" (click)="page.set(currentPage() + 1)">→</button></nav>
+  }
+</section>

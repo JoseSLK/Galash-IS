@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin-demo' ? '/administracion-demo' : activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span>GALASH</span>
@@ -35,6 +35,9 @@
                 <div><strong>{{ authService.profileName() }}</strong><span>{{ authService.profileRole() }}</span><span class="account-email">{{ authService.profileEmail() || 'Correo no disponible' }}</span></div>
               </div>
               <a class="profile-menu-link" routerLink="/mi-perfil" (click)="authMenuOpen = false; closeMenu()">Mi perfil <span aria-hidden="true">↗</span></a>
+              @if (adminDemo.allowed()) {
+                <a class="profile-menu-link" routerLink="/administracion-demo" (click)="authMenuOpen = false; closeMenu()">Administración demo <span aria-hidden="true">↗</span></a>
+              }
               @if (authService.isAdmin()) {
                 <a class="profile-menu-link" routerLink="/administracion" (click)="authMenuOpen = false; closeMenu()">Administración <span aria-hidden="true">↗</span></a>
               }

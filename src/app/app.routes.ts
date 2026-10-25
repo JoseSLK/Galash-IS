@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { profileGuard } from './core/guards/profile.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { adminDemoGuard } from './core/guards/admin-demo.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', component: DashboardComponent },
@@ -9,5 +10,6 @@ export const routes: Routes = [
   { path: 'unete', loadComponent: () => import('./features/join-request/join-request.component').then(module => module.JoinRequestComponent) },
   { path: 'mi-perfil', canActivate: [profileGuard], loadComponent: () => import('./features/profile/profile.component').then(module => module.ProfileComponent) },
   { path: 'administracion', canActivate: [adminGuard], loadComponent: () => import('./features/admin/admin.component').then(module => module.AdminComponent) },
+  { path: 'administracion-demo', canActivate: [adminDemoGuard], loadComponent: () => import('./features/admin-demo/admin-demo.component').then(module => module.AdminDemoComponent) },
   { path: '**', redirectTo: '' }
 ];
