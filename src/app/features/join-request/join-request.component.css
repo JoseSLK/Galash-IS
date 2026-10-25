@@ -45,6 +45,11 @@
   border-radius:14px;
   padding:26px
 }
+.form-card:not(.confirmation) {
+  background:transparent;
+  border:0;
+  border-radius:0
+}
 .seedbed-chip {
   border:1px solid rgb(155 232 184 / 35%);
   border-radius:20px;
