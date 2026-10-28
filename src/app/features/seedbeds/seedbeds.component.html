@@ -1,29 +1,39 @@
 <app-dashboard #homeHeader [headerOnly]="true" />
 <main id="contenido" class="seedbeds-page" [attr.inert]="homeHeader.registrationOpen ? '' : null" [attr.aria-hidden]="homeHeader.registrationOpen ? 'true' : null">
   <div class="page-content">
+    @if (state() !== 'ready' && !(state() === 'loading' && selected())) {
+    <section class="seedbed-overview" aria-live="polite">
+      <div class="overview-copy">
+        @switch (state()) {
+          @case ('loading') { <p class="overview-description">Cargando semilleros…</p> }
+          @case ('empty') { <h1>Aún no hay semilleros publicados</h1> }
+          @default { <h1>No pudimos cargar los semilleros</h1><div class="overview-actions"><button type="button" class="join-action" (click)="retry()">Reintentar</button></div> }
+        }
+      </div>
+    </section>
+    } @else {
     <section class="seedbed-overview" aria-labelledby="seedbed-title">
       <div class="overview-copy">
         <nav class="point-switcher" aria-label="Seleccionar semillero">
-          @for (seedbed of seedbeds; track seedbed; let index = $index) {
-            <button type="button" [class.active]="selectedSeedbed === seedbed" [attr.aria-pressed]="selectedSeedbed === seedbed" (click)="selectSeedbed(seedbed)"><span class="point" aria-hidden="true"></span><span class="point-label">0{{ index + 1 }} · {{ seedbed }}</span></button>
+          @for (seedbed of seedbeds(); track seedbed.id; let index = $index) {
+            <button type="button" [class.active]="selected()?.id === seedbed.id" [attr.aria-pressed]="selected()?.id === seedbed.id" (click)="selectSeedbed(seedbed)"><span class="point" aria-hidden="true"></span><span class="point-label">0{{ index + 1 }} · {{ seedbed.name }}</span></button>
           }
         </nav>
         <p class="switcher-hint">Toca un punto para viajar a otro semillero</p>
-        <h1 id="seedbed-title">Semillero de <span>{{ selectedSeedbed }}</span></h1>
-        <p class="overview-description">{{ currentContent.description }}</p>
-        <p class="temporary">Información temporal de ejemplo</p>
-        <div class="overview-actions"><a class="join-action" routerLink="/unete" [queryParams]="{ id: joinSeedbedId }">Quiero unirme</a><a class="members-action" [attr.href]="teamLink" (click)="scrollToTeam($event)">Conocer integrantes</a></div>
+        <h1 id="seedbed-title">Semillero de <span>{{ selected()?.name }}</span></h1>
+        <p class="overview-description">{{ selected()?.description }}</p>
+        <div class="overview-actions"><a class="join-action" routerLink="/unete" [queryParams]="{ id: selected()?.id }">Quiero unirme</a><a class="members-action" [attr.href]="teamLink" (click)="scrollToTeam($event)">Conocer integrantes</a></div>
       </div>
-      <app-knowledge-graph [data]="knowledgeGraphs[selectedSeedbed]" />
+      @if (knowledgeGraph(); as graph) { <app-knowledge-graph [data]="graph" /> }
     </section>
     <section id="equipo" class="team-section" aria-labelledby="members-title">
       <div class="team-heading"><h2 id="members-title">Equipo del semillero</h2><a [attr.href]="teamLink" (click)="scrollToTeam($event)">Ver todos →</a></div>
       <div class="team-grid">
-        <article class="team-coordinator"><div class="coordinator-avatar" aria-hidden="true">CO</div><div><p class="team-eyebrow">Coordinación</p><h3>{{ currentContent.coordinator }}</h3><p class="coordinator-focus">{{ currentContent.focus }}</p><span class="coordinator-profile">Perfil CvLAC pendiente</span></div></article>
+        <article class="team-coordinator"><div class="coordinator-avatar" aria-hidden="true">CO</div><div><p class="team-eyebrow">Coordinación</p><h3>{{ coordinator }}</h3><p class="coordinator-focus">{{ selected()?.researchLine }}</p><span class="coordinator-profile">Perfil CvLAC pendiente</span></div></article>
                 <div class="team-carousel" aria-label="Integrantes del semillero">
-          <button class="team-arrow" type="button" aria-label="Ver integrantes anteriores" [disabled]="members.length <= 4" (click)="moveMembers(-1)">‹</button>
-          <div class="team-members" aria-live="polite" aria-atomic="true">@for (member of visibleMembers; track member.name) {<article class="team-member"><div class="member-avatar" aria-hidden="true">{{ memberInitials(member.name) }}</div><h3>{{ member.name }}</h3><p class="member-role" [class.professor]="member.role === 'Profesor'">{{ member.role }}</p></article>}</div>
-          <button class="team-arrow" type="button" aria-label="Ver siguientes integrantes" [disabled]="members.length <= 4" (click)="moveMembers(1)">›</button>
+          <button class="team-arrow" type="button" aria-label="Ver integrantes anteriores" [disabled]="members().length <= 4" (click)="moveMembers(-1)">‹</button>
+          <div class="team-members" aria-live="polite" aria-atomic="true">@for (member of visibleMembers; track member.userId) {<article class="team-member"><div class="member-avatar" aria-hidden="true">{{ memberInitials(member) }}</div><h3>{{ memberName(member) }}</h3><p class="member-role" [class.professor]="memberRole(member) === 'Profesor'">{{ memberRole(member) }}</p></article>} @empty {<p>Aún no hay integrantes registrados.</p>}</div>
+          <button class="team-arrow" type="button" aria-label="Ver siguientes integrantes" [disabled]="members().length <= 4" (click)="moveMembers(1)">›</button>
         </div>
       </div>
     </section>
@@ -39,15 +49,15 @@
       <p class="result-count" aria-live="polite">{{ filteredEvents.length }} {{ filteredEvents.length === 1 ? 'evento' : 'eventos' }} · {{ selectedEventOrder }}</p>
       <div class="event-list" [class.scrollable]="filteredEvents.length > 3" tabindex="0" role="region" aria-label="Lista de eventos">
         <div class="event-stack">
-          @for (event of filteredEvents; track event.title) {
+          @for (event of filteredEvents; track event.id) {
             <article class="event-card">
-              <div class="event-date"><strong>{{ event.day }}</strong><span>{{ event.month }}</span></div>
+              <div class="event-date">@if (event.date) {<strong>{{ event.date | date:'d' }}</strong><span>{{ event.date | date:'MM/yyyy' }}</span>} @else {<span>Sin fecha</span>}</div>
               <div class="card-body">
                 <div class="card-copy"><h3>{{ event.title }}</h3><p>{{ event.description }}</p></div>
-                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + event.title" (click)="$event.preventDefault(); openDetails(detailsDialog, event, 'Evento', event.day + ' ' + event.month)">Ver más detalles <span aria-hidden="true">↗</span></a>
+                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + event.title" (click)="$event.preventDefault(); openDetails(detailsDialog, event, 'Evento', eventMetadata(event))">Ver más detalles <span aria-hidden="true">↗</span></a>
               </div>
             </article>
-          }
+          } @empty {<p>Aún no hay eventos registrados.</p>}
         </div>
       </div>
     </section>
@@ -56,7 +66,7 @@
         <h2 id="projects-title">Proyectos</h2>
         <nav class="tabs" aria-label="Filtrar proyectos por estado">
           @for (status of statuses; track status) {
-            <button type="button" [class.active]="selectedStatus === status" [attr.aria-pressed]="selectedStatus === status" (click)="selectedStatus = status">{{ status }} <span class="filter-count">{{ projectCount(status) }}</span></button>
+            <button type="button" [class.active]="selectedStatus === status" [attr.aria-pressed]="selectedStatus === status" (click)="selectedStatus = status">{{ filterLabels[status] }} <span class="filter-count">{{ projectCount(status) }}</span></button>
           }
         </nav>
       </div>
@@ -66,24 +76,24 @@
           @for (project of filteredProjects; track project.id) {
             <article class="project-card">
               <div class="card-body">
-                <div class="project-heading"><span class="project-line">{{ selectedSeedbed }}</span><span class="status" [class.status--finished]="project.status === 'Finalizados'" [class.status--filed]="project.status === 'Radicados'"><span class="status-dot" aria-hidden="true"></span>{{ projectStatusLabel(project.status) }}</span></div>
-                <div class="card-copy"><h3>{{ project.title }}</h3><p>{{ project.description }}</p></div>
-                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + project.title" (click)="$event.preventDefault(); openDetails(detailsDialog, project, 'Proyecto', project.status)">Ver más detalles <span aria-hidden="true">↗</span></a>
+                <div class="project-heading"><span class="project-line">{{ selected()?.name }}</span><span class="status" [class.status--finished]="project.status === 'Finalizado'" [class.status--filed]="project.status === 'Radicado'"><span class="status-dot" aria-hidden="true"></span>{{ projectStatusLabel(project.status) }}</span></div>
+                <div class="card-copy"><h3>{{ project.title }}</h3><p>{{ project.summary }}</p></div>
+                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + project.title" (click)="$event.preventDefault(); openDetails(detailsDialog, { title: project.title, description: project.summary }, 'Proyecto', projectStatusLabel(project.status))">Ver más detalles <span aria-hidden="true">↗</span></a>
               </div>
             </article>
-          }
+          } @empty {<p>No hay proyectos en este estado.</p>}
         </div>
       </div>
     </section>
+    }
   </div>
 </main>
-<app-site-footer [seedbedId]="joinSeedbedId" [attr.inert]="homeHeader.registrationOpen ? '' : null" [attr.aria-hidden]="homeHeader.registrationOpen ? 'true' : null" />
+<app-site-footer [seedbedId]="selected()?.id ?? ''" [attr.inert]="homeHeader.registrationOpen ? '' : null" [attr.aria-hidden]="homeHeader.registrationOpen ? 'true' : null" />
 
 <dialog #detailsDialog id="detalles" class="details-dialog" aria-labelledby="detail-title">
   <div class="dialog-heading"><span class="card-category">{{ selectedDetail?.kind }}</span><button type="button" aria-label="Cerrar detalles" (click)="detailsDialog.close()" autofocus>×</button></div>
   <h2 id="detail-title">{{ selectedDetail?.title }}</h2>
   <p class="detail-meta">{{ selectedDetail?.metadata }}</p>
   <p>{{ selectedDetail?.description }}</p>
-  <div class="detail-seedbed"><span>Semillero</span><strong>{{ selectedSeedbed }}</strong></div>
-  <p class="temporary">Información temporal de ejemplo. Los detalles definitivos se publicarán cuando estén disponibles.</p>
+  <div class="detail-seedbed"><span>Semillero</span><strong>{{ selected()?.name }}</strong></div>
 </dialog>
