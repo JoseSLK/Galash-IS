@@ -16,6 +16,8 @@ export const USER_ROLES: readonly RoleDefinition[] = [
 // Solo admite los cuatro roles del contrato; los valores desconocidos no otorgan acceso.
 export function parseUserRole(value: unknown): UserRole | null {
   if (typeof value !== 'string') return null;
-  const normalized = value.trim().toLowerCase();
+  const raw = value.trim().toLowerCase();
+  // The backend still stores "profesor" for teachers; the contract name is "docente".
+  const normalized = raw === 'profesor' ? 'docente' : raw;
   return USER_ROLES.find(role => role.id === normalized)?.id ?? null;
 }

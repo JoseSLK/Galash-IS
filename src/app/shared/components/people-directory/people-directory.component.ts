@@ -1,6 +1,5 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
-import { AdminDemoAccessService } from '../../../core/services/admin-demo-access.service';
 import { USER_ROLES, UserRole } from '../../../core/models/role.model';
 import { ACCOUNT_STATUS_LABELS, DirectoryPerson } from './person-directory.model';
 
@@ -14,11 +13,12 @@ const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u0
 })
 export class PeopleDirectoryComponent {
   private readonly auth = inject(AuthService);
-  private readonly demo = inject(AdminDemoAccessService);
   readonly people = input.required<readonly DirectoryPerson[]>();
   readonly selectedId = input<string | null>(null);
   readonly management = input(false);
   readonly selection = output<string>();
+  // Lets a parent run a server-side search with the same box.
+  readonly queryChange = output<string>();
   readonly query = signal('');
   readonly filter = signal<DirectoryFilter>('all');
   readonly seedbed = signal('');
@@ -26,7 +26,7 @@ export class PeopleDirectoryComponent {
   readonly pageSize = 6;
   readonly roles = USER_ROLES;
   readonly statusLabels = ACCOUNT_STATUS_LABELS;
-  readonly privateView = computed(() => this.management() && (this.auth.isAdmin() || this.demo.allowed()));
+  readonly privateView = computed(() => this.management() && this.auth.isAdmin());
   readonly visiblePeople = computed(() => this.people().filter(person => this.privateView() || person.status === 'active'));
   readonly seedbeds = computed(() => [...new Set(this.visiblePeople().map(person => person.seedbed))].filter(Boolean).sort());
   readonly filtered = computed(() => {
@@ -48,7 +48,11 @@ export class PeopleDirectoryComponent {
     ...(this.privateView() ? [{ id: 'inactive' as const, label: 'Inactivas' }] : [])
   ]);
 
-  search(event: Event): void { this.query.set((event.target as HTMLInputElement).value); this.page.set(1); }
+  search(event: Event): void {
+    this.query.set((event.target as HTMLInputElement).value);
+    this.page.set(1);
+    this.queryChange.emit(this.query());
+  }
   chooseFilter(value: DirectoryFilter): void { this.filter.set(value); this.page.set(1); }
   chooseSeedbed(event: Event): void { this.seedbed.set((event.target as HTMLSelectElement).value); this.page.set(1); }
   clear(): void { this.query.set(''); this.filter.set('all'); this.seedbed.set(''); this.page.set(1); }

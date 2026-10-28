@@ -1,0 +1,39 @@
+<section class="requests" aria-label="Solicitudes de ingreso">
+  @if (loadState() === 'loading') { <p role="status">Cargando solicitudes…</p> }
+  @if (loadState() === 'error') { <p role="alert">No pudimos cargar las solicitudes. <button type="button" class="view-button" (click)="load()">Reintentar</button></p> }
+  <div class="request-stats" aria-label="Resumen de solicitudes">
+    <div class="stat pending"><span class="stat-ring" aria-hidden="true"></span><div><strong>{{ pending() }}</strong><span>Pendientes</span></div></div>
+    <div class="stat resolved"><span class="stat-ring" aria-hidden="true"></span><div><strong>{{ resolved() }}</strong><span>Resueltas</span></div></div>
+  </div>
+  <div class="request-filters" role="group" aria-label="Filtrar solicitudes">
+    <button type="button" [attr.aria-pressed]="filter() === 'pending'" [class.active]="filter() === 'pending'" (click)="filter.set('pending')">Pendientes ({{ pending() }})</button>
+    <button type="button" [attr.aria-pressed]="filter() === 'all'" [class.active]="filter() === 'all'" (click)="filter.set('all')">Todas ({{ service.requests().length }})</button>
+    <button type="button" [attr.aria-pressed]="filter() === 'resolved'" [class.active]="filter() === 'resolved'" (click)="filter.set('resolved')">Resueltas ({{ resolved() }})</button>
+  </div>
+  <div class="table-scroll" role="region" aria-label="Tabla de solicitudes, desplazable horizontalmente" tabindex="0">
+    <table><caption class="sr-only">Solicitudes de ingreso y su estado de revisión</caption><thead><tr><th scope="col">Código</th><th scope="col">Solicitante</th><th scope="col">Semillero</th><th scope="col">Estado</th><th scope="col">Recibida</th><th scope="col"><span class="sr-only">Acciones</span></th></tr></thead>
+      <tbody>@for (item of visible(); track item.id) {<tr><td class="code">{{ item.id.slice(0, 8) }}</td><th scope="row">{{ item.nombre }}</th><td>{{ seedbedName(item) }}</td><td><span [class]="'phase ' + stateClass(item.estado)">{{ item.estado }}</span></td><td>{{ item.fechaRadicacion | date:'dd/MM' }}</td><td><button #reviewButton type="button" [class]="!isResolved(item.estado) ? 'review-button' : 'view-button'" [attr.aria-label]="(!isResolved(item.estado) ? 'Revisar solicitud de ' : 'Ver solicitud de ') + item.nombre" (click)="open(item, reviewButton)">{{ !isResolved(item.estado) ? 'Revisar' : 'Ver' }}</button></td></tr>} @empty {<tr><td colspan="6" class="empty">No hay solicitudes en este filtro.</td></tr>}</tbody>
+    </table>
+  </div>
+  <p class="request-feedback" role="status">{{ feedback() }}</p>
+</section>
+
+<dialog #reviewDialog aria-labelledby="request-review-title" (close)="afterClose()" (click)="dismissBackdrop($event)">
+  @if (selected(); as item) {
+    <button type="button" class="close-dialog" aria-label="Cerrar revisión" (click)="close()" autofocus>×</button>
+    <div class="review-heading"><span class="request-avatar" aria-hidden="true">{{ initials(item.nombre) }}</span><div><h2 id="request-review-title">{{ item.nombre }}</h2><p class="code">{{ item.id }} · {{ seedbedName(item) }}</p></div><span [class]="'phase ' + stateClass(item.estado)">{{ item.estado }}</span></div>
+    <h3 class="history-label">Historial de revisión</h3>
+    <ol class="review-history">@for (event of item.historial ?? []; track $index) {<li><div><strong>{{ event.estado }}</strong><time>{{ event.fecha | date:'dd/MM/yyyy' }}</time></div><p>{{ event.observacion }}</p></li>}@if (!isResolved(item.estado)) {<li class="waiting"><div><strong>Decisión administrativa</strong><span>Ahora</span></div><p>Pendiente de tu decisión.</p></li>}</ol>
+    @if (!isResolved(item.estado)) {
+      <section class="decision" aria-labelledby="decision-title">
+        <h3 id="decision-title">Tu decisión</h3>
+        <label for="request-observation">Observación <span>(obligatoria)</span></label>
+        <textarea id="request-observation" [formControl]="observation" rows="3" maxlength="1000" placeholder="Escribe la observación que verá el solicitante" [attr.aria-invalid]="!!decisionError()" aria-describedby="decision-help decision-error" (input)="decisionError.set('')"></textarea>
+        <p id="decision-help" class="decision-help">El cambio queda en el historial con tu usuario como responsable.</p>
+        <p id="decision-error" class="decision-error" role="alert">{{ decisionError() }}</p>
+        <div class="decision-actions">@for (state of nextStates(item.estado); track state) {<button type="button" [class]="state === 'Rechazada' ? 'reject' : 'approve'" [disabled]="saving()" (click)="decide(state)">{{ state === 'Aprobada' ? 'Aprobar' : state === 'Rechazada' ? 'Rechazar' : 'Pasar a ' + state }}</button>}</div>
+      </section>
+    }
+    <details class="application-data"><summary>Ver los {{ formFields.length }} datos del formulario</summary><dl>@for (field of formFields; track field.key) {<div><dt>{{ field.label }}</dt><dd>{{ formValue(field.key, item) }}</dd></div>}</dl></details>
+  }
+</dialog>
