@@ -6,11 +6,11 @@ GALASH-UPTC web system for academic management, research, and communication.
 
 ## Implemented state
 
-- The admin demo section selector also opens fictional registration requests with reactive counters/filters, a centered review dialog, history and 15 form fields. Approve/reject update only memory; rejection requires a reason. Uses M3 statuses and no backend request endpoints.
+- Data integration with the backend (services listed in `servicios.md`, `Uso` column): `/` loads seedbeds and the member count (`GET /seedbeds`, `GET /members?limit=100`, `100+` when it reaches the limit) only when the dashboard is not `headerOnly`. `/semilleros` uses `GET /seedbeds` (`?id=` is the real id), `/seedbeds/{id}/space`, `/members`, `/activities` (the events section) and `GET /projects?seedbedId=`. The knowledge graph and the home topics come from `seedbed.topics`. `/unete` submits `POST /registration-requests` and shows the id and the `trackingToken` only once, without storing it.
 
-- A separately configured, verified test account can open `/administracion-demo`. The reusable people directory supports search, role/status/seedbed filters and pagination; its default public view hides emails and non-active accounts. The demo editor changes fictional roles/statuses only in route-scoped memory. Real Admin authorization and backend data remain unchanged; deployment must supply the ignored environment configuration. See `docs/admin-demo.md`.
+- `/administracion` (Admin only; the backend validates every call) manages registration requests and accounts. Requests: list, detail with history, and only the contract M3 transitions, with a required observation. Accounts: debounced search from the directory box against `GET /admin/members` (minimum 2 characters, includes inactive accounts), role by Firebase UID (`PUT /users/{uid}/roles`) and status (`PATCH /members/{id}/status`). `parseUserRole` reads `profesor` as `docente`. The admin demo was removed.
 
-- Frontend role identity now uses only Visitante, Estudiante, Docente and Admin from the existing backend session `role` field. Unknown roles grant no administrative access. The account menu exposes `/administracion` only for Admin; its route waits for session restoration and the page leaves when access is lost. This is an identity/access screen, not user or permission management. The `/users/me` roles/permissions schema and role-update payload still need a backend handoff before implementing those operations; no API contract or endpoint was changed.
+- Not connected yet (no UI): status lookup of a request, editing seedbeds, topics, activities, projects, proposals, reviews and M6 events, and profile editing (M5).
 
 - Versioned OpenCode configuration in `opencode.json`.
 - Shared agent rules in `AGENTS.md`.
@@ -26,7 +26,7 @@ GALASH-UPTC web system for academic management, research, and communication.
 - Public home composition now separates the dark full-bleed background layer from a replaceable tilted photo inset, uses the inverted left triangle, the upper-right translucent band, and an SVG outline G; it remains image-ready when the supplied asset is added.
 - Public navigation header is fixed flush to the top, expands to 64px while scrolling upward and compacts to 44px while scrolling downward with a smooth 650ms resize; header actions are borderless and unfilled.
 - The public home now loads the supplied group photograph from `src/assets/fondo.png` through the shared `--galash-home-image` token.
-- Public home now contains three responsive screens: hero carousel, join CTA with editable mosaic, and editable seedbed tabs with footer; seedbed and mosaic copy lives in `dashboard-content.ts`.
+- Public home now contains three responsive screens: hero carousel, join CTA with mosaic and member counter, and seedbed tabs loaded from the backend with footer.
 - Hero now uses a reusable accessible three-slide carousel with synchronized 6-second progress, pause-on-hover/focus/visibility/intersection controls, keyboard and touch navigation; the join and seedbed screens contain no robot assets.
 - Test tooling: Vitest unit tests (`npm test`), Playwright e2e with axe accessibility scans (`npm run test:e2e`), Lighthouse CI performance budgets (`npm run test:perf`), and GitHub Actions workflow `.github/workflows/tests.yml` running build and all suites on pull requests and pushes to `main`.
 - Private requirements excluded from version control.
