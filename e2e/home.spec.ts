@@ -2,8 +2,13 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-  // Backend is mocked: an anonymous visitor gets 401 from every API call.
+  // Backend is mocked: an anonymous visitor gets 401 from every API call,
+  // except the public seedbed list, so the home renders its seedbed section.
   await page.route('**/api/**', route => route.fulfill({ status: 401 }));
+  await page.route('**/api/seedbeds', route => route.fulfill({ json: { seedbeds: [{
+    id: 's1', name: 'Ciberseguridad', description: 'Descripción', researchLine: 'Seguridad digital', objective: 'Objetivo',
+    topics: [{ title: 'Datos', phrase: 'Frase' }]
+  }] } }));
   await page.goto('/');
 });
 

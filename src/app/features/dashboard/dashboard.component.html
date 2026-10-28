@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin-demo' ? '/administracion-demo' : activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span>GALASH</span>
@@ -35,9 +35,6 @@
                 <div><strong>{{ authService.profileName() }}</strong><span>{{ authService.profileRole() }}</span><span class="account-email">{{ authService.profileEmail() || 'Correo no disponible' }}</span></div>
               </div>
               <a class="profile-menu-link" routerLink="/mi-perfil" (click)="authMenuOpen = false; closeMenu()">Mi perfil <span aria-hidden="true">↗</span></a>
-              @if (adminDemo.allowed()) {
-                <a class="profile-menu-link" routerLink="/administracion-demo" (click)="authMenuOpen = false; closeMenu()">Administración demo <span aria-hidden="true">↗</span></a>
-              }
               @if (authService.isAdmin()) {
                 <a class="profile-menu-link" routerLink="/administracion" (click)="authMenuOpen = false; closeMenu()">Administración <span aria-hidden="true">↗</span></a>
               }
@@ -104,26 +101,28 @@
           <div class="mosaic-tile mosaic-photo mosaic-photo--large">[FOTO DEL SEMILLERO]</div>
           <div class="mosaic-tile mosaic-question" aria-hidden="true">?</div>
           <div class="mosaic-tile mosaic-photo mosaic-photo--small">[FOTO]</div>
-          <div class="mosaic-tile mosaic-counter"><strong>{{ mosaicContent.memberCount }}</strong><span>INTEGRANTES</span></div>
+          <div class="mosaic-tile mosaic-counter"><strong>{{ memberCount() }}</strong><span>INTEGRANTES</span></div>
           <div class="mosaic-tile mosaic-message">¡Te estamos esperando!</div>
           <div class="mosaic-tile mosaic-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div>
         </div>
       </div>
     </section>
 
+    @if (currentSeedbed; as current) {
     <section id="semilleros" class="seedbeds-section" aria-label="Semilleros">
       <div class="section-heading"><p class="eyebrow">Explora nuestra comunidad</p></div>
       <div class="seedbed-tabs" role="tablist" aria-label="Semilleros disponibles">
-        @for (seedbed of seedbeds; track seedbed.id; let i = $index) {
-          <button type="button" role="tab" [attr.aria-selected]="i === activeSeedbed" [class.is-active]="i === activeSeedbed" (click)="selectSeedbed(i)"><span aria-hidden="true">✦</span>{{ seedbed.label }}</button>
+        @for (seedbed of seedbeds(); track seedbed.id; let i = $index) {
+          <button type="button" role="tab" [attr.aria-selected]="i === activeSeedbed" [class.is-active]="i === activeSeedbed" (click)="selectSeedbed(i)"><span aria-hidden="true">✦</span>{{ seedbed.name }}</button>
         }
       </div>
       <div class="seedbed-layout">
-        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">{{ currentSeedbed.label }}</p><h3>{{ currentSeedbed.title }}</h3><p class="seedbed-phrase">{{ currentSeedbed.phrase }}</p><p>{{ currentSeedbed.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: currentSeedbed.id }">Conoce el semillero →</a></article>
-        <div class="device-stage" aria-label="Vista previa del semillero"><div class="light-beam"></div><div class="monitor"><div class="monitor-screen">{{ currentSeedbed.captureLabel }}</div><span class="monitor-stand"></span></div><div class="device-tiles"><div class="device-photo">[FOTO]</div><div class="device-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div></div></div>
-         <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h3>Preguntas que abren caminos</h3><ul>@for (topic of currentSeedbed.topics; track topic) {<li><span aria-hidden="true">✓</span>{{ topic }}</li>}</ul></aside>
+        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">Semillero {{ activeSeedbed + 1 }}</p><h3>{{ current.name }}</h3><p class="seedbed-phrase">{{ current.researchLine }}</p><p>{{ current.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: current.id }">Conoce el semillero →</a></article>
+        <div class="device-stage" aria-label="Vista previa del semillero"><div class="light-beam"></div><div class="monitor"><div class="monitor-screen">[Captura de {{ current.name }}]</div><span class="monitor-stand"></span></div><div class="device-tiles"><div class="device-photo">[FOTO]</div><div class="device-flask" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M19 5h10M23 5v14L12 37a5 5 0 0 0 4 7h16a5 5 0 0 0 4-7L25 19V5M16 34h16" /></svg></div></div></div>
+        <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h3>Preguntas que abren caminos</h3>@if (current.topics?.length) {<ul>@for (topic of current.topics; track topic.title) {<li><span aria-hidden="true">✓</span>{{ topic.title }}</li>}</ul>} @else {<p>{{ current.objective }}</p>}</aside>
       </div>
     </section>
+    }
   </main>
 
   <app-site-footer id="noticias" class="site-footer-anchor" />
