@@ -1,12 +1,16 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
-import { JoinField, joinSteps, temporaryCatalogs } from './join-request.catalog';
+import { JoinField, joinSteps } from './join-request.catalog';
+import { SeedbedsService } from '../seedbeds/seedbeds.service';
 import { JoinRequestReceipt, JoinRequestService } from './join-request.service';
+
+const NO_SEEDBED = { value: '', label: 'Solo al grupo / sin semillero específico' };
 
 function today(): string {
   const date = new Date();
@@ -32,6 +36,8 @@ export class JoinRequestComponent implements AfterViewInit {
   private readonly detector = inject(ChangeDetectorRef);
   private readonly service = inject(JoinRequestService);
   private readonly route = inject(ActivatedRoute);
+  private readonly seedbeds = inject(SeedbedsService);
+  private readonly seedbedOptions = signal<readonly { value: string; label: string }[]>([NO_SEEDBED]);
   readonly steps = joinSteps;
   readonly form = new FormGroup<Record<string, FormControl<string>>>({});
   readonly maxDate = today();
@@ -49,20 +55,28 @@ export class JoinRequestComponent implements AfterViewInit {
       if (field.type === 'url') validators.push(validUrl);
       if (field.key === 'phone') validators.push(control => !control.value || /^\d{7,10}$/.test(control.value) ? null : { phone: true });
       if (field.type === 'date') validators.push(control => !control.value || control.value <= today() ? null : { future: true });
-      if (field.type === 'select') validators.push(control => field.options?.some(option => option.value === control.value) || (!control.value && !field.optional) ? null : { option: true });
+      if (field.type === 'select') validators.push(control => this.options(field).some(option => option.value === control.value) || (!control.value && !field.optional) ? null : { option: true });
       this.form.addControl(field.key, new FormControl('', { nonNullable: true, validators }));
     }
-    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => {
-      const id = params.get('id') || '';
-      const seedbed = temporaryCatalogs.seedbeds.find(option => option.value === id);
-      this.form.controls['seedbed'].setValue(seedbed?.value || '');
-    });
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.preselect(params.get('id') || ''));
+  }
+  private async preselect(id: string): Promise<void> {
+    if (this.seedbedOptions().length === 1) {
+      // Without the list the request still works: it goes to the group, not to one seedbed.
+      const items = await this.seedbeds.list().catch(() => []);
+      this.seedbedOptions.set([NO_SEEDBED, ...items.map(item => ({ value: item.id, label: item.name }))]);
+    }
+    this.form.controls['seedbed'].setValue(this.options(this.seedbedField).some(option => option.value === id) ? id : '');
+  }
+  private readonly seedbedField = joinSteps.flatMap(section => section.fields).find(field => field.key === 'seedbed')!;
+  options(field: JoinField): readonly { value: string; label: string }[] {
+    return field.key === 'seedbed' ? this.seedbedOptions() : field.options ?? [];
   }
   ngAfterViewInit(): void { this.stepTitle?.nativeElement.focus(); }
   get currentStep() { return this.steps[this.step]; }
   get missing(): number { return this.currentStep.fields.filter(field => !field.optional && !this.form.controls[field.key].value.trim()).length; }
   get selectedSeedbed(): string { return this.seedbedLabel(this.form.controls['seedbed'].value); }
-  seedbedLabel(value: string): string { return temporaryCatalogs.seedbeds.find(option => option.value === value)?.label || ''; }
+  seedbedLabel(value: string): string { return this.seedbedOptions().find(option => option.value === value)?.label || ''; }
   control(field: JoinField): FormControl<string> { return this.form.controls[field.key]; }
   error(field: JoinField): string {
     const control = this.control(field);
@@ -91,7 +105,7 @@ export class JoinRequestComponent implements AfterViewInit {
   }
   valueLabel(field: JoinField): string {
     const value = this.control(field).value;
-    if (field.options) return field.options.find(option => option.value === value)?.label || 'Sin indicar';
+    if (field.type === 'select') return this.options(field).find(option => option.value === value)?.label || 'Sin indicar';
     if (field.type === 'date' && value) return value.split('-').reverse().join('/');
     return value || 'Sin indicar';
   }
@@ -109,13 +123,17 @@ export class JoinRequestComponent implements AfterViewInit {
       this.receipt = await this.service.submit(payload);
       this.form.reset();
       this.focusTitle();
-    } catch { this.submitError = 'No pudimos radicar la solicitud. Tus datos siguen en el formulario; inténtalo de nuevo.'; }
+    } catch (error: unknown) {
+      this.submitError = error instanceof HttpErrorResponse && error.status === 400
+        ? 'Revisa los datos: falta información o el semillero ya no está disponible. Tus datos siguen en el formulario.'
+        : 'No pudimos radicar la solicitud. Tus datos siguen en el formulario; inténtalo de nuevo.';
+    }
     finally { this.loading = false; }
   }
   async copyCode(): Promise<void> {
     if (!this.receipt) return;
     this.copyError = '';
-    try { await navigator.clipboard.writeText(this.receipt.code); this.copied = true; }
+    try { await navigator.clipboard.writeText(`Solicitud: ${this.receipt.id}\nClave de seguimiento: ${this.receipt.trackingToken}`); this.copied = true; }
     catch { this.copyError = 'No se pudo copiar. Selecciona y copia el código manualmente.'; }
   }
 }

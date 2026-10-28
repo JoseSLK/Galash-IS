@@ -167,3 +167,34 @@
 {"v":1,"id":"X031","t":"result","run":"R019","test":"T031","s":"fail","defect":"D003"}
 {"v":1,"id":"X032","t":"result","run":"R019","test":"T032","s":"pass","note":"Assertions are warnings; performance median 0.75 is below the 0.8 target."}
 {"v":1,"id":"D003","t":"defect","test":"T031","run":"R019","sev":"medium","s":"open","name":"Home .device-photo text contrast 3.86:1 (#a3a8c6 on #1b4d6b, 9px) below WCAG AA 4.5:1"}
+{"v":1,"id":"T033","t":"test","area":"core-api","p":"must","name":"ApiService sends PATCH and PUT to /api-prefixed paths with JSON body and credentials"}
+{"v":1,"id":"R030","t":"run","at":"2026-10-28T02:05:36Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false"}
+{"v":1,"id":"X033","t":"result","run":"R030","test":"T033","s":"pass","ev":["api.service.spec 3/3 passed"]}
+{"v":1,"id":"T034","t":"test","area":"seedbeds","p":"must","name":"SeedbedsService reads /seedbeds, space, members, activities and /projects?seedbedId with encoded ids and null lists as empty"}
+{"v":1,"id":"T035","t":"test","area":"seedbeds","p":"must","name":"/semilleros shows the empty state when the backend has no published seedbeds"}
+{"v":1,"id":"R031","t":"run","at":"2026-10-28T02:11:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; Playwright against ng serve + backend :8080"}
+{"v":1,"id":"X034","t":"result","run":"R031","test":"T034","s":"pass","ev":["seedbeds.service.spec 3/3","ng build ok (existing budget warning)"]}
+{"v":1,"id":"X035","t":"result","run":"R031","test":"T035","s":"pass","ev":["GET /seedbeds returned {\"seedbeds\":[]}","the page rendered 'Aún no hay semilleros publicados'"]}
+{"v":1,"id":"T036","t":"test","area":"home","p":"must","name":"Home loads GET /seedbeds and GET /members?limit=100 once; pages that embed the dashboard as header make no requests"}
+{"v":1,"id":"R032","t":"run","at":"2026-10-28T02:18:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; Playwright against ng serve + backend :8080"}
+{"v":1,"id":"X036","t":"result","run":"R032","test":"T036","s":"pass","ev":["home requests: /api/seedbeds, /api/members?limit=100","/semilleros requests: only its own /api/seedbeds","counter rendered 01 from the backend","ng test 6/6, build ok"]}
+{"v":1,"id":"T037","t":"test","area":"join-request","p":"must","name":"JoinRequestService maps the form keys to the POST /registration-requests payload and returns id, status, date and trackingToken"}
+{"v":1,"id":"T038","t":"test","area":"join-request","p":"must","name":"/unete submits a complete request to the backend and shows a receipt with id and tracking key"}
+{"v":1,"id":"R033","t":"run","at":"2026-10-28T02:26:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; Playwright against ng serve + backend :8080"}
+{"v":1,"id":"X037","t":"result","run":"R033","test":"T037","s":"pass","ev":["join-request.service.spec 1/1","ng test 7/7, build ok"]}
+{"v":1,"id":"X038","t":"result","run":"R033","test":"T038","s":"pass","ev":["POST /api/registration-requests returned 201","the receipt rendered state Radicada","with synthetic data and no seedbed (the DB has none published)"]}
+{"v":1,"id":"T039","t":"test","area":"admin","p":"must","name":"Admin services: M3 transitions only, request list/PATCH, account search, role by Firebase UID, status by member id, partial failure keeps the saved role"}
+{"v":1,"id":"T040","t":"test","area":"admin","p":"must","name":"/administracion without an admin session and the removed /administracion-demo redirect to /"}
+{"v":1,"id":"R034","t":"run","at":"2026-10-28T02:40:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; Playwright against ng serve + backend :8080 with synthetic data"}
+{"v":1,"id":"X039","t":"result","run":"R034","test":"T039","s":"pass","ev":["admin-services.spec 4/4","ng test 11/11, build ok"]}
+{"v":1,"id":"X040","t":"result","run":"R034","test":"T040","s":"pass","ev":["/administracion -> /","/administracion-demo -> /"]}
+{"v":1,"id":"X041","t":"result","run":"R034","test":"T035","s":"pass","ev":["with synthetic data: /semilleros showed Ciberseguridad, 4 members and the knowledge graph"]}
+{"v":1,"id":"X042","t":"result","run":"R034","test":"T036","s":"pass","ev":["with synthetic data: home counter 13, 3 seedbed tabs"]}
+{"v":1,"id":"T041","t":"test","area":"admin","p":"must","name":"/administracion with an admin session: debounced search without page reload, role change, and a valid M3 transition"}
+{"v":1,"id":"R035","t":"run","at":"2026-10-28T03:02:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; Playwright against ng serve + backend :8080 with a temporary synthetic admin session; then database/seed/seed.sh --reset && seed.sh"}
+{"v":1,"id":"X043","t":"result","run":"R035","test":"T041","s":"pass","ev":["'ejemplo' -> 6 rows on the first page, 1 page load","'ana' -> Mariana León Ejemplo","'felipe' -> Inactiva","PUT /users/{uid}/roles 204","Radicada offered En revisión and Pendiente de información; PATCH 200","synthetic data restored and probe admin deleted"]}
+{"v":1,"id":"T042","t":"test","area":"seedbeds","p":"should","name":"Knowledge graph and home topics come from seedbed.topics; abbreviation derived from the name"}
+{"v":1,"id":"R036","t":"run","at":"2026-10-28T03:05:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; Playwright against ng serve + backend :8080 with synthetic data"}
+{"v":1,"id":"X044","t":"result","run":"R036","test":"T042","s":"pass","ev":["seedbeds.service.spec abbreviation RA/IA/CIBER/RS","ng test 12/12, build ok","/semilleros Ciberseguridad graph shows CIBER and Aplicaciones, no sample text","home topics: Aplicaciones, Datos, Personas, Riesgos"]}
+{"v":1,"id":"R037","t":"run","at":"2026-10-28T03:12:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; npx playwright test (e2e/home.spec.ts with /api/seedbeds mocked)"}
+{"v":1,"id":"X045","t":"result","run":"R037","test":"T031","s":"fail","defect":"D003","ev":["axe still detects .device-photo contrast on desktop, tablet and mobile (test.fail holds)","e2e 6/6 as expected","before the /api/seedbeds mock the integration hid the seedbed section and masked D003 on tablet and mobile"]}

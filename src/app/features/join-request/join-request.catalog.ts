@@ -12,8 +12,7 @@ export const temporaryCatalogs = {
   education: ['Bachillerato', 'Técnico', 'Tecnólogo', 'Pregrado', 'Especialización', 'Maestría', 'Doctorado'],
   affiliation: ['Estudiante', 'Docente', 'Egresado', 'Investigador externo'],
   researcher: ['Sin categoría', 'Investigador Junior', 'Investigador Asociado', 'Investigador Senior'],
-  calls: ['Sin participación', 'Convocatoria 2024 (ejemplo)', 'Convocatoria 2025 (ejemplo)', 'Convocatoria 2026 (ejemplo)'],
-  seedbeds: [{ value: '', label: 'Solo al grupo / sin semillero específico' }, { value: 'ra', label: 'RA' }, { value: 'ia', label: 'IA' }, { value: 'ciberseguridad', label: 'Ciberseguridad' }]
+  calls: ['Sin participación', 'Convocatoria 2024 (ejemplo)', 'Convocatoria 2025 (ejemplo)', 'Convocatoria 2026 (ejemplo)']
 } as const;
 const options = (values: readonly string[]) => values.map(value => ({ value, label: value }));
 
@@ -38,7 +37,8 @@ export const joinSteps: { label: string; title: string; accent: string; help: st
     { key: 'orcid', label: 'Link ORCID', type: 'url' },
     { key: 'researcherCategory', label: 'Categoría actual de investigador', type: 'select', options: options(temporaryCatalogs.researcher) },
     { key: 'call', label: 'Convocatoria MinCiencias', type: 'select', options: options(temporaryCatalogs.calls) },
-    { key: 'seedbed', label: 'Semillero de interés', type: 'select', optional: true, options: temporaryCatalogs.seedbeds }
+    // Options come from GET /seedbeds at runtime.
+    { key: 'seedbed', label: 'Semillero de interés', type: 'select', optional: true, options: [] }
   ] },
   { label: 'Revisar y enviar', title: 'Tu solicitud, lista para', accent: 'revisar', help: 'Comprueba tus datos antes de radicar la solicitud.', fields: [] }
 ];

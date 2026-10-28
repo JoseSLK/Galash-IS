@@ -4,13 +4,13 @@
   <p id="status-notice" class="notice">La consulta de estado estará disponible próximamente.</p>
   @if (receipt; as result) {
     <section class="form-card confirmation">
-      <span class="eyebrow">SOLICITUD · DEMOSTRACIÓN</span>
+      <span class="eyebrow">SOLICITUD</span>
       <h1 #stepTitle tabindex="-1">Tu solicitud fue <em>radicada</em></h1>
-      <p>Este envío es simulado. Aún no se ha enviado una solicitud al grupo.</p>
-      <div class="receipt-code"><span>Código de seguimiento</span><strong>{{ result.code }}</strong><button type="button" class="secondary" (click)="copyCode()">{{ copied ? 'Copiado' : 'Copiar código' }}</button></div>
+      <div class="receipt-code"><span>Número de solicitud</span><strong>{{ result.id }}</strong></div>
+      <div class="receipt-code"><span>Clave de seguimiento</span><strong>{{ result.trackingToken }}</strong><button type="button" class="secondary" (click)="copyCode()">{{ copied ? 'Copiado' : 'Copiar datos' }}</button></div>
       <p aria-live="polite">{{ copyError }}</p>
       <dl class="receipt-details"><div><dt>Estado</dt><dd class="mint">● {{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
-      <p>Guarda este código para consultar el estado de tu solicitud.</p>
+      <p>Guarda el número y la clave: la clave solo se muestra una vez y la necesitas para consultar el estado.</p>
       <div class="success-actions"><button type="button" class="secondary" disabled aria-describedby="status-notice">Consultar mi estado</button><a class="primary" routerLink="/">Volver al inicio</a></div>
     </section>
   } @else {
@@ -25,7 +25,7 @@
               <div class="field"><label [for]="'request-' + field.key">{{ field.label }} @if (!field.optional) {<span class="required" aria-hidden="true">*</span>} @else {<span class="optional">(opcional)</span>}</label>
                 <div class="input-wrap" [class.invalid]="!!error(field)" [class.valid]="control(field).valid && !!control(field).value">
                   @if (field.type === 'select') {
-                    <select [id]="'request-' + field.key" [formControlName]="field.key" [attr.aria-required]="!field.optional" [attr.aria-invalid]="!!error(field)" [attr.aria-describedby]="error(field) ? 'error-' + field.key : null">@if (!field.optional) {<option value="" disabled>Selecciona una opción</option>}@for (option of field.options; track option.value) {<option [value]="option.value">{{ option.label }}</option>}</select><span class="chevron" aria-hidden="true">⌄</span>
+                    <select [id]="'request-' + field.key" [formControlName]="field.key" [attr.aria-required]="!field.optional" [attr.aria-invalid]="!!error(field)" [attr.aria-describedby]="error(field) ? 'error-' + field.key : null">@if (!field.optional) {<option value="" disabled>Selecciona una opción</option>}@for (option of options(field); track option.value) {<option [value]="option.value">{{ option.label }}</option>}</select><span class="chevron" aria-hidden="true">⌄</span>
                   } @else {
                     <input [id]="'request-' + field.key" [type]="field.type" [formControlName]="field.key" [attr.inputmode]="field.numeric ? 'numeric' : null" [attr.max]="field.type === 'date' ? maxDate : null" [attr.aria-required]="!field.optional" [attr.aria-invalid]="!!error(field)" [attr.aria-describedby]="error(field) ? 'error-' + field.key : null" />
                   }

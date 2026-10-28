@@ -1,11 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
-import { AdminDemoAccessService } from '../../core/services/admin-demo-access.service';
 import { RegisterComponent } from '../auth/register/register.component';
-import { seedbeds, Seedbed, mosaicContent } from './dashboard-content';
+import { ApiService } from '../../core/services/api.service';
+import { Seedbed, SeedbedsService } from '../seedbeds/seedbeds.service';
+
+const MEMBER_COUNT_LIMIT = 100;
 
 @Component({
   selector: 'app-dashboard',
@@ -14,7 +16,7 @@ import { seedbeds, Seedbed, mosaicContent } from './dashboard-content';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements AfterViewInit, OnDestroy {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() headerOnly = false;
   @Input() activePage = 'semilleros';
   @ViewChild('mobileNav') private mobileNav?: ElementRef<HTMLElement>;
@@ -22,9 +24,10 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;
   @ViewChild('authMenuTrigger') private authMenuTrigger?: ElementRef<HTMLButtonElement>;
   readonly authService = inject(AuthService);
-  readonly adminDemo = inject(AdminDemoAccessService);
-  readonly seedbeds = seedbeds;
-  readonly mosaicContent = mosaicContent;
+  private readonly api = inject(ApiService);
+  private readonly seedbedsService = inject(SeedbedsService);
+  readonly seedbeds = signal<Seedbed[]>([]);
+  readonly memberCount = signal('—');
   activeSeedbed = 0;
   menuOpen = false;
   authMenuOpen = false;
@@ -36,7 +39,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   activeSection = 'nosotros';
   private previousScrollY = 0;
 
-  get currentSeedbed(): Seedbed { return this.seedbeds[this.activeSeedbed]; }
+  get currentSeedbed(): Seedbed | undefined { return this.seedbeds()[this.activeSeedbed]; }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
@@ -46,6 +49,20 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.previousScrollY = currentScrollY;
     this.headerScrolled = currentScrollY > 80;
     this.updateActiveSection();
+  }
+
+  ngOnInit(): void {
+    // Every page embeds this component as its header; only the home page shows this content.
+    if (this.headerOnly) return;
+    this.seedbedsService.list().then(items => this.seedbeds.set(items), () => undefined);
+    // GET /members has no total; it returns at most MEMBER_COUNT_LIMIT public profiles.
+    this.api.get<{ members: unknown[] | null }>(`/members?limit=${MEMBER_COUNT_LIMIT}`).then(
+      ({ members }) => {
+        const count = members?.length ?? 0;
+        this.memberCount.set(count >= MEMBER_COUNT_LIMIT ? `${MEMBER_COUNT_LIMIT}+` : String(count).padStart(2, '0'));
+      },
+      () => undefined
+    );
   }
 
   ngAfterViewInit(): void {
