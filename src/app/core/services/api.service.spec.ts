@@ -22,4 +22,16 @@ describe('ApiService', () => {
     request.flush({ ok: true });
     await expect(response).resolves.toEqual({ ok: true });
   });
+
+  it.each(['PATCH', 'PUT'] as const)('sends %s bodies with credentials', async method => {
+    const body = { status: 'activo' };
+    const response = method === 'PATCH'
+      ? api.patch<{ ok: boolean }, typeof body>('/members/1/status', body)
+      : api.put<{ ok: boolean }, typeof body>('/members/1/status', body);
+    const request = http.expectOne({ method, url: '/api/members/1/status' });
+    expect(request.request.body).toEqual(body);
+    expect(request.request.withCredentials).toBe(true);
+    request.flush({ ok: true });
+    await expect(response).resolves.toEqual({ ok: true });
+  });
 });

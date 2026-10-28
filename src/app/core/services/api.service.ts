@@ -26,6 +26,18 @@ export class ApiService {
     }).pipe(timeout(REQUEST_TIMEOUT_MS)));
   }
 
+  patch<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
+    return firstValueFrom(this.http.patch<TResponse>(this.endpoint(path), body, {
+      withCredentials: true
+    }).pipe(timeout(REQUEST_TIMEOUT_MS)));
+  }
+
+  put<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
+    return firstValueFrom(this.http.put<TResponse>(this.endpoint(path), body, {
+      withCredentials: true
+    }).pipe(timeout(REQUEST_TIMEOUT_MS)));
+  }
+
   delete(path: string): Promise<void> {
     return firstValueFrom(this.http.delete<void>(this.endpoint(path), {
       withCredentials: true
