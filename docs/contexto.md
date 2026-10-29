@@ -6,6 +6,8 @@ GALASH-UPTC web system for academic management, research, and communication.
 
 ## Implemented state
 
+- Public `/eventos` is lazy-loaded and linked as “Eventos” from the desktop/mobile header and footer, replacing Noticias. Standalone EventsComponent and reusable EventCardComponent consume the existing published-events service, with Próximos/Anteriores/Todos filters, next-event spotlight, responsive cards, optional images and detail dialog. The agenda remains general; no seedbed association or public cancelled-event visibility is invented. Date counts refresh every minute and the timer is cleared on destruction.
+
 - Admin menu “Eventos” embeds a standalone events editor and API service (M6). It loads real events and detail, filters the four publication states, creates drafts, updates content, and connects publish/hide/cancel actions. Dates are converted between local inputs and RFC3339. The editor uses image URLs; file upload, seedbed assignment and news management remain pending because these services/fields are not registered for M6. Read-only browser verification covered list/detail and filters; write operations remain unverified against the live service.
 
 - The home join-section mosaic displays the supplied `assets/img1.jpeg` group photograph in its large tile and `assets/img2.jpeg` exhibition photograph in the small tile, with responsive cropping and alternative text.
@@ -52,3 +54,5 @@ GALASH-UPTC web system for academic management, research, and communication.
 - Detailed history: `docs/bitacora.ndjson`.
 - This file describes current state, not history.
 - Contains no private requirements, credentials, or personal data.
+
+- Las tarjetas públicas de eventos y su diálogo de detalle muestran la imagen opcional imageUrl con proporción 16:9 y sin recortar su contenido; solo se aceptan enlaces HTTP/HTTPS mediante safeEventLink.

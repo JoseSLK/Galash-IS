@@ -55,6 +55,9 @@
         <div class="event-stack">
           @for (event of filteredEvents; track event.id) {
             <article class="event-card">
+              @if (safeEventLink(event.imageUrl); as imageUrl) {
+                <img class="event-image" [src]="imageUrl" [alt]="event.title" loading="lazy" decoding="async" />
+              }
               <div class="event-date"><strong>{{ event.startAt | date:'d' }}</strong><span>{{ event.startAt | date:'MM/yyyy' }}</span></div>
               <div class="card-body">
                 <div class="card-copy"><h3>{{ event.title }}</h3><p>{{ event.description }}</p></div>
@@ -101,6 +104,9 @@
   <p class="detail-meta">{{ selectedDetail?.metadata }}</p>
   <p>{{ selectedDetail?.description }}</p>
   @if (selectedDetail?.event; as event) {
+    @if (safeEventLink(event.imageUrl); as imageUrl) {
+      <img class="event-image" [src]="imageUrl" [alt]="event.title" decoding="async" />
+    }
     @if (event.endAt) {<p class="detail-meta">Finaliza: {{ event.endAt | date:'dd/MM/yyyy, HH:mm' }}</p>}
     @if (safeEventLink(event.meetingUrl); as meetingUrl) {<p><a class="details-link" [href]="meetingUrl" target="_blank" rel="noopener noreferrer">Abrir enlace virtual ↗</a></p>}
     @if (safeEventLink(event.registrationUrl); as registrationUrl) {<p><a class="details-link" [href]="registrationUrl" target="_blank" rel="noopener noreferrer">Inscribirme al evento ↗</a></p>}

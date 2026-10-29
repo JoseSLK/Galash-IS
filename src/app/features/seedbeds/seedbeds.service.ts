@@ -49,6 +49,7 @@ export interface PublicEvent {
   endAt?: string | null;
   venue?: string;
   meetingUrl?: string;
+  imageUrl?: string;
   registrationUrl?: string;
   organizerName?: string;
 }
