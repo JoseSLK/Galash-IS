@@ -46,20 +46,25 @@
           }
         </nav>
       </div>
+      <p class="result-count">Agenda del grupo · eventos publicados</p>
+      @if (eventsState() === 'loading') {<p role="status">Cargando eventos publicados…</p>}
+      @else if (eventsState() === 'error') {<p role="alert">No pudimos cargar los eventos.</p><button type="button" class="members-action" (click)="loadEvents()">Reintentar</button>}
+      @else {
       <p class="result-count" aria-live="polite">{{ filteredEvents.length }} {{ filteredEvents.length === 1 ? 'evento' : 'eventos' }} · {{ selectedEventOrder }}</p>
       <div class="event-list" [class.scrollable]="filteredEvents.length > 3" tabindex="0" role="region" aria-label="Lista de eventos">
         <div class="event-stack">
           @for (event of filteredEvents; track event.id) {
             <article class="event-card">
-              <div class="event-date">@if (event.date) {<strong>{{ event.date | date:'d' }}</strong><span>{{ event.date | date:'MM/yyyy' }}</span>} @else {<span>Sin fecha</span>}</div>
+              <div class="event-date"><strong>{{ event.startAt | date:'d' }}</strong><span>{{ event.startAt | date:'MM/yyyy' }}</span></div>
               <div class="card-body">
                 <div class="card-copy"><h3>{{ event.title }}</h3><p>{{ event.description }}</p></div>
-                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + event.title" (click)="$event.preventDefault(); openDetails(detailsDialog, event, 'Evento', eventMetadata(event))">Ver más detalles <span aria-hidden="true">↗</span></a>
+                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + event.title" (click)="$event.preventDefault(); openEventDetails(detailsDialog, event)">Ver más detalles <span aria-hidden="true">↗</span></a>
               </div>
             </article>
-          } @empty {<p>Aún no hay eventos registrados.</p>}
+          } @empty {<p>Aún no hay eventos publicados.</p>}
         </div>
       </div>
+      }
     </section>
     <section class="projects" aria-labelledby="projects-title">
       <div class="section-heading">
@@ -95,5 +100,9 @@
   <h2 id="detail-title">{{ selectedDetail?.title }}</h2>
   <p class="detail-meta">{{ selectedDetail?.metadata }}</p>
   <p>{{ selectedDetail?.description }}</p>
-  <div class="detail-seedbed"><span>Semillero</span><strong>{{ selected()?.name }}</strong></div>
+  @if (selectedDetail?.event; as event) {
+    @if (event.endAt) {<p class="detail-meta">Finaliza: {{ event.endAt | date:'dd/MM/yyyy, HH:mm' }}</p>}
+    @if (safeEventLink(event.meetingUrl); as meetingUrl) {<p><a class="details-link" [href]="meetingUrl" target="_blank" rel="noopener noreferrer">Abrir enlace virtual ↗</a></p>}
+    @if (safeEventLink(event.registrationUrl); as registrationUrl) {<p><a class="details-link" [href]="registrationUrl" target="_blank" rel="noopener noreferrer">Inscribirme al evento ↗</a></p>}
+  } @else {<div class="detail-seedbed"><span>Semillero</span><strong>{{ selected()?.name }}</strong></div>}
 </dialog>

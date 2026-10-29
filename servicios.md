@@ -49,7 +49,7 @@ re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/
 | GET | `/admin/registration-requests` | lista administrativa | M3 | [x] |
 | GET | `/admin/registration-requests/{id}` | detalle e historial administrativo | M3 | [x] |
 | PATCH | `/admin/registration-requests/{id}/status` | actualiza estado y auditoría | M3 | [x] |
-| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [x] |
+| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [ ] |
 | POST | `/seedbeds/{seedbedId}/activities` | registra actividad | M4 | [ ] |
 | GET | `/activities/{id}` | detalle de actividad | M4 | [ ] |
 | PATCH | `/activities/{id}` | modifica actividad | M4 | [ ] |
