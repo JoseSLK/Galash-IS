@@ -1,0 +1,49 @@
+<app-dashboard #header [headerOnly]="true" activePage="unete" />
+<main id="contenido" [inert]="header.registrationOpen">
+  @if (authenticated()) {
+    @if (result(); as status) {
+      <span class="eyebrow">MI SOLICITUD</span>
+      <div class="result-heading"><h1>Así va tu <em>solicitud</em></h1><button class="text-button" type="button" (click)="result.set(null)">Consultar otra solicitud →</button></div>
+      <div class="result-layout" aria-live="polite">
+        <aside>
+          <div class="dial" [class.rejected]="status.estado === 'Rechazada'" [class.approved]="status.estado === 'Aprobada'">
+            <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="track" cx="100" cy="100" r="87"/><circle class="arc" cx="100" cy="100" r="87" pathLength="100" [attr.stroke-dasharray]="progress() + ' 100'"/></svg>
+            <div><span>ESTADO ACTUAL</span><strong>{{ status.estado }}</strong></div>
+          </div>
+          <span class="eyebrow">CÓDIGO DE TU SOLICITUD</span><p class="code">{{ submittedCode() }}</p>
+        </aside>
+        <section class="details" aria-labelledby="status-heading">
+          <span class="eyebrow">ESTADO ACTUAL</span><h2 id="status-heading">{{ description() }}</h2>
+          <p>Este es el estado registrado para tu solicitud de ingreso a GALASH.</p>
+          <div class="states" aria-label="Estados del proceso">@for (state of states; track state) {<span [class.selected]="state === status.estado" [attr.aria-current]="state === status.estado ? 'step' : null">{{ state }}</span>}</div>
+          @if (status.fechaActualizacion) {<div class="info"><span class="eyebrow">ÚLTIMA ACTUALIZACIÓN</span><p>{{ status.fechaActualizacion | date:'dd/MM/yyyy, HH:mm' }}</p></div>}
+          @if (status.observacion) {<div class="info observation"><span class="eyebrow">OBSERVACIONES</span><p>{{ status.observacion }}</p></div>}
+          <a routerLink="/semilleros">Volver a semilleros →</a>
+        </section>
+      </div>
+    } @else {
+      <section class="lookup" aria-labelledby="lookup-title">
+        <span class="eyebrow">MI SOLICITUD</span>
+        <h1 id="lookup-title">Consulta el <em>estado</em> de tu solicitud</h1>
+        <p>Ingresa el código que recibiste al enviar tu formulario. Consultaremos la solicitud con tu sesión actual.</p>
+        <form (submit)="consult($event)" [attr.aria-busy]="loading()" novalidate>
+          <label for="request-code">Código de solicitud <em>*</em></label>
+          <input id="request-code" [formControl]="code" autocomplete="off" placeholder="Código recibido al enviar tu solicitud" maxlength="120" required [attr.aria-invalid]="code.touched && code.invalid" [attr.aria-describedby]="code.touched && code.invalid ? 'code-error' : null" />
+          @if (code.touched && code.invalid) {<p id="code-error" class="error">Ingresa un código válido: letras, números y guiones.</p>}
+          <button type="submit" class="primary" [disabled]="loading()">{{ loading() ? 'Consultando…' : 'Consultar estado' }}</button>
+          @if (error()) {<p class="error" role="alert">{{ error() }}</p>}
+        </form>
+        <p class="privacy">Solo se muestran el estado y las observaciones autorizadas, sin datos personales.</p>
+        <p>¿Aún no has enviado tu solicitud? <a routerLink="/unete">Ir al formulario →</a></p>
+      </section>
+    }
+  } @else {
+    <section class="lookup"><span class="eyebrow">MI SOLICITUD</span><h1>Inicia sesión para consultar tu <em>solicitud</em></h1>
+      <p>Usa la cuenta con la que enviaste tu solicitud para consultar su estado.</p>
+      @if (auth.sessionStatus() === 'checking') {<p role="status">Verificando tu sesión…</p>}
+      @else {<button class="primary" type="button" (click)="header.continueWithGoogle()" [disabled]="header.authLoading">{{ header.authLoading ? 'Conectando…' : 'Iniciar sesión con Google' }}</button>}
+      @if (header.authErrorMessage) {<p class="error" role="alert">{{ header.authErrorMessage }}</p>}
+    </section>
+  }
+</main>
+<app-site-footer [inert]="header.registrationOpen" />

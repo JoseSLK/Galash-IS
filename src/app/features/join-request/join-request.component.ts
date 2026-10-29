@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { SiteFooterComponent } from '../../shared/components/site-footer/site-fo
 import { JoinField, joinSteps } from './join-request.catalog';
 import { SeedbedsService } from '../seedbeds/seedbeds.service';
 import { JoinRequestReceipt, JoinRequestService } from './join-request.service';
+import { AuthService } from '../../core/services/auth.service';
 
 const NO_SEEDBED = { value: '', label: 'Solo al grupo / sin semillero específico' };
 
@@ -37,6 +38,9 @@ export class JoinRequestComponent implements AfterViewInit {
   private readonly service = inject(JoinRequestService);
   private readonly route = inject(ActivatedRoute);
   private readonly seedbeds = inject(SeedbedsService);
+  readonly auth = inject(AuthService);
+  readonly canJoin = computed(() => this.auth.isAuthenticated() && this.auth.sessionStatus() === 'authenticated');
+  private formUserId: string | null = null;
   private readonly seedbedOptions = signal<readonly { value: string; label: string }[]>([NO_SEEDBED]);
   readonly steps = joinSteps;
   readonly form = new FormGroup<Record<string, FormControl<string>>>({});
@@ -59,6 +63,30 @@ export class JoinRequestComponent implements AfterViewInit {
       this.form.addControl(field.key, new FormControl('', { nonNullable: true, validators }));
     }
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.preselect(params.get('id') || ''));
+    effect(() => {
+      const authenticated = this.canJoin();
+      const user = this.auth.backendUser();
+      const identity = authenticated ? user?.id || this.auth.currentUser()?.uid || null : null;
+      if (this.formUserId && this.formUserId !== identity) {
+        const seedbed = this.form.controls['seedbed'].value;
+        this.form.reset({ seedbed });
+        this.step = 0;
+        this.receipt = null;
+        this.submitError = '';
+        this.copyError = '';
+        this.copied = false;
+      }
+      this.formUserId = identity;
+      if (!authenticated) return;
+      const values: Record<string, string> = {
+        fullName: [user?.name, user?.last_name].filter(Boolean).join(' ').trim() || this.auth.currentUser()?.displayName || '',
+        document: user?.document_number || ''
+      };
+      for (const [key, value] of Object.entries(values)) {
+        const control = this.form.controls[key];
+        if (value && control.pristine && !control.value.trim()) control.setValue(value);
+      }
+    });
   }
   private async preselect(id: string): Promise<void> {
     if (this.seedbedOptions().length === 1) {
@@ -111,7 +139,7 @@ export class JoinRequestComponent implements AfterViewInit {
   }
   invalidSections(): number[] { return [0, 1, 2].filter(index => this.steps[index].fields.some(field => this.control(field).invalid)); }
   async submit(): Promise<void> {
-    if (this.loading) return;
+    if (this.loading || !this.canJoin()) return;
     if (this.step !== 3) { this.next(); return; }
     this.form.markAllAsTouched();
     const invalidStep = this.invalidSections()[0];

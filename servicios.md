@@ -45,7 +45,7 @@ re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/
 | POST | `/seedbeds/{id}/members` | vincula | M2 | [ ] |
 | DELETE | `/seedbeds/{id}/members/{userId}` | retiro | M2 | [ ] |
 | POST | `/registration-requests` | radica solicitud pública | M3 | [x] |
-| GET | `/registration-requests/{id}/status` | consulta propia con token/sesión | M3 | [ ] |
+| GET | `/registration-requests/{id}/status` | consulta propia con token/sesión | M3 | [x] |
 | GET | `/admin/registration-requests` | lista administrativa | M3 | [x] |
 | GET | `/admin/registration-requests/{id}` | detalle e historial administrativo | M3 | [x] |
 | PATCH | `/admin/registration-requests/{id}/status` | actualiza estado y auditoría | M3 | [x] |

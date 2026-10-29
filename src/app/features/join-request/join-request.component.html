@@ -1,7 +1,22 @@
 <app-dashboard #header [headerOnly]="true" activePage="unete" />
 <main id="contenido" class="join-page" [inert]="header.registrationOpen">
-  <div class="page-top"><span>ÚNETE A GALASH</span><button type="button" class="status-link" disabled aria-describedby="status-notice">¿Ya enviaste una solicitud? Consulta tu estado →</button></div>
-  <p id="status-notice" class="notice">La consulta de estado estará disponible próximamente.</p>
+  @if (!canJoin()) {
+    <section class="session-gate" aria-labelledby="session-title" [attr.aria-busy]="auth.sessionStatus() === 'checking'">
+      <span class="eyebrow">ÚNETE A GALASH</span>
+      @if (auth.sessionStatus() === 'checking') {
+        <h1 id="session-title">Verificando tu <em>sesión</em></h1>
+        <p role="status">Espera un momento para continuar con tu solicitud.</p>
+      } @else {
+        <h1 id="session-title">Inicia sesión para <em>unirte</em></h1>
+        <p>Necesitas iniciar sesión antes de solicitar tu ingreso a un semillero. Al entrar podrás continuar con el semillero que elegiste.</p>
+        @if (auth.sessionStatus() === 'unavailable') {<p role="status">No pudimos verificar tu sesión. Intenta iniciar sesión de nuevo.</p>}
+        @if (auth.sessionStatus() === 'expired') {<p role="status">Tu sesión ha caducado. Inicia sesión de nuevo para continuar.</p>}
+        <div class="success-actions"><button type="button" class="primary" (click)="header.continueWithGoogle()" [disabled]="header.authLoading">{{ header.authLoading ? 'Conectando con Google…' : 'Iniciar sesión con Google' }}</button><a class="secondary" routerLink="/semilleros" [queryParams]="{ id: form.controls['seedbed'].value || null }">Volver a semilleros</a></div>
+        @if (header.authErrorMessage) {<p class="error" role="alert">{{ header.authErrorMessage }}</p>}
+      }
+    </section>
+  } @else {
+  <div class="page-top"><span>ÚNETE A GALASH</span><a class="status-link" routerLink="/mi-solicitud">¿Ya enviaste una solicitud? Consulta tu estado →</a></div>
   @if (receipt; as result) {
     <section class="form-card confirmation">
       <span class="eyebrow">SOLICITUD</span>
@@ -11,7 +26,7 @@
       <p aria-live="polite">{{ copyError }}</p>
       <dl class="receipt-details"><div><dt>Estado</dt><dd class="mint">● {{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
       <p>Guarda el número y la clave: la clave solo se muestra una vez y la necesitas para consultar el estado.</p>
-      <div class="success-actions"><button type="button" class="secondary" disabled aria-describedby="status-notice">Consultar mi estado</button><a class="primary" routerLink="/">Volver al inicio</a></div>
+      <div class="success-actions"><a class="secondary" routerLink="/mi-solicitud" [queryParams]="{ id: result.id }">Consultar mi estado</a><a class="primary" routerLink="/">Volver al inicio</a></div>
     </section>
   } @else {
     <section class="form-card">
@@ -44,6 +59,7 @@
         <p class="notice">Demostración con catálogos temporales. El envío es simulado y los datos no se guardan al salir.</p>
       </form>
     </section>
+  }
   }
 </main>
 <app-site-footer [inert]="header.registrationOpen" />

@@ -10,6 +10,25 @@
   margin:auto;
   padding:140px 28px 70px
 }
+.session-gate {
+  max-width:760px;
+  margin:60px auto;
+  padding:32px 0;
+}
+.session-gate p {
+  color:#b8c8d5;
+  line-height:1.8;
+  margin:24px 0;
+}
+.session-gate .success-actions {
+  justify-content:flex-start;
+  flex-wrap:wrap;
+  margin-top:32px;
+}
+.session-gate button:disabled {
+  opacity:.65;
+  cursor:wait;
+}
 .page-top,.step-top,.form-actions,.advance,.review-heading,.success-actions {
   display:flex;
   align-items:center;
