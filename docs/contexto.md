@@ -6,11 +6,18 @@ GALASH-UPTC web system for academic management, research, and communication.
 
 ## Implemented state
 
+- Admin menu “Eventos” embeds a standalone events editor and API service (M6). It loads real events and detail, filters the four publication states, creates drafts, updates content, and connects publish/hide/cancel actions. Dates are converted between local inputs and RFC3339. The editor uses image URLs; file upload, seedbed assignment and news management remain pending because these services/fields are not registered for M6. Read-only browser verification covered list/detail and filters; write operations remain unverified against the live service.
+
+- The home join-section mosaic displays the supplied `assets/img1.jpeg` group photograph in its large tile and `assets/img2.jpeg` exhibition photograph in the small tile, with responsive cropping and alternative text.
+
+- `/unete` requires a verified backend session before displaying or submitting the form. Its access screen reuses the header Google login and preserves the selected seedbed. Full name and document number are prefilled from available session data into empty, untouched fields; missing data remains editable, and changing or closing the session clears the previous account's form data. This is a frontend restriction; the M3 API contract is unchanged.
+
 - Data integration with the backend (services listed in `servicios.md`, `Uso` column): `/` loads seedbeds and the member count (`GET /seedbeds`, `GET /members?limit=100`, `100+` when it reaches the limit) only when the dashboard is not `headerOnly`. `/semilleros` uses `GET /seedbeds` (`?id=` is the real id), `/seedbeds/{id}/space`, `/members`, `/activities` (the events section) and `GET /projects?seedbedId=`. The knowledge graph and the home topics come from `seedbed.topics`. `/unete` submits `POST /registration-requests` and shows the id and the `trackingToken` only once, without storing it.
 
 - `/administracion` (Admin only; the backend validates every call) manages registration requests and accounts. Requests: list, detail with history, and only the contract M3 transitions, with a required observation. Accounts: debounced search from the directory box against `GET /admin/members` (minimum 2 characters, includes inactive accounts), role by Firebase UID (`PUT /users/{uid}/roles`) and status (`PATCH /members/{id}/status`). `parseUserRole` reads `profesor` as `docente`. The admin demo was removed.
 
-- Not connected yet (no UI): status lookup of a request, editing seedbeds, topics, activities, projects, proposals, reviews and M6 events, and profile editing (M5).
+- `/mi-solicitud` provides request lookup through `GET /registration-requests/{id}/status` with the current applicant session. A standalone component contains the lookup and result views, uses the five M3 states, and displays available update date and authorized observation. Links are enabled from `/unete` and its receipt. Anonymous token lookup is pending because token transport is not documented; a successful lookup with an applicant-owned request remains to be verified. No fabricated history or leader phase is shown.
+- Not connected yet (no UI): editing seedbeds, topics, activities, projects, proposals, reviews, news, and profile editing (M5).
 
 - Versioned OpenCode configuration in `opencode.json`.
 - Shared agent rules in `AGENTS.md`.

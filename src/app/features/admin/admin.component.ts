@@ -10,18 +10,19 @@ import { MembersAdminService } from './members-admin.service';
 import { USER_ROLES, UserRole } from '../../core/models/role.model';
 import { AccountStatus } from '../../shared/components/people-directory/person-directory.model';
 import { RegistrationRequestsComponent } from './requests/registration-requests.component';
+import { EventsAdminComponent } from './events/events-admin.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent],
+  imports: [DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnDestroy {
   @ViewChild('sectionMenu') private sectionMenu?: ElementRef<HTMLDetailsElement>;
-  readonly upcomingSections = ['Semilleros', 'Proyectos', 'Noticias y eventos', 'Auditoría'];
-  readonly activeSection = signal<'users' | 'requests'>('users');
+  readonly upcomingSections = ['Semilleros', 'Proyectos', 'Auditoría'];
+  readonly activeSection = signal<'users' | 'requests' | 'events'>('users');
   readonly auth = inject(AuthService);
   readonly users = inject(MembersAdminService);
   readonly roles = USER_ROLES;
@@ -55,7 +56,7 @@ export class AdminComponent implements OnDestroy {
     menu.querySelector('summary')?.focus();
   }
 
-  showSection(section: 'users' | 'requests', menu: HTMLDetailsElement): void {
+  showSection(section: 'users' | 'requests' | 'events', menu: HTMLDetailsElement): void {
     this.activeSection.set(section);
     this.closeSections(menu);
   }

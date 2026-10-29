@@ -4,19 +4,22 @@
     @if (auth.isAdmin()) {
       <p class="eyebrow">PANEL DE ADMINISTRACIÓN</p>
       <div class="title-row">
-        <h1 id="admin-screen-title" tabindex="-1">@if (activeSection() === 'users') {Gestión de <span>usuarios</span>} @else {Solicitudes de ingreso}</h1>
+        <h1 id="admin-screen-title" tabindex="-1">@if (activeSection() === 'users') {Gestión de <span>usuarios</span>} @else if (activeSection() === 'events') {Eventos} @else {Solicitudes de ingreso}</h1>
         <details #sectionMenu class="section-menu" (keydown.escape)="closeSections(sectionMenu)">
           <summary aria-label="Mostrar secciones de administración"><span class="section-chevron" aria-hidden="true"></span></summary>
           <nav class="sections-dropdown" aria-label="Secciones de administración">
             <button type="button" [class.current-section]="activeSection() === 'users'" [attr.aria-current]="activeSection() === 'users' ? 'page' : null" (click)="showSection('users', sectionMenu)">Usuarios y roles</button>
             <button type="button" [class.current-section]="activeSection() === 'requests'" [attr.aria-current]="activeSection() === 'requests' ? 'page' : null" (click)="showSection('requests', sectionMenu)">Solicitudes de ingreso</button>
+            <button type="button" [class.current-section]="activeSection() === 'events'" [attr.aria-current]="activeSection() === 'events' ? 'page' : null" (click)="showSection('events', sectionMenu)">Eventos</button>
             @for (section of upcomingSections; track section) {<button type="button" disabled><span>{{ section }}</span><small>Próximamente</small></button>}
           </nav>
         </details>
       </div>
-      <p class="intro">{{ activeSection() === 'users' ? 'Busca una cuenta, asigna un rol y activa o desactiva su acceso.' : 'Consulta las solicitudes y revisa su historial antes de tomar una decisión.' }}</p>
+      <p class="intro">{{ activeSection() === 'users' ? 'Busca una cuenta, asigna un rol y activa o desactiva su acceso.' : activeSection() === 'events' ? 'Publica, actualiza, oculta o cancela los eventos del grupo.' : 'Consulta las solicitudes y revisa su historial antes de tomar una decisión.' }}</p>
       @if (activeSection() === 'requests') {
         <app-registration-requests />
+      } @else if (activeSection() === 'events') {
+        <app-events-admin />
       } @else {
       <div class="management-layout">
         <div>
