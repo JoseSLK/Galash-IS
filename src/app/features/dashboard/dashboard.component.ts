@@ -1,3 +1,4 @@
+import { ScrollStackComponent } from '../../shared/components/scroll-stack/scroll-stack.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -6,13 +7,15 @@ import { AuthService, RegistrationRequiredError } from '../../core/services/auth
 import { RegisterComponent } from '../auth/register/register.component';
 import { ApiService } from '../../core/services/api.service';
 import { Seedbed, SeedbedsService } from '../seedbeds/seedbeds.service';
+import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
+import { SpecularButtonDirective } from '../../shared/directives/specular-button.directive';
 
 const MEMBER_COUNT_LIMIT = 100;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RegisterComponent, SiteFooterComponent],
+  imports: [RouterLink, RegisterComponent, SiteFooterComponent, GlitchBackgroundComponent, SpecularButtonDirective, ScrollStackComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -28,6 +31,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly seedbedsService = inject(SeedbedsService);
   readonly seedbeds = signal<Seedbed[]>([]);
   readonly memberCount = signal('—');
+  readonly seedbedCount = signal('—');
   activeSeedbed = 0;
   menuOpen = false;
   authMenuOpen = false;
@@ -38,6 +42,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   headerCompact = false;
   activeSection = 'nosotros';
   private previousScrollY = 0;
+
+  get seedbedIcon(): string {
+    const name = this.currentSeedbed?.name.toLocaleLowerCase('es') ?? '';
+    if (name.includes('ciber')) return 'security';
+    if (name.includes('inteligencia')) return 'ai';
+    if (name.includes('realidad')) return 'ar';
+    return 'research';
+  }
 
   get currentSeedbed(): Seedbed | undefined { return this.seedbeds()[this.activeSeedbed]; }
 
@@ -54,7 +66,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     // Every page embeds this component as its header; only the home page shows this content.
     if (this.headerOnly) return;
-    this.seedbedsService.list().then(items => this.seedbeds.set(items), () => undefined);
+    this.seedbedsService.list().then(items => { this.seedbeds.set(items); this.seedbedCount.set(String(items.length).padStart(2, '0')); }, () => undefined);
     // GET /members has no total; it returns at most MEMBER_COUNT_LIMIT public profiles.
     this.api.get<{ members: unknown[] | null }>(`/members?limit=${MEMBER_COUNT_LIMIT}`).then(
       ({ members }) => {

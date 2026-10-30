@@ -6,6 +6,10 @@ GALASH-UPTC web system for academic management, research, and communication.
 
 ## Implemented state
 
+- “Iniciar sesión” uses the reusable native-button SpecularButtonDirective with configurable light/material inputs, pointer-following highlight and 250px proximity. Shared CSS draws the illuminated border and reflection; the directive itself needs no React/shadcn. The previous periodic sweep is removed. Pointer updates are frame-batched outside Angular, keyboard focus lights the button, and listeners are removed on destroy. Authenticated account controls retain their original style and auth actions are unchanged.
+
+- Home is trying an alternate full-width centered welcome with a reusable standalone GlitchBackgroundComponent. It dynamically loads Three.js to render a shader with perspective grid, mint/violet abstract waves, RGB separation, subtle grain and occasional horizontal distortions. Text and CTA stay stable above it. Rendering targets 30 fps with capped pixel ratio, pauses offscreen/when the tab is hidden, starts moving automatically without an activation/pause button, and releases observers/listeners/GPU resources on destruction. WebGL failure retains a solid blue fallback. The centered group introduction and real seedbed/member counts remain below. The preceding photo-overlay design (90% of available height) is backed up locally for restoration if requested.
+
 - Public `/eventos` is lazy-loaded and linked as “Eventos” from the desktop/mobile header and footer, replacing Noticias. Standalone EventsComponent and reusable EventCardComponent consume the existing published-events service, with Próximos/Anteriores/Todos filters, next-event spotlight, responsive cards, optional images and detail dialog. The agenda remains general; no seedbed association or public cancelled-event visibility is invented. Date counts refresh every minute and the timer is cleared on destruction.
 
 - Admin menu “Eventos” embeds a standalone events editor and API service (M6). It loads real events and detail, filters the four publication states, creates drafts, updates content, and connects publish/hide/cancel actions. Dates are converted between local inputs and RFC3339. The editor uses image URLs; file upload, seedbed assignment and news management remain pending because these services/fields are not registered for M6. Read-only browser verification covered list/detail and filters; write operations remain unverified against the live service.
@@ -56,3 +60,5 @@ GALASH-UPTC web system for academic management, research, and communication.
 - Contains no private requirements, credentials, or personal data.
 
 - Las tarjetas públicas de eventos y su diálogo de detalle muestran la imagen opcional imageUrl con proporción 16:9 y sin recortar su contenido; solo se aceptan enlaces HTTP/HTTPS mediante safeEventLink.
+
+- The home introduction is centered above a React Bits ScrollStack with 21:9 GALASH photos, page scrolling, natural container height and zero hold distance. React/ReactDOM are loaded dynamically through an Angular bridge that recovers an empty mount after template updates and unmounts on destruction. Three statistic cards and seedbed-specific SVG emblems have continuous animations. Build passes with initial-bundle budget and React CommonJS warnings.

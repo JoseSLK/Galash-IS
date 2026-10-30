@@ -1,0 +1,16 @@
+@import './ScrollStack.css';
+
+app-scroll-stack { display: block; min-width: 0; }
+.galash-scroll-stack { height: auto; }
+.galash-scroll-stack .scroll-stack { height: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.galash-scroll-stack .scroll-stack::-webkit-scrollbar { display: none; width: 0; height: 0; }
+.galash-scroll-stack:focus-visible { outline: 2px solid #9be8b8; outline-offset: 5px; border-radius: 28px; }
+.galash-scroll-stack .galash-stack-card { height: auto; aspect-ratio: 21 / 9; padding: 0; overflow: hidden; background: #102b40; color: #fff; border: 0; border-radius: 20px; }
+.galash-scroll-stack .galash-stack-card > img { position: absolute; inset: 0; }
+.galash-stack-card > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.galash-stack-caption { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: end; padding: 26px; background: linear-gradient(transparent 20%, #0a1420ed); }
+.galash-stack-caption span { color: #9be8b8; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+.galash-stack-caption h3 { margin: 12px 0 0; font: 700 clamp(24px, 2.8vw, 36px)/1.15 var(--fuente-titulo); }
+@media (max-width: 640px) { .galash-stack-caption { padding: 18px; }.galash-stack-caption h3 { font-size: 22px; }.galash-stack-caption span { font-size: 9px; } }
+
+.galash-scroll-stack .scroll-stack__inner { padding-inline: 4px; }
