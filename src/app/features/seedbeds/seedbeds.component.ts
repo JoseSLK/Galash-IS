@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KnowledgeGraphComponent, KnowledgeGraphData } from '../../shared/components/knowledge-graph/knowledge-graph.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
-import { Activity, Project, Seedbed, SeedbedMember, SeedbedSpace, SeedbedsService, seedbedAbbreviation } from './seedbeds.service';
+import { PublicEvent, Project, Seedbed, SeedbedMember, SeedbedSpace, SeedbedsService, seedbedAbbreviation } from './seedbeds.service';
 
 type ProjectFilter = 'Todos' | Project['status'];
 
@@ -28,7 +28,8 @@ export class SeedbedsComponent {
   readonly selected = signal<Seedbed | null>(null);
   readonly space = signal<SeedbedSpace | null>(null);
   readonly members = signal<SeedbedMember[]>([]);
-  readonly activities = signal<Activity[]>([]);
+  readonly events = signal<PublicEvent[]>([]);
+  readonly eventsState = signal<'loading' | 'ready' | 'error'>('loading');
   readonly projects = signal<Project[]>([]);
   readonly knowledgeGraph = computed<KnowledgeGraphData | null>(() => {
     const seedbed = this.selected();
@@ -40,7 +41,7 @@ export class SeedbedsComponent {
   selectedStatus: ProjectFilter = 'Activo';
   readonly eventOrders = ['Más recientes', 'Más antiguos'];
   selectedEventOrder = 'Más recientes';
-  selectedDetail: { title: string; description: string; kind: string; metadata: string } | null = null;
+  selectedDetail: { title: string; description: string; kind: string; metadata: string; event?: PublicEvent } | null = null;
   memberOffset = 0;
 
   get coordinator(): string {
@@ -59,7 +60,15 @@ export class SeedbedsComponent {
     });
   }
   constructor() {
+    void this.loadEvents();
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.load(params.get('id')));
+  }
+  async loadEvents(): Promise<void> {
+    this.eventsState.set('loading');
+    try {
+      this.events.set(await this.service.publishedEvents());
+      this.eventsState.set('ready');
+    } catch { this.eventsState.set('error'); }
   }
   selectSeedbed(seedbed: Seedbed): void {
     void this.router.navigate([], { relativeTo: this.route, queryParams: { id: seedbed.id }, queryParamsHandling: 'merge' });
@@ -74,17 +83,15 @@ export class SeedbedsComponent {
         if (request === this.loadId) this.state.set('empty');
         return;
       }
-      const [space, members, activities, projects] = await Promise.all([
+      const [space, members, projects] = await Promise.all([
         this.service.space(seedbed.id),
         this.service.members(seedbed.id),
-        this.service.activities(seedbed.id),
         this.service.projects(seedbed.id)
       ]);
       if (request !== this.loadId) return;
       this.selected.set(seedbed);
       this.space.set(space);
       this.members.set(members);
-      this.activities.set(activities);
       this.projects.set(projects);
       this.memberOffset = 0;
       this.selectedStatus = 'Activo';
@@ -98,13 +105,21 @@ export class SeedbedsComponent {
   retry(): void { void this.load(this.route.snapshot.queryParamMap.get('id')); }
   projectCount(status: ProjectFilter): number { return this.projects().filter(project => status === 'Todos' || project.status === status).length; }
   get filteredProjects(): Project[] { return this.projects().filter(project => this.selectedStatus === 'Todos' || project.status === this.selectedStatus); }
-  get filteredEvents(): Activity[] {
+  get filteredEvents(): PublicEvent[] {
     const direction = this.selectedEventOrder === 'Más recientes' ? -1 : 1;
-    // Undated activities go last in both orders.
-    return [...this.activities()].sort((first, second) => !first.date ? 1 : !second.date ? -1 : direction * first.date.localeCompare(second.date));
+    return [...this.events()].sort((first, second) => direction * (Date.parse(first.startAt) - Date.parse(second.startAt)));
   }
-  eventMetadata(event: Activity): string {
-    return `${event.date ? formatDate(event.date, 'dd/MM/yyyy', this.locale) : 'Sin fecha'} · ${event.status}`;
+  eventMetadata(event: PublicEvent): string {
+    return [formatDate(event.startAt, 'dd/MM/yyyy, HH:mm', this.locale), event.type, event.venue, event.organizerName].filter(Boolean).join(' · ');
+  }
+  openEventDetails(dialog: HTMLDialogElement, event: PublicEvent): void {
+    this.selectedDetail = { title: event.title, description: event.description, kind: 'Evento', metadata: this.eventMetadata(event), event };
+    dialog.showModal();
+  }
+  safeEventLink(value: string | undefined): string | null {
+    if (!value) return null;
+    try { return ['https:', 'http:'].includes(new URL(value).protocol) ? value : null; }
+    catch { return null; }
   }
   memberName(member: SeedbedMember): string { return [member.name, member.lastName].filter(Boolean).join(' '); }
   memberInitials(member: SeedbedMember): string { return this.memberName(member).split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase(); }

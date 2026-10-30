@@ -49,7 +49,7 @@ re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/
 | GET | `/admin/registration-requests` | lista administrativa | M3 | [x] |
 | GET | `/admin/registration-requests/{id}` | detalle e historial administrativo | M3 | [x] |
 | PATCH | `/admin/registration-requests/{id}/status` | actualiza estado y auditoría | M3 | [x] |
-| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [x] |
+| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [ ] |
 | POST | `/seedbeds/{seedbedId}/activities` | registra actividad | M4 | [ ] |
 | GET | `/activities/{id}` | detalle de actividad | M4 | [ ] |
 | PATCH | `/activities/{id}` | modifica actividad | M4 | [ ] |
@@ -68,13 +68,13 @@ re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/
 | POST | `/seedbeds/{seedbedId}/reviews` | crea reseña | M4 | [ ] |
 | GET | `/admin/seedbed-reviews` | lista reseñas | M4 | [ ] |
 | PATCH | `/admin/seedbed-reviews/{id}/moderation` | modera reseña | M4 | [ ] |
-| GET | `/events` | agenda pública filtrable; Admin autenticado ve todos los estados | M6 | [ ] |
-| POST | `/events` | crea evento en borrador | M6 | [ ] |
-| GET | `/events/{id}` | detalle publicado/autorizado | M6 | [ ] |
-| PATCH | `/events/{id}` | edita evento | M6 | [ ] |
-| POST | `/events/{id}/publish` | publica evento | M6 | [ ] |
-| POST | `/events/{id}/cancel` | cancela evento | M6 | [ ] |
-| POST | `/events/{id}/hide` | oculta evento | M6 | [ ] |
+| GET | `/events` | agenda pública filtrable; Admin autenticado ve todos los estados | M6 | [x] |
+| POST | `/events` | crea evento en borrador | M6 | [x] |
+| GET | `/events/{id}` | detalle publicado/autorizado | M6 | [x] |
+| PATCH | `/events/{id}` | edita evento | M6 | [x] |
+| POST | `/events/{id}/publish` | publica evento | M6 | [x] |
+| POST | `/events/{id}/cancel` | cancela evento | M6 | [x] |
+| POST | `/events/{id}/hide` | oculta evento | M6 | [x] |
 
 Payloads M4 en camelCase (`id`, `seedbedId`, `responsibleIds`, `memberIds`,
 `progress`, ...). `GET /research-proposals/{id}` incluye `history` y

@@ -1,0 +1,46 @@
+<section aria-label="Administración de eventos">
+  <div class="toolbar"><span>Eventos ({{ events().length }})</span><button type="button" class="primary" (click)="newEvent()" [disabled]="busy() || loading()">+ Nuevo evento</button></div>
+  <div class="filters" aria-label="Filtrar eventos por estado">@for (status of filters; track status) {<button type="button" [class.active]="filter() === status" [attr.aria-pressed]="filter() === status" (click)="setFilter(status)">{{ labels[status] }} ({{ count(status) }})</button>}</div>
+  @if (error()) {<p class="error" role="alert">{{ error() }}</p>}
+  <p class="feedback" role="status">{{ feedback() }}</p>
+  @if (loading()) {<p role="status">Cargando eventos…</p>}
+  @else {
+    <div class="layout">
+      <div class="event-list" aria-label="Eventos disponibles" [attr.aria-busy]="busy()">
+        @for (event of filtered(); track event.id) {
+          <button type="button" class="event-row" [class.selected]="selected()?.id === event.id" [disabled]="busy()" (click)="select(event)" [attr.aria-pressed]="selected()?.id === event.id">
+            <time [attr.datetime]="event.startAt"><strong>{{ event.startAt | date:'dd' }}</strong><small>{{ event.startAt | date:'MM/yyyy' }}</small></time>
+            <span class="event-copy"><strong>{{ event.title }}</strong><small>{{ event.type }}</small></span>
+            <span class="badge" [attr.data-status]="event.status">{{ statusLabels[event.status] }}</span>
+          </button>
+        } @empty {<div class="empty"><p>No hay eventos en este filtro.</p><button type="button" class="outline" [disabled]="busy()" (click)="load()">Actualizar lista</button></div>}
+      </div>
+      <div class="editor" [attr.aria-busy]="busy()">
+        @if (selected() || creating()) {
+          <div class="editor-heading"><div><span class="eyebrow">{{ creating() ? 'NUEVO EVENTO' : 'EDITAR EVENTO' }}</span>@if (selected()?.updatedAt) {<p>Actualizado {{ selected()?.updatedAt | date:'dd/MM/yyyy, HH:mm' }}</p>}</div><span class="badge" [attr.data-status]="selected()?.status || 'borrador'">{{ statusLabels[selected()?.status || 'borrador'] }}</span></div>
+          <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+            <fieldset [disabled]="busy()"><legend class="sr-only">Datos del evento</legend>
+              <label for="event-title">Título <em>*</em></label><input id="event-title" formControlName="title" required [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid" />
+              <label for="event-description">Descripción <em>*</em></label><textarea id="event-description" formControlName="description" rows="4" required [attr.aria-invalid]="form.controls.description.touched && form.controls.description.invalid"></textarea>
+              <label for="event-type">Tipo <em>*</em></label><input id="event-type" formControlName="type" placeholder="Ej. Taller o encuentro" required [attr.aria-invalid]="form.controls.type.touched && form.controls.type.invalid" />
+              <div class="columns"><div><label for="event-start">Fecha y hora de inicio <em>*</em></label><input id="event-start" type="datetime-local" formControlName="startAt" required /></div><div><label for="event-end">Fecha y hora de fin (opcional)</label><input id="event-end" type="datetime-local" formControlName="endAt" [min]="form.controls.startAt.value" /></div></div>
+              <label for="event-venue">Lugar</label><input id="event-venue" formControlName="venue" />
+              <label for="event-meeting">Enlace virtual</label><input id="event-meeting" type="url" formControlName="meetingUrl" placeholder="https://" [attr.aria-invalid]="form.controls.meetingUrl.touched && form.controls.meetingUrl.invalid" /><p class="hint">Indica al menos un lugar o un enlace virtual.</p>
+              @if (selected()?.organizerName) {<p class="organizer">Organizador: {{ selected()?.organizerName }}</p>}
+              <label for="event-image">Imagen (URL opcional)</label><input id="event-image" type="url" formControlName="imageUrl" placeholder="https://" [attr.aria-invalid]="form.controls.imageUrl.touched && form.controls.imageUrl.invalid" />
+              <label for="event-registration">Enlace de inscripción (opcional)</label><input id="event-registration" type="url" formControlName="registrationUrl" placeholder="https://" [attr.aria-invalid]="form.controls.registrationUrl.touched && form.controls.registrationUrl.invalid" />
+              <div class="actions"><button type="submit" class="outline" [disabled]="!creating() && form.pristine">{{ busy() ? 'Guardando…' : creating() ? 'Crear borrador' : 'Guardar cambios' }}</button>
+                @if (selected(); as event) {
+                  @if (event.status === 'borrador' || event.status === 'oculto') {<button type="button" class="primary" [disabled]="form.dirty" (click)="action('publish')">Publicar</button>}
+                  @if (event.status === 'publicado') {<button type="button" class="outline yellow" [disabled]="form.dirty" (click)="action('hide')">Ocultar</button>}
+                  @if (event.status !== 'cancelado') {<button type="button" class="outline danger" [disabled]="form.dirty" (click)="action('cancel')">Cancelar evento</button>}
+                }
+              </div>
+              @if (form.dirty && selected()) {<p class="hint">Guarda los cambios antes de publicar, ocultar o cancelar el evento.</p>}
+            </fieldset>
+          </form>
+        } @else {<div class="empty"><h2>Selecciona un evento</h2><p>Revisa su información y administra su publicación, o crea un evento nuevo.</p></div>}
+      </div>
+    </div>
+  }
+</section>

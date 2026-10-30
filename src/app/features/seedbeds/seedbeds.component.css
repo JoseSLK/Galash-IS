@@ -77,3 +77,4 @@ h1 { font-size: 24px; } h1 span { color: var(--mint); } h2 { font-size: 24px; } 
 .project-line { width: fit-content; padding: 3px 10px; border: 1px solid #ffffff29; border-radius: 20px; color: #daddf0; font-size: 10px; }
 .details-link { font-size: 11px; }.filter-count { margin-left: 3px; font-size: 10px; opacity: .7; }
 @media (max-width: 600px) { .event-stack, .project-stack { grid-template-columns: 1fr; }.event-list.scrollable, .project-list.scrollable { max-height: 570px; }.event-card, .project-card { min-height: 180px; }.events .tabs, .projects .tabs { width: auto; max-width: 100%; }.event-card .event-date { width: auto; }.event-date strong { font-size: 32px; } }
+.event-image { display: block; width: 100%; max-height: 320px; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 6px; background: #0a1420; }

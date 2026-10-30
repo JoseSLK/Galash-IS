@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <span>GALASH</span>
@@ -8,7 +8,7 @@
       <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
       <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
-      <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
+      <a routerLink="/eventos" [attr.aria-current]="headerOnly && activePage === 'eventos' ? 'page' : null" (click)="closeMenu()">Eventos<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     </nav>
     <div class="header-actions">
@@ -64,7 +64,7 @@
     <a [attr.href]="headerOnly ? '/#unete' : '#unete'" [attr.aria-current]="!headerOnly && activeSection === 'unete' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#nosotros' : '#nosotros'" [attr.aria-current]="!headerOnly && activeSection === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
     <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
-    <a [attr.href]="headerOnly ? '/#noticias' : '#noticias'" [attr.aria-current]="!headerOnly && activeSection === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
+    <a routerLink="/eventos" [attr.aria-current]="headerOnly && activePage === 'eventos' ? 'page' : null" (click)="closeMenu()">Eventos<span aria-hidden="true"></span></a>
     <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
   </nav>
 
@@ -125,7 +125,7 @@
     }
   </main>
 
-  <app-site-footer id="noticias" class="site-footer-anchor" />
+  <app-site-footer class="site-footer-anchor" />
   }
 </div>
 
