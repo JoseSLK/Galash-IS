@@ -12,6 +12,8 @@ form { display: grid; gap: 16px; }
 label { color: #fff; font-size: 12px; font-weight: 700; }
 input, select { width: 100%; min-height: 44px; border: 1px solid rgb(255 255 255 / .3); border-radius: 4px; padding: 9px 11px; background: #fff; color: #1e1a17; font: 400 14px/1.4 var(--fuente-texto); }
 input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid #f7c500; outline-offset: 3px; }
+input[type=date] { color-scheme: light; }
+.optional { color: rgb(255 255 255 / .6); font-weight: 400; }
 input:disabled { background: #e6e6e6; color: #333; }
 .form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .form-actions button, .close-button { min-height: 44px; border-radius: 4px; cursor: pointer; font: 700 13px/1.2 var(--fuente-texto); }

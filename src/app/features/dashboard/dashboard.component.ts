@@ -110,9 +110,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.authMenuOpen = false;
     } catch (error: unknown) {
       if (error instanceof RegistrationRequiredError) {
-        this.authMenuOpen = false;
-        this.registrationOpen = true;
-        document.body.style.overflow = 'hidden';
+        this.openRegistration();
       } else {
         // Endpoint, status and CORS details stay out of the UI; they are only logged in development.
         if (isDevMode()) console.warn('[auth] inicio de sesión fallido', error);
@@ -125,14 +123,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /** Opens the signup drawer; with a session open it completes the account's basic data. */
+  openRegistration(): void {
+    this.authMenuOpen = false;
+    this.registrationOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
   async cancelGoogleRegistration(): Promise<void> {
     this.registrationOpen = false;
     this.authMenuOpen = false;
     document.body.style.overflow = '';
-    try {
-      await this.authService.cancelGoogleRegistration();
-    } catch {
-      this.authErrorMessage = 'No se pudo cerrar el acceso de Google. Inténtalo de nuevo.';
+    // Closing the data completion of a signed-in account must not end its session.
+    if (!this.authService.isAuthenticated()) {
+      try {
+        await this.authService.cancelGoogleRegistration();
+      } catch {
+        this.authErrorMessage = 'No se pudo cerrar el acceso de Google. Inténtalo de nuevo.';
+      }
     }
     setTimeout(() => this.authMenuTrigger?.nativeElement.focus(), 0);
   }

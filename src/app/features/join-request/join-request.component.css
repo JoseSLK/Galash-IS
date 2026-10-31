@@ -306,6 +306,31 @@ dd {
   justify-content:flex-start;
   margin-top:30px
 }
+.account-card {
+  margin-bottom:28px;
+  padding:20px 22px;
+  border:1px solid rgb(155 232 184 / 22%);
+  border-radius:12px;
+  background:rgb(155 232 184 / 4%)
+}
+.account-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px
+}
+.account-heading h2 {
+  font-size:18px
+}
+.account-card dl {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;
+  margin:16px 0 0
+}
+.pending {
+  color:#f5c518
+}
 .sr-only {
   position:absolute;
   width:1px;
@@ -350,7 +375,7 @@ h1:focus {
 h1 {
   font-size:32px
 }
-.fields,.review dl,.receipt-details {
+.fields,.review dl,.receipt-details,.account-card dl {
   grid-template-columns:1fr
 }
 .form-actions,.advance,.success-actions {

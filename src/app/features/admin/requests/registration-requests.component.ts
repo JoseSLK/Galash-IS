@@ -32,7 +32,15 @@ export class RegistrationRequestsComponent implements OnDestroy {
   readonly resolved = computed(() => this.service.requests().filter(item => this.isResolved(item.estado)).length);
   readonly visible = computed(() => this.service.requests().filter(item => this.filter() === 'all'
     || (this.filter() === 'pending' ? !this.isResolved(item.estado) : this.isResolved(item.estado))));
-  readonly formFields = joinSteps.flatMap(step => step.fields).filter(field => !field.optional);
+  // Keys are M3 response fields. Personal data comes from the account, not from the Únete form, but M3 still returns it.
+  readonly formFields = [
+    { key: 'nombre', label: 'Nombre completo' },
+    { key: 'cc', label: 'C.C.' },
+    { key: 'cod', label: 'COD. (código estudiantil)' },
+    { key: 'telefono', label: 'Teléfono' },
+    { key: 'fechaNacimiento', label: 'Fecha de nacimiento' },
+    ...joinSteps.flatMap(step => step.fields).filter(field => !field.optional).map(field => ({ key: JOIN_REQUEST_FIELDS[field.key], label: field.label }))
+  ];
   private returnFocus?: HTMLButtonElement;
   private previousOverflow = '';
   private scrollLocked = false;
@@ -119,8 +127,8 @@ export class RegistrationRequestsComponent implements OnDestroy {
   ngOnDestroy(): void { this.close(); this.releaseScroll(); }
 
   formValue(key: string, item: RegistrationRequest): string {
-    const value = item[JOIN_REQUEST_FIELDS[key]];
-    if (key === 'birthDate' && typeof value === 'string') return value.slice(0, 10).split('-').reverse().join('/');
+    const value = item[key];
+    if (key === 'fechaNacimiento' && typeof value === 'string') return value.slice(0, 10).split('-').reverse().join('/');
     return typeof value === 'string' && value ? value : 'Sin indicar';
   }
 }

@@ -16,13 +16,9 @@ interface CreatedRegistration {
   trackingToken: string;
 }
 
-// Form keys -> POST /registration-requests fields (M3).
+// Form keys -> POST /registration-requests fields (M3). Personal data comes from the session account.
 export const JOIN_REQUEST_FIELDS: Record<string, string> = {
-  fullName: 'nombre',
-  document: 'cc',
   studentCode: 'cod',
-  phone: 'telefono',
-  birthDate: 'fechaNacimiento',
   birthPlace: 'lugarNacimiento',
   address: 'direccionResidencia',
   cvlac: 'linkCvLAC',

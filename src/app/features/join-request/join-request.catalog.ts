@@ -17,12 +17,9 @@ export const temporaryCatalogs = {
 const options = (values: readonly string[]) => values.map(value => ({ value, label: value }));
 
 export const joinSteps: { label: string; title: string; accent: string; help: string; fields: JoinField[] }[] = [
-  { label: 'Datos personales', title: 'Comencemos por', accent: 'conocerte', help: 'Cuéntanos quién eres para iniciar tu solicitud.', fields: [
-    { key: 'fullName', label: 'Nombre completo', type: 'text' },
-    { key: 'document', label: 'C.C.', type: 'text', numeric: true },
-    { key: 'studentCode', label: 'COD. (código estudiantil)', type: 'text', numeric: true },
-    { key: 'phone', label: 'Teléfono', type: 'tel', numeric: true },
-    { key: 'birthDate', label: 'Fecha de nacimiento', type: 'date' },
+  // Name, document, phone and birth date come from the account (GET /users/me), not from this form.
+  { label: 'Datos personales', title: 'Comencemos por', accent: 'conocerte', help: 'Tomamos tus datos básicos de tu cuenta; completa el resto para iniciar tu solicitud.', fields: [
+    { key: 'studentCode', label: 'COD. (código estudiantil)', type: 'text', numeric: true, optional: true },
     { key: 'birthPlace', label: 'Lugar de nacimiento', type: 'text' },
     { key: 'address', label: 'Dirección de residencia', type: 'text' }
   ] },

@@ -198,3 +198,6 @@
 {"v":1,"id":"X044","t":"result","run":"R036","test":"T042","s":"pass","ev":["seedbeds.service.spec abbreviation RA/IA/CIBER/RS","ng test 12/12, build ok","/semilleros Ciberseguridad graph shows CIBER and Aplicaciones, no sample text","home topics: Aplicaciones, Datos, Personas, Riesgos"]}
 {"v":1,"id":"R037","t":"run","at":"2026-10-28T03:12:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng test --watch=false; npx ng build; npx playwright test (e2e/home.spec.ts with /api/seedbeds mocked)"}
 {"v":1,"id":"X045","t":"result","run":"R037","test":"T031","s":"fail","defect":"D003","ev":["axe still detects .device-photo contrast on desktop, tablet and mobile (test.fail holds)","e2e 6/6 as expected","before the /api/seedbeds mock the integration hid the seedbed section and masked D003 on tablet and mobile"]}
+{"v":1,"id":"T043","t":"test","area":"join-request","p":"must","name":"POST /registration-requests payload carries cod and academic fields only; no nombre, cc, telefono or fechaNacimiento"}
+{"v":1,"id":"R038","t":"run","at":"2026-10-31T18:55:00Z","build":"wip","by":"agent","mode":"automated","cmd":"npx ng build; npx ng test --watch=false"}
+{"v":1,"id":"X046","t":"result","run":"R038","test":"T043","s":"pass","ev":["join-request.service.spec ok","ng test 12/12","ng build ok"]}
