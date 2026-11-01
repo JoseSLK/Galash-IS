@@ -45,9 +45,15 @@ Jonquil puede aparecer en elementos grandes y decorativos que no son interactivo
 | Elemento | Límite |
 |---|---|
 | Números o palabras del hero | Una palabra o cifra por hero, de 32px o más. |
+| Palabra destacada en un `h2` de sección | Una por sección, solo mientras el `h2` mide 32px o más, y lejos del primario (no en la misma sección que un botón Jonquil). Si el `h2` mide menos de 32px en algún ancho, en ese ancho la palabra va en blanco (`--galash-text-strong`). Decisión del 2026-11-01. |
 | Nodo activo del grafo (d3) | Solo el nodo activo o enfocado, uno a la vez. Los demás nodos y aristas no usan Jonquil. |
 | Subrayado de títulos | Barra de 3–4px bajo el `h1` o los `h2` de sección. Máximo una por sección. |
 | Línea del botón specular | Solo la línea del borde. El relleno sigue siendo navy y el texto blanco. No cuenta como acción primaria. |
+
+Excepción nombrada (2026-11-01): la palabra "GALASH" del `h1` del hero del Home
+puede ir en Jonquil aunque comparta `.hero-copy` con el botón primario relleno.
+Solo aplica a ese elemento; no es una regla general. Se separa visualmente del
+botón con el subtítulo intermedio más un margen extra en el CTA.
 
 Límites comunes:
 

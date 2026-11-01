@@ -4,3 +4,5 @@
 .area-callout { min-width:0; padding:0; background:transparent; border:0; }.area-callout h3 { font-size:21px; margin-bottom:9px; }.area-callout>p:last-child { margin:0; color:var(--galash-text); font-size:12px; line-height:1.7; }
 @media(max-width:767px) { .area-universe { grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 22px; min-height:0; }.area-logo { grid-column:1 / -1; grid-row:1; width:min(100%,520px); justify-self:center; }.area-callout { grid-column:auto!important; grid-row:auto!important; align-self:start; }.area-callout h3 { font-size:19px; } }
 @media(max-width:420px) { .area-universe { grid-template-columns:1fr; }.area-logo { grid-column:1; } }
+/* MASTER: this h2 is clamp(32px, …) so it is always ≥32px; its highlight stays Jonquil at every width. */
+.area-heading h2 span { color: var(--galash-accent); }
