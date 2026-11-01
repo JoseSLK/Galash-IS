@@ -75,9 +75,9 @@ test('public universe content is reachable, responsive, keyboard operable and ac
   expect(audit.violations.map(v => `${v.id}: ${v.nodes.map(n => n.target).join(', ')}`)).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('heading', { name: 'Grupo de investigación en', exact: true }).scrollIntoViewIfNeeded();
-  await page.screenshot({ path: `docs/testing/evidence/R20261101-nosotros-refinement/hero-${info.project.name}.png`, fullPage: false });
+  await page.screenshot({ path: info.outputPath('hero.png'), fullPage: false });
   await page.locator('#areas').scrollIntoViewIfNeeded();
-  await page.screenshot({ path: `docs/testing/evidence/R20261101-nosotros-refinement/areas-${info.project.name}.png` });
+  await page.screenshot({ path: info.outputPath('areas.png') });
 });
 
 test('constellation loops continuously including reduced-motion mode while other motion remains reduced', async ({ page }) => {
