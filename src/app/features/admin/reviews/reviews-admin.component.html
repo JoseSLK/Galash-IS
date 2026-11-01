@@ -8,7 +8,7 @@
   <div class="moderation-grid">
     @for (review of visible(); track review.id) {
       <article class="review-card">
-        <div class="review-top"><span class="seedbed-label">{{ review.seedbedName }}</span><span class="review-status" [class.pending]="review.status === 'pendiente'">{{ labels[review.status] }}</span></div>
+        <div class="review-top"><span class="seedbed-label">{{ review.seedbedName }}</span><span class="review-status" [class.pending]="review.status === 'pendiente'">@if (review.status === 'pendiente') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>}{{ labels[review.status] }}</span></div>
         <p class="review-text">{{ review.text }}</p>
         <h3>{{ review.author }}</h3><time [attr.datetime]="review.date">{{ review.date | date:'dd/MM/yyyy, HH:mm' }}</time>
         <div class="moderation-actions">

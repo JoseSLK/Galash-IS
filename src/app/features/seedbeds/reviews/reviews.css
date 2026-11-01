@@ -18,7 +18,7 @@ h3 { margin:0 0 4px; font-size:12px; font-weight:600; } time,.review-meta { colo
 textarea { display:block; width:100%; box-sizing:border-box; padding:14px; resize:vertical; min-height:100px; border:1px solid var(--galash-border-strong); border-radius:10px; background:#0a1420; color:#fff; font:400 14px/1.6 var(--fuente-texto); }
 textarea::placeholder { color:#9dafbd; }
 .composer-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:14px; } small { color:#aabcc9; }
-button { min-height:44px; padding:10px 18px; border:1px solid var(--galash-accent); border-radius:8px; background:var(--galash-accent); color:var(--galash-accent-fg); font:600 12px var(--fuente-texto); cursor:pointer; }
+button { min-height:44px; padding:10px 18px; border:1px solid var(--galash-border-strong); border-radius:8px; background:var(--galash-accent); color:var(--galash-accent-fg); font:600 12px var(--fuente-texto); cursor:pointer; }
 button:disabled { opacity:.5; cursor:default; } 
 .feedback { color:var(--galash-text-strong)!important; }
 @media(max-width:800px) { .review-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }

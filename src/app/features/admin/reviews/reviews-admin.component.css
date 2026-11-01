@@ -1,10 +1,13 @@
 .moderation-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin:24px 0; }
-.moderation-heading p { color:#9be8b8; font-size:14px; }.moderation-heading > span { max-width:450px; color:#aabcc9; font-size:12px; line-height:1.7; }
+.moderation-heading p { color:var(--galash-muted); font-size:14px; }.moderation-heading > span { max-width:450px; color:#aabcc9; font-size:12px; line-height:1.7; }
 .review-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
-.review-filters button { border-radius:24px; background:transparent; color:#c3ccd4; }.review-filters .active { background:#f7c500; color:#0a1420; border-color:#f7c500; }
+.review-filters button { border-radius:24px; background:transparent; color:#c3ccd4; }.review-filters .active { background:var(--galash-accent); color:var(--galash-accent-fg); border-color:var(--galash-accent); }
 .moderation-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start; }
 .review-top { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:20px; }
-.seedbed-label { font-size:12px; color:#9be8b8; }.review-status { font-size:10px; border:1px solid #9be8b83d; padding:6px 10px; border-radius:20px; color:#c3ccd4; }.review-status.pending { color:#f7c500; border-color:#f7c50050; }
+.seedbed-label { font-size:12px; color:var(--galash-muted); }.review-status { font-size:10px; border:1px solid var(--galash-border-strong); padding:6px 10px; border-radius:20px; color:#c3ccd4; }.review-status.pending { color:var(--galash-muted); border-color:var(--galash-muted); }
 .moderation-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }.moderation-actions .secondary { background:transparent; color:#c3ccd4; }
 .empty-state { color:#c3ccd4; font-size:14px; }
 @media(max-width:650px) { .moderation-grid { grid-template-columns:1fr; } }
+.review-status { display: inline-flex; align-items: center; gap: 6px; }
+.review-status.pending { border-style: dashed; }
+.status-icon { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }

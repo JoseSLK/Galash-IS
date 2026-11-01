@@ -11,13 +11,13 @@
           <button type="button" class="event-row" [class.selected]="selected()?.id === event.id" [disabled]="busy()" (click)="select(event)" [attr.aria-pressed]="selected()?.id === event.id">
             <time [attr.datetime]="event.startAt"><strong>{{ event.startAt | date:'dd' }}</strong><small>{{ event.startAt | date:'MM/yyyy' }}</small></time>
             <span class="event-copy"><strong>{{ event.title }}</strong><small>{{ event.type }}</small></span>
-            <span class="badge" [attr.data-status]="event.status">{{ statusLabels[event.status] }}</span>
+            <span class="badge" [attr.data-status]="event.status">@if (event.status === 'publicado') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>}{{ statusLabels[event.status] }}</span>
           </button>
         } @empty {<div class="empty"><p>No hay eventos en este filtro.</p><button type="button" class="outline" [disabled]="busy()" (click)="load()">Actualizar lista</button></div>}
       </div>
       <div class="editor" [attr.aria-busy]="busy()">
         @if (selected() || creating()) {
-          <div class="editor-heading"><div><span class="eyebrow">{{ creating() ? 'NUEVO EVENTO' : 'EDITAR EVENTO' }}</span>@if (selected()?.updatedAt) {<p>Actualizado {{ selected()?.updatedAt | date:'dd/MM/yyyy, HH:mm' }}</p>}</div><span class="badge" [attr.data-status]="selected()?.status || 'borrador'">{{ statusLabels[selected()?.status || 'borrador'] }}</span></div>
+          <div class="editor-heading"><div><span class="eyebrow">{{ creating() ? 'NUEVO EVENTO' : 'EDITAR EVENTO' }}</span>@if (selected()?.updatedAt) {<p>Actualizado {{ selected()?.updatedAt | date:'dd/MM/yyyy, HH:mm' }}</p>}</div><span class="badge" [attr.data-status]="selected()?.status || 'borrador'">@if (selected()?.status === 'publicado') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>}{{ statusLabels[selected()?.status || 'borrador'] }}</span></div>
           <form [formGroup]="form" (ngSubmit)="save()" novalidate>
             <fieldset [disabled]="busy()"><legend class="sr-only">Datos del evento</legend>
               <label for="event-title">Título <em>*</em></label><input id="event-title" formControlName="title" required [attr.aria-invalid]="form.controls.title.touched && form.controls.title.invalid" />
@@ -32,7 +32,7 @@
               <div class="actions"><button type="submit" class="outline" [disabled]="!creating() && form.pristine">{{ busy() ? 'Guardando…' : creating() ? 'Crear borrador' : 'Guardar cambios' }}</button>
                 @if (selected(); as event) {
                   @if (event.status === 'borrador' || event.status === 'oculto') {<button type="button" class="primary" [disabled]="form.dirty" (click)="action('publish')">Publicar</button>}
-                  @if (event.status === 'publicado') {<button type="button" class="outline yellow" [disabled]="form.dirty" (click)="action('hide')">Ocultar</button>}
+                  @if (event.status === 'publicado') {<button type="button" class="outline hide-action" [disabled]="form.dirty" (click)="action('hide')">Ocultar</button>}
                   @if (event.status !== 'cancelado') {<button type="button" class="outline danger" [disabled]="form.dirty" (click)="action('cancel')">Cancelar evento</button>}
                 }
               </div>
