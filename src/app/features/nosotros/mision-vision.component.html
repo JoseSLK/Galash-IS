@@ -1,0 +1,6 @@
+<section #stage id="mision-vision" class="u-section" appReveal aria-labelledby="mission-title" (focusin)="focusIn()" (focusout)="focusOut($event)">
+<h2 id="mission-title" class="sr-only">Misión y visión</h2>
+<div class="purpose-carousel" role="region" aria-label="Misión y visión; el cambio se pausa al enfocarlo" tabindex="0">
+@for (slide of [selected()]; track slide) {<article id="purpose-slide" class="purpose-slide" role="group" [attr.aria-label]="labels[slide]" aria-roledescription="diapositiva"><app-institutional-icon [kind]="selected() === 0 ? 6 : 3" /><h3 class="purpose-current">{{ labels[slide] }}</h3>@if (words.length) {<p class="purpose-quote">@for (word of words; track $index) {<span class="purpose-word" [class.is-lit]="$index < litWords()">{{ word }} </span>}</p>} @else {<p class="empty">Contenido en preparación</p>}</article>}
+<div class="purpose-pagination" role="group" aria-label="Elegir contenido institucional">@for (label of labels; track label; let i = $index) {<button type="button" [attr.aria-pressed]="selected() === i" aria-controls="purpose-slide" [class.selected]="selected() === i" (click)="choose(i)"><span class="purpose-dot" aria-hidden="true"></span>{{ label }}</button>}</div>
+</div></section>

@@ -5,6 +5,7 @@ import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', component: DashboardComponent },
+  { path: 'nosotros', loadComponent: () => import('./features/nosotros/nosotros-page.component').then(module => module.NosotrosPageComponent) },
   { path: 'semilleros', loadComponent: () => import('./features/seedbeds/seedbeds.component').then(module => module.SeedbedsComponent) },
   { path: 'eventos', loadComponent: () => import('./features/events/events.component').then(module => module.EventsComponent) },
   { path: 'unete', loadComponent: () => import('./features/join-request/join-request.component').then(module => module.JoinRequestComponent) },
