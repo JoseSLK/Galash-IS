@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direcciones de acento GALASH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Signika:wght@600&display=swap" rel="stylesheet">
+<style>
+/* Propuesta de refresh visual. Comparación, no código de producción. */
+:root {
+  --navy: #0A1420;          /* base de identidad, se mantiene */
+  --surface: #102332;       /* superficie actual */
+  --text: #C3CCD4;
+  --text-strong: #FFFFFF;
+  --muted: #8FA1AD;
+  --border: rgb(255 255 255 / 0.12);
+  --border-strong: rgb(255 255 255 / 0.28);
+  --jonquil: #F7C500;       /* único amarillo; reemplaza #F5C518 */
+  --accent: var(--jonquil);
+  --accent-hover: #FFD42E;
+  --accent-fg: var(--navy);
+  --light-blue: #B4BEDA;    /* "link" oscuro de DESIGN.galash.md */
+  --danger: #FF8F8A;        /* error actual, sin cambios */
+  --celadon: #A5E6BA;
+  --green-text: #86E0A6;
+  --font-display: "Signika", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Open Sans", system-ui, sans-serif;
+  --font-label: "Arial Narrow", "Liberation Sans Narrow", Arial, sans-serif;
+  --r: 10px;
+}
+* { box-sizing: border-box; }
+html, body { min-width: 320px; }
+body { margin: 0; background: var(--navy); color: var(--text); font: 400 1rem/1.55 var(--font-body); }
+body.gray { filter: grayscale(1); }
+main { max-width: 1120px; margin: 0 auto; padding: 32px 16px 96px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; color: var(--text-strong); line-height: 1.15; }
+h1 { font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem); margin: 0 0 8px; }
+h2 { font-size: 1.5rem; margin: 56px 0 8px; }
+h3 { font-size: 1.125rem; margin: 0 0 12px; }
+p { max-width: 65ch; }
+.label { font: 600 0.75rem/1.3 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 16px; top: 16px; background: var(--text-strong); color: var(--navy); padding: 8px 12px; z-index: 9; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 24px 0; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.panel { min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: var(--r); background: var(--navy); }
+.panel.on-surface { background: var(--surface); }
+.panel.rec { border-color: var(--accent); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 12px 0; }
+
+/* Botones */
+.btn { min-height: 44px; padding: 0 20px; border-radius: var(--r); font: 600 1rem var(--font-body); cursor: pointer; border: 1px solid transparent; }
+.btn-primary { background: var(--accent); color: var(--accent-fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: transparent; color: var(--text-strong); border-color: var(--border-strong); }
+.btn-secondary:hover { border-color: var(--text-strong); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Dirección A1: foco blanco con anillo doble.
+   El halo navy separa el anillo del jonquil (blanco vs jonquil = 1.62:1). */
+.a1 :is(a, button, input):focus-visible,
+.a1 .force-focus { outline: 2px solid #FFFFFF; outline-offset: 2px; box-shadow: 0 0 0 2px var(--navy); }
+.a1 a { color: var(--light-blue); text-underline-offset: 3px; }
+
+/* Dirección A2: foco azul claro + azul claro como acento secundario. */
+.a2 :is(a, button, input):focus-visible,
+.a2 .force-focus { outline: 2px solid var(--light-blue); outline-offset: 2px; box-shadow: 0 0 0 2px var(--navy); }
+.a2 a { color: var(--light-blue); text-underline-offset: 3px; }
+.a2 .tab[aria-selected=true] { color: var(--text-strong); border-bottom-color: var(--light-blue); }
+.a2 .info { border-left: 4px solid var(--light-blue); }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); }
+.tab { min-height: 44px; padding: 0 12px; background: none; border: 0; border-bottom: 3px solid transparent; color: var(--muted); font: 600 0.9375rem var(--font-body); cursor: pointer; }
+.a1 .tab[aria-selected=true] { color: var(--text-strong); border-bottom-color: var(--accent); }
+.info { padding: 12px 16px; background: var(--surface); border-radius: var(--r); border-left: 4px solid var(--border-strong); }
+.info svg { vertical-align: -3px; margin-right: 6px; }
+
+/* Estados: forma + ícono + texto; el color solo refuerza */
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border-radius: 999px; font: 600 0.875rem var(--font-body); }
+.chip svg { flex: none; width: 16px; height: 16px; }
+.st-pending { border: 1.5px dashed var(--muted); color: var(--text-strong); background: transparent; }
+.st-error { border: 1.5px solid var(--danger); color: var(--danger); background: rgb(255 143 138 / .08); }
+.st-ok-1 { border: 1.5px solid var(--celadon); background: var(--celadon); color: var(--navy); }
+.st-ok-2 { border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-strong); }
+.st-ok-3 { border: 1.5px solid var(--green-text); color: var(--green-text); background: transparent; }
+
+/* Foto */
+.photo { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 733 / 424; background: var(--surface); }
+.photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.photo figcaption { position: absolute; inset: auto 0 0 0; padding: 40px 16px 16px; background: linear-gradient(transparent, rgb(10 20 32 / .93)); color: var(--text-strong); }
+.photo figcaption span { color: var(--muted); font: 600 0.75rem ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; } /* regla de eyebrow única (MASTER.md) */
+
+/* Tabla de contraste */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--text-strong); font-weight: 600; }
+.sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--border-strong); }
+.pass { color: var(--text-strong); }
+.fail { color: var(--danger); font-weight: 600; }
+ul.rules { padding-left: 20px; max-width: 70ch; }
+ul.rules li { margin: 6px 0; }
+code { font-size: .875em; color: var(--text-strong); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<main id="main">
+  <p class="label">GALASH-IS · refresh visual · paso 2</p>
+  <h1>Direcciones de acento sobre navy</h1>
+  <p>Opción A: Jonquil <code>#F7C500</code> es el acento único y reemplaza <code>#F5C518</code>. El navy <code>#0A1420</code> sigue siendo la base. Fuente de verdad: <code>minimal-system</code>; esta página es solo para comparar y no modifica <code>src/</code>.</p>
+
+  <div class="toolbar">
+    <button class="btn btn-secondary" id="gray" type="button" aria-pressed="false">Ver en escala de grises</button>
+    <span class="label">Comprueba que los estados se distinguen sin color</span>
+  </div>
+
+  <h2>1. Foco</h2>
+  <p>Ningún color claro llega a 3:1 contra Jonquil: el blanco da 1.62:1 y el azul claro 1.14:1. Por eso el foco es un <strong>anillo doble</strong>: <code>outline</code> claro de 2px con un halo navy de 2px. Navy contra Jonquil da 11.41:1 y el anillo contra navy, 18.5:1 o 9.98:1.</p>
+  <div class="grid">
+    <section class="panel rec a1" aria-labelledby="a1t">
+      <p class="label">Recomendada</p>
+      <h3 id="a1t">A1 · Foco blanco</h3>
+      <div class="row">
+        <button class="btn btn-primary force-focus" type="button">Enviar solicitud</button>
+        <button class="btn btn-secondary force-focus" type="button">Cancelar</button>
+      </div>
+      <div class="row"><a href="#a1t" class="force-focus">Ver estado de mi solicitud</a></div>
+      <div class="tabs" role="tablist" aria-label="Ejemplo A1">
+        <button class="tab" role="tab" aria-selected="true" type="button">Eventos</button>
+        <button class="tab" role="tab" aria-selected="false" type="button">Proyectos</button>
+      </div>
+      <p>El foco blanco no se parece a ningún otro rol. El azul claro queda solo para enlaces, como define <code>DESIGN.galash.md</code> en modo oscuro. La pestaña activa usa Jonquil (estado activo).</p>
+    </section>
+    <section class="panel a2 on-surface" aria-labelledby="a2t">
+      <p class="label">Alternativa</p>
+      <h3 id="a2t">A2 · Foco azul claro + secundario</h3>
+      <div class="row">
+        <button class="btn btn-primary force-focus" type="button">Enviar solicitud</button>
+        <button class="btn btn-secondary force-focus" type="button">Cancelar</button>
+      </div>
+      <div class="row"><a href="#a2t" class="force-focus">Ver estado de mi solicitud</a></div>
+      <div class="tabs" role="tablist" aria-label="Ejemplo A2">
+        <button class="tab" role="tab" aria-selected="true" type="button">Eventos</button>
+        <button class="tab" role="tab" aria-selected="false" type="button">Proyectos</button>
+      </div>
+      <p class="info"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v4M8 4.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>La convocatoria cierra el 15 de noviembre.</p>
+      <p>Riesgo: un enlace enfocado tiene el mismo color que su anillo, y las pestañas activas en azul compiten con Jonquil por el rol "activo".</p>
+    </section>
+  </div>
+
+  <h3 style="margin-top:24px">Reglas del azul claro <code>#B4BEDA</code></h3>
+  <ul class="rules">
+    <li><strong>A1 y A2:</strong> enlaces de texto, siempre subrayados. Contraste 9.98:1 sobre navy y 8.65:1 sobre superficie.</li>
+    <li><strong>Solo en A2:</strong> anillo de foco, borde de avisos informativos y pestaña o filtro activo dentro de un grupo.</li>
+    <li><strong>Nunca:</strong> rellenar botones, marcar éxito o pendiente, ni ir sobre Jonquil (1.14:1). Ningún elemento puede usar Jonquil y azul claro a la vez.</li>
+    <li><strong>Jonquil:</strong> una acción primaria por vista, el estado seleccionado más importante y, como mucho, una palabra destacada. No se usa para bordes ni decoración.</li>
+  </ul>
+
+  <h2>2. Texto sobre Jonquil</h2>
+  <div class="row">
+    <button class="btn btn-primary" type="button">Navy #0A1420 · 11.41:1</button>
+    <button class="btn btn-primary" type="button" style="color:#1E1A17">Eerie #1E1A17 · marca</button>
+    <button class="btn btn-primary" type="button" disabled>Deshabilitado</button>
+  </div>
+  <p>Se usa navy, como pediste. Supera 4.5:1 con margen. <code>DESIGN.galash.md</code> indica Eerie black; usar navy es una desviación pequeña y conviene registrarla.</p>
+
+  <h2>3. Pendiente vs error vs éxito</h2>
+  <p>Cada estado se distingue por <strong>forma del borde + ícono + texto</strong>. Activa la escala de grises: pendiente usa borde punteado y reloj; error, borde sólido y signo de exclamación.</p>
+  <div class="grid">
+    <section class="panel" aria-labelledby="stt">
+      <h3 id="stt">Pendiente y error</h3>
+      <div class="row">
+        <span class="chip st-pending"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Pendiente de revisión</span>
+        <span class="chip st-error"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14H1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6v3.5M8 11.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Rechazada</span>
+      </div>
+      <p>Pendiente es neutro: texto blanco y borde <code>#8FA1AD</code> punteado (6.94:1). Deja de usar amarillo. Error mantiene <code>#FF8F8A</code> (8.42:1).</p>
+    </section>
+    <section class="panel on-surface" aria-labelledby="okt">
+      <h3 id="okt">Éxito: tres opciones</h3>
+      <div class="row">
+        <span class="chip st-ok-1"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>S1 · Aprobada</span>
+        <span class="chip st-ok-2"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>S2 · Aprobada</span>
+        <span class="chip st-ok-3"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>S3 · Aprobada</span>
+      </div>
+      <ul class="rules">
+        <li><strong>S1 (recomendada):</strong> relleno Celadon <code>#A5E6BA</code> con texto navy (12.9:1). Es el éxito oficial de la marca. Al ser relleno sólido, no se confunde con el acento menta anterior, que era trazo y borde.</li>
+        <li><strong>S2 (sin verde):</strong> chip neutro con check; solo el ícono comunica el estado. Es el más sobrio, pero se distingue menos al escanear tablas.</li>
+        <li><strong>S3:</strong> contorno verde <code>#86E0A6</code> (11.67:1 sobre navy). Visualmente es casi la menta anterior, así que no lo recomiendo.</li>
+      </ul>
+    </section>
+  </div>
+
+  <h2>4. Jonquil sobre fondo.png</h2>
+  <p>La foto tiene pasto oliva (<code>#738A32</code>, cerca del 7% de los píxeles) abajo a la derecha. El pie de imagen va sobre un degradado navy, así que Jonquil no se mezcla con el pasto.</p>
+  <figure class="photo" style="margin:0">
+    <img src="../../src/assets/fondo.png" alt="Integrantes de GALASH frente al mural de Ingeniería de Sistemas">
+    <figcaption><span>01 · Nuestra comunidad</span><br>Semilleros de investigación en la UPTC</figcaption>
+  </figure>
+
+  <h2>5. Contraste calculado</h2>
+  <p>Se calcula en esta página con la fórmula WCAG 2.x. Objetivos: texto ≥ 4.5:1 y UI o foco ≥ 3:1.</p>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Tabla de contraste">
+    <table>
+      <thead><tr><th scope="col">Par</th><th scope="col">Uso</th><th scope="col">Ratio</th><th scope="col">Mínimo</th></tr></thead>
+      <tbody id="ct"></tbody>
+    </table>
+  </div>
+
+  <h2>Mapeo de roles (para el paso 3)</h2>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Tabla de mapeo de roles">
+    <table>
+      <thead><tr><th scope="col">Rol</th><th scope="col">Antes</th><th scope="col">Después (A1 + S1)</th></tr></thead>
+      <tbody>
+        <tr><td>CTA principal</td><td>menta / amarillo mezclados</td><td><code>--accent</code> Jonquil + <code>--accent-fg</code> navy</td></tr>
+        <tr><td>Enlace</td><td>menta</td><td><code>--link</code> #B4BEDA, subrayado</td></tr>
+        <tr><td>Foco</td><td>amarillo (20) y menta (1)</td><td><code>--focus</code> blanco + halo navy</td></tr>
+        <tr><td>Hover / borde</td><td>menta rgba .12–.35</td><td><code>--border</code> / <code>--border-strong</code> (blanco 12% / 28%)</td></tr>
+        <tr><td>Seleccionado / activo</td><td>menta</td><td>Jonquil (uno por grupo) + indicador de forma</td></tr>
+        <tr><td>Éxito</td><td>menta</td><td><code>--success-bg</code> Celadon + check + texto</td></tr>
+        <tr><td>Pendiente</td><td>amarillo</td><td>neutro con borde punteado + reloj + texto</td></tr>
+        <tr><td>Error</td><td>#FF8F8A</td><td><code>--danger</code> #FF8F8A + triángulo + texto</td></tr>
+        <tr><td>Texto destacado / eyebrow</td><td>menta</td><td><code>--text-muted</code> + mono 12px mayúsculas (tabla, app y pie de foto); nunca Jonquil</td></tr>
+        <tr><td>Gráfico (d3, canvas, shader)</td><td>menta / turquesa</td><td>Glaucous #7785AC, con Jonquil para el nodo activo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<script>
+const lum = h => { const c = [1,3,5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(x => x <= .04045 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + .05) / (y + .05); };
+const pairs = [
+  ['#0A1420', '#F7C500', 'Texto navy sobre Jonquil', 4.5],
+  ['#F7C500', '#0A1420', 'Jonquil sobre navy', 3],
+  ['#F7C500', '#102332', 'Jonquil sobre superficie', 3],
+  ['#FFFFFF', '#0A1420', 'Foco A1 sobre navy', 3],
+  ['#FFFFFF', '#102332', 'Foco A1 sobre superficie', 3],
+  ['#FFFFFF', '#F7C500', 'Foco blanco pegado a Jonquil (sin halo)', 3],
+  ['#0A1420', '#F7C500', 'Halo navy vs Jonquil', 3],
+  ['#B4BEDA', '#0A1420', 'Enlace / foco A2 sobre navy', 4.5],
+  ['#B4BEDA', '#102332', 'Enlace / foco A2 sobre superficie', 4.5],
+  ['#B4BEDA', '#F7C500', 'Foco A2 pegado a Jonquil (sin halo)', 3],
+  ['#8FA1AD', '#0A1420', 'Borde pendiente sobre navy', 3],
+  ['#FF8F8A', '#0A1420', 'Error sobre navy', 4.5],
+  ['#FF8F8A', '#102332', 'Error sobre superficie', 4.5],
+  ['#0A1420', '#A5E6BA', 'S1 navy sobre Celadon', 4.5],
+  ['#86E0A6', '#0A1420', 'S3 verde sobre navy', 4.5],
+  ['#C3CCD4', '#102332', 'Texto base sobre superficie', 4.5],
+];
+document.getElementById('ct').innerHTML = pairs.map(([a, b, use, min]) => {
+  const r = ratio(a, b), ok = r >= min;
+  return `<tr><td><span class="sw" style="background:${a}"></span>${a} / <span class="sw" style="background:${b}"></span>${b}</td><td>${use}</td><td class="${ok ? 'pass' : 'fail'}">${r.toFixed(2)}:1 ${ok ? '' : '✕ no cumple'}</td><td>${min}:1</td></tr>`;
+}).join('');
+const g = document.getElementById('gray');
+g.addEventListener('click', () => { const on = document.body.classList.toggle('gray'); g.setAttribute('aria-pressed', on); });
+document.querySelectorAll('[role=tablist]').forEach(list => list.addEventListener('click', e => {
+  const t = e.target.closest('[role=tab]'); if (!t) return;
+  list.querySelectorAll('[role=tab]').forEach(x => x.setAttribute('aria-selected', x === t));
+}));
+</script>
+</body>
+</html>

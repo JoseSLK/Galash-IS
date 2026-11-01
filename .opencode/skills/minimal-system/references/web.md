@@ -30,6 +30,6 @@
 One `<h1>`, ordered headings, landmarks (`header, nav, main, footer`), skip link, sufficient contrast per the brand table, full keyboard path, no keyboard traps (use `<dialog>` or a focus trap with Escape), `aria-current="page"` on active nav, tap targets 44px, `text-wrap: balance` on headings.
 
 ## Digital pieces
-- OpenGraph 1200x630 with the vertical logo on Eerie black, a short Signika title, one Jonquil highlight at most. Add `og:title`, `og:description`, `og:image`, `twitter:card=summary_large_image`.
+- OpenGraph 1200x630 with the vertical logo on Eerie black, a short Sora title, one Jonquil highlight at most. Add `og:title`, `og:description`, `og:image`, `twitter:card=summary_large_image`.
 - Emails: 800px wide container, inline styles, system fallbacks (web fonts may not load), Eerie black on white with a Jonquil button.
 - Sizes for heroes, agenda and bulletin images are in `galash-brand.md`. Serve responsive `srcset` and modern formats (AVIF/WebP).

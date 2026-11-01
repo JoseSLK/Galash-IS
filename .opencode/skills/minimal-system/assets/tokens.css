@@ -1,7 +1,10 @@
 /* GALASH design tokens. Source: Manual de Identidad Digital.
    "brand" = from the manual. "derived" = added for function, keep minimal. */
 
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Signika:wght@500;600&display=swap");
+/* Fonts load from the HTML head, not @import:
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap"> */
 
 :root {
   /* brand palette */
@@ -35,9 +38,9 @@
   --focus: var(--delft-blue);
 
   /* type */
-  --font-display: "Signika", "Arial Narrow", Arial, sans-serif;
-  --font-body: "Open Sans", system-ui, sans-serif;
-  --font-label: "Arial Narrow", "Liberation Sans Narrow", Arial, sans-serif;
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --t-xs: 0.75rem;   --t-sm: 0.875rem; --t-base: 1rem;
   --t-lg: 1.25rem;
   --t-xl: clamp(1.5rem, 1.2rem + 1vw, 2rem);
@@ -121,8 +124,8 @@ h3 { font-size: var(--t-lg); }
 p { max-width: var(--reading-max); text-wrap: pretty; }
 a { color: var(--link); text-underline-offset: 0.2em; }
 .eyebrow {
-  font-family: var(--font-label); font-size: var(--t-xs); text-transform: uppercase;
-  letter-spacing: 0.14em; color: var(--text-muted);
+  font: 500 var(--t-xs)/var(--lh-ui) var(--font-mono); text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--text-muted);
 }
 .highlight { background: var(--accent); color: var(--accent-fg); padding: 0 0.2em; border-radius: 2px; }
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
@@ -133,7 +136,7 @@ a { color: var(--link); text-underline-offset: 0.2em; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
   min-height: var(--control-h); padding: 0 var(--s-5); border-radius: var(--r-control);
-  font: 500 var(--t-sm)/var(--lh-ui) var(--font-body); cursor: pointer;
+  font: 600 var(--t-sm)/var(--lh-ui) var(--font-body); cursor: pointer;
   border: 1px solid var(--border-strong); background: transparent; color: var(--text);
   transition: transform var(--d-fast) var(--ease-out);
 }

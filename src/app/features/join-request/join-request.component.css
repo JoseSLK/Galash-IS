@@ -2,7 +2,7 @@
   display:block;
   background:#0a1420;
   color:#fff;
-  font-family:'Open Sans',sans-serif;
+  font-family:var(--fuente-texto);
   min-height:100vh
 }
 .join-page {
@@ -45,7 +45,7 @@
   border:0;
   background:none;
   color:#9be8b8;
-  font:600 12px 'Open Sans',sans-serif
+  font:600 12px var(--fuente-texto)
 }
 .status-link:disabled {
   opacity:.65
@@ -108,7 +108,7 @@
   max-width:730px
 }
 h1 {
-  font:700 48px/1.12 'Signika Negative',sans-serif;
+  font:700 48px/1.12 var(--fuente-titulo);
   margin:0 0 15px;
   scroll-margin-top:140px
 }
@@ -123,7 +123,7 @@ h1 em {
   line-height:1.7
 }
 .step-number {
-  font:700 100px/1 'Signika Negative',sans-serif;
+  font:700 100px/1 var(--fuente-titulo);
   color:transparent;
   -webkit-text-stroke:1px rgb(155 232 184 / 20%)
 }
@@ -161,7 +161,7 @@ input,select {
   background:rgb(255 255 255 / 4%);
   color:#fff;
   padding:0 42px 0 13px;
-  font:400 13.5px 'Open Sans',sans-serif;
+  font:400 13.5px var(--fuente-texto);
   color-scheme:dark
 }
 select {
@@ -219,7 +219,7 @@ input[type=date]::-webkit-calendar-picker-indicator {
   min-height:44px;
   padding:10px 24px;
   border-radius:30px;
-  font:700 14px 'Open Sans',sans-serif;
+  font:700 14px var(--fuente-texto);
   text-decoration:none;
   cursor:pointer
 }
@@ -259,7 +259,7 @@ button:disabled {
   border-bottom:1px solid rgb(155 232 184 / 15%)
 }
 h2 {
-  font:700 22px 'Signika Negative',sans-serif;
+  font:700 22px var(--fuente-titulo);
   margin:0
 }
 .edit {

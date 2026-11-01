@@ -32,7 +32,7 @@
 | danger | `#B3261E` (derived) | `#F2A29C` (derived) | errors |
 
 ## Type
-- Display: Signika 600 (fallback Arial Narrow). Body: Open Sans 400/500/600. Labels: Arial Narrow stack, uppercase, +0.14em.
+- Display: Sora 600. Body: IBM Plex Sans 400/600. Labels, codes and data: IBM Plex Mono 500, labels uppercase, +0.12em. Typography evolution of 2026-11-01 (see `references/galash-brand.md`).
 - Scale: 12 / 14 / 16 / 20 / fluid 24-32 / fluid 32-48. Body line-height 1.55, headings 1.15.
 
 ## Space, shape, elevation, motion
