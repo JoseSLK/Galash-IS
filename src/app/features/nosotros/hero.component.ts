@@ -1,6 +1,7 @@
 import { HeroAcronimoComponent } from './hero-acronimo.component';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnDestroy, ViewChild, inject } from '@angular/core';
 import { ContenidoInstitucional } from './institucional.models';
+import { cssColorString } from '../../shared/css-color';
 interface Star { x: number; y: number; vx: number; vy: number; near: boolean; }
 @Component({ selector: 'app-nosotros-hero', standalone: true, imports: [HeroAcronimoComponent], changeDetection: ChangeDetectionStrategy.OnPush, templateUrl: './hero.component.html', styleUrls: ['./universo.css', './hero.component.css'] })
 export class NosotrosHeroComponent implements AfterViewInit, OnDestroy {
@@ -9,6 +10,7 @@ export class NosotrosHeroComponent implements AfterViewInit, OnDestroy {
   private readonly zone = inject(NgZone);
   private context: CanvasRenderingContext2D | null = null;
   private stars: Star[] = [];
+  private colors = { line: '', star: '', near: '' };
   private width = 0; private height = 0; private frame = 0; private last = 0;
   private visible = false; private destroyed = false;
   private pointer: { x: number; y: number } | null = null;
@@ -19,6 +21,7 @@ export class NosotrosHeroComponent implements AfterViewInit, OnDestroy {
     this.zone.runOutsideAngular(() => {
       this.context = this.field.nativeElement.getContext('2d');
       if (!this.context) return;
+      this.colors = { line: cssColorString('--galash-secondary'), star: cssColorString('--galash-secondary'), near: cssColorString('--galash-text-strong') };
       this.resize = new ResizeObserver(() => this.size()); this.resize.observe(this.field.nativeElement);
       this.intersection = new IntersectionObserver(entries => { this.visible = entries[0].isIntersecting; this.sync(); }); this.intersection.observe(this.field.nativeElement);
       this.motion.addEventListener('change', this.onPreference); this.mobile.addEventListener('change', this.onPreference);
@@ -66,10 +69,10 @@ export class NosotrosHeroComponent implements AfterViewInit, OnDestroy {
     for (let i = 0; i < this.stars.length; i++) for (let j = i + 1; j < this.stars.length; j++) {
       const a = this.stars[i], b = this.stars[j]; const distance = Math.hypot(a.x - b.x, a.y - b.y);
       if (distance >= 180) continue;
-      ctx.globalAlpha = (1 - distance / 180) * .5; ctx.strokeStyle = '#9BE8B8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      ctx.globalAlpha = (1 - distance / 180) * .5; ctx.strokeStyle = this.colors.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }
     ctx.globalAlpha = .8;
-    for (const star of this.stars) { ctx.fillStyle = star.near ? '#F7C500' : '#9BE8B8'; ctx.beginPath(); ctx.arc(star.x, star.y, star.near ? 3 : 2.2, 0, Math.PI * 2); ctx.fill(); }
+    for (const star of this.stars) { ctx.fillStyle = star.near ? this.colors.near : this.colors.star; ctx.beginPath(); ctx.arc(star.x, star.y, star.near ? 3 : 2.2, 0, Math.PI * 2); ctx.fill(); }
     ctx.globalAlpha = 1;
   }
   ngOnDestroy(): void {

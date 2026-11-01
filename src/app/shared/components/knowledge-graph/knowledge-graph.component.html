@@ -8,7 +8,7 @@
     @for (node of satellites; track node.id) {
       <g class="satellite" [style.transform]="position(node)" tabindex="0" role="button" [attr.aria-label]="node.title" [attr.aria-expanded]="activeId === node.id" [attr.aria-describedby]="activeId === node.id ? tooltipId : null"
         (pointerenter)="hovered = $event.pointerType === 'mouse' ? node.id : null" (pointerleave)="hovered = null" (focus)="focused = node.id" (blur)="focused = null" (click)="toggle(node)" (keydown)="keydown($event, node)" (pointerdown)="pointerDown($event, node)" (pointermove)="pointerMove($event)" (pointerup)="pointerUp($event)" (pointercancel)="pointerUp($event)">
-        <g class="node-visual" [class.active]="activeId === node.id"><circle class="hit-area" r="23"/><circle class="node-circle" [attr.r]="node.radius"/><circle class="yellow-dot" r="3.5"/></g>
+        <g class="node-visual" [class.active]="activeId === node.id"><circle class="hit-area" r="23"/><circle class="node-circle" [attr.r]="node.radius"/><circle class="node-dot" r="3.5"/></g>
         <text class="node-label" [attr.x]="compact ? 0 : (node.x ?? node.homeX) < centerX - 1 ? -22 : 22" [attr.y]="compact ? 32 : 4" [attr.text-anchor]="compact ? 'middle' : (node.x ?? node.homeX) < centerX - 1 ? 'end' : 'start'">{{ node.title }}</text>
       </g>
     }

@@ -1,10 +1,15 @@
 import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inject, isDevMode } from '@angular/core';
+import { cssColor } from '../../css-color';
 import type { Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
 
 const fragmentShader = `
 precision highp float;
 uniform float uTime;
 uniform vec2 uResolution;
+uniform vec3 uBase;
+uniform vec3 uRibbonA;
+uniform vec3 uRibbonB;
+uniform vec3 uStar;
 varying vec2 vUv;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -13,14 +18,14 @@ vec3 field(vec2 uv) {
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
   float t = uTime;
-  vec3 color = vec3(0.018, 0.035, 0.075);
+  vec3 color = uBase;
   float drift = sin(p.x * 2.3 + t * 0.24) * 0.045 + cos(p.x * 4.1 - t * 0.17) * 0.025;
   float ribbon = exp(-abs(p.y + 0.30 + drift) * 24.0);
   float broad = exp(-abs(p.y + 0.30 + drift) * 6.0);
   float center = exp(-p.x * p.x * 1.9);
-  vec3 neon = mix(vec3(0.19, 0.85, 0.66), vec3(0.58, 0.20, 0.94), sin(p.x * 2.0 + t * 0.13) * 0.5 + 0.5);
+  vec3 neon = mix(uRibbonA, uRibbonB, sin(p.x * 2.0 + t * 0.13) * 0.5 + 0.5);
   color += neon * (ribbon * 0.47 + broad * 0.16) * (0.4 + center * 0.6);
-  color += vec3(0.22, 0.08, 0.45) * exp(-length((p - vec2(0.28 * sin(t * 0.1), -0.40)) * vec2(1.1, 2.8)) * 2.3) * 0.55;
+  color += uRibbonA * 0.5 * exp(-length((p - vec2(0.28 * sin(t * 0.1), -0.40)) * vec2(1.1, 2.8)) * 2.3) * 0.55;
 
   float depth = max(0.045, 0.47 - uv.y);
   vec2 world = vec2((uv.x - 0.5) * aspect / depth, 1.0 / depth + t * 0.16);
@@ -32,7 +37,7 @@ vec3 field(vec2 uv) {
   vec2 stars = uv * vec2(85.0, 46.0);
   vec2 starCell = floor(stars);
   float star = (1.0 - smoothstep(0.015, 0.08, length(fract(stars) - 0.5))) * step(0.982, hash(starCell));
-  color += vec3(0.55, 0.75, 0.92) * star * (0.35 + sin(t * 0.3 + hash(starCell) * 6.28) * 0.15);
+  color += uStar * star * (0.35 + sin(t * 0.3 + hash(starCell) * 6.28) * 0.15);
   return color;
 }
 
@@ -56,7 +61,7 @@ void main() {
   selector: 'app-glitch-background',
   standalone: true,
   template: `<canvas #surface aria-hidden="true"></canvas>`,
-  styles: `:host{position:absolute;inset:0;display:block;overflow:hidden;pointer-events:none;background:#0a1420}canvas{display:block;width:100%;height:100%}`
+  styles: `:host{position:absolute;inset:0;display:block;overflow:hidden;pointer-events:none;background:var(--galash-bg)}canvas{display:block;width:100%;height:100%}`
 })
 export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
   @ViewChild('surface', { static: true }) private surface!: ElementRef<HTMLCanvasElement>;
@@ -87,14 +92,19 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private async initialize(): Promise<void> {
     try {
-      const { WebGLRenderer, Scene, OrthographicCamera, PlaneGeometry, ShaderMaterial, Mesh, Vector2 } = await import('three');
+      const { WebGLRenderer, Scene, OrthographicCamera, PlaneGeometry, ShaderMaterial, Mesh, Vector2, Vector3 } = await import('three');
       if (this.destroyed) return;
       this.renderer = new WebGLRenderer({ canvas: this.surface.nativeElement, antialias: false, powerPreference: 'low-power' });
       this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
       this.scene = new Scene();
       this.camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       this.mesh = new Mesh(new PlaneGeometry(2, 2), new ShaderMaterial({
-        uniforms: { uTime: { value: this.elapsed }, uResolution: { value: new Vector2(1, 1) } },
+        uniforms: {
+          uTime: { value: this.elapsed }, uResolution: { value: new Vector2(1, 1) },
+          // Colors come from CSS tokens (styles.css), never duplicated here.
+          uBase: { value: new Vector3(...cssColor('--galash-deep')) }, uRibbonA: { value: new Vector3(...cssColor('--galash-secondary')) },
+          uRibbonB: { value: new Vector3(...cssColor('--galash-link')) }, uStar: { value: new Vector3(...cssColor('--galash-text')) }
+        },
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
         fragmentShader, depthTest: false, depthWrite: false
       }));
