@@ -81,9 +81,11 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
   private frame = 0;
   private previousTime = 0;
   private elapsed = 12;
+  private readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   ngAfterViewInit(): void {
     document.addEventListener('visibilitychange', this.onVisibility);
+    this.reducedMotion.addEventListener('change', this.onVisibility);
     this.zone.runOutsideAngular(() => {
       this.intersectionObserver = new IntersectionObserver(entries => {
         this.visible = entries[0]?.isIntersecting ?? false;
@@ -137,6 +139,8 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
     this.frame = 0;
     this.previousTime = 0;
     if (this.destroyed || !this.renderer || !this.visible || document.hidden) return;
+    // Reduced motion: one static frame, no animation loop.
+    if (this.reducedMotion.matches) { this.draw(); return; }
     this.frame = requestAnimationFrame(this.animate);
   }
   private readonly animate = (time: number): void => {
@@ -161,6 +165,7 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
     this.destroyed = true;
     this.intersectionObserver?.disconnect();
     document.removeEventListener('visibilitychange', this.onVisibility);
+    this.reducedMotion.removeEventListener('change', this.onVisibility);
     this.release();
   }
 }
