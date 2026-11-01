@@ -2,14 +2,18 @@ import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inj
 import { cssColor } from '../../css-color';
 import type { Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
 
-const fragmentShader = `
+type Rgb = [number, number, number];
+const vec3 = ([r, g, b]: Rgb): string => `vec3(${r.toFixed(4)}, ${g.toFixed(4)}, ${b.toFixed(4)})`;
+
+// Token colors are inlined as GLSL constants (not uniforms) so the compiler can fold them; software WebGL is measurably slower with uniforms.
+const fragmentShader = (c: { base: Rgb; ribbonA: Rgb; ribbonB: Rgb; star: Rgb }) => `
 precision highp float;
 uniform float uTime;
 uniform vec2 uResolution;
-uniform vec3 uBase;
-uniform vec3 uRibbonA;
-uniform vec3 uRibbonB;
-uniform vec3 uStar;
+const vec3 uBase = ${vec3(c.base)};
+const vec3 uRibbonA = ${vec3(c.ribbonA)};
+const vec3 uRibbonB = ${vec3(c.ribbonB)};
+const vec3 uStar = ${vec3(c.star)};
 varying vec2 vUv;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -92,21 +96,18 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private async initialize(): Promise<void> {
     try {
-      const { WebGLRenderer, Scene, OrthographicCamera, PlaneGeometry, ShaderMaterial, Mesh, Vector2, Vector3 } = await import('three');
+      const { WebGLRenderer, Scene, OrthographicCamera, PlaneGeometry, ShaderMaterial, Mesh, Vector2 } = await import('three');
       if (this.destroyed) return;
       this.renderer = new WebGLRenderer({ canvas: this.surface.nativeElement, antialias: false, powerPreference: 'low-power' });
       this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
       this.scene = new Scene();
       this.camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       this.mesh = new Mesh(new PlaneGeometry(2, 2), new ShaderMaterial({
-        uniforms: {
-          uTime: { value: this.elapsed }, uResolution: { value: new Vector2(1, 1) },
-          // Colors come from CSS tokens (styles.css), never duplicated here.
-          uBase: { value: new Vector3(...cssColor('--galash-deep')) }, uRibbonA: { value: new Vector3(...cssColor('--galash-secondary')) },
-          uRibbonB: { value: new Vector3(...cssColor('--galash-link')) }, uStar: { value: new Vector3(...cssColor('--galash-text')) }
-        },
+        uniforms: { uTime: { value: this.elapsed }, uResolution: { value: new Vector2(1, 1) } },
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
-        fragmentShader, depthTest: false, depthWrite: false
+        // Colors come from CSS tokens (styles.css), never duplicated here.
+        fragmentShader: fragmentShader({ base: cssColor('--galash-deep'), ribbonA: cssColor('--galash-secondary'), ribbonB: cssColor('--galash-link'), star: cssColor('--galash-text') }),
+        depthTest: false, depthWrite: false
       }));
       this.scene.add(this.mesh);
       this.resizeObserver = new ResizeObserver(() => this.resize());
