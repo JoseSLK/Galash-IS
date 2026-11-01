@@ -1,0 +1,6 @@
+.area-heading { text-align:center; max-width:900px; margin:0 auto 32px; }.area-heading h2 { font-size:clamp(32px,4.6vw,56px); letter-spacing:-.035em; }
+.area-universe { display:grid; grid-template-columns:minmax(170px,220px) minmax(0,1fr) minmax(170px,220px); grid-template-rows:1fr 1fr; gap:32px 24px; align-items:center; min-height:600px; }
+.area-logo { grid-column:2; grid-row:1 / 3; pointer-events:none; }.area-logo img { display:block; width:100%; height:auto; object-fit:contain; }
+.area-callout { min-width:0; padding:0; background:transparent; border:0; }.area-callout h3 { font-size:21px; margin-bottom:9px; }.area-callout>p:last-child { margin:0; color:var(--galash-text); font-size:12px; line-height:1.7; }
+@media(max-width:767px) { .area-universe { grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 22px; min-height:0; }.area-logo { grid-column:1 / -1; grid-row:1; width:min(100%,520px); justify-self:center; }.area-callout { grid-column:auto!important; grid-row:auto!important; align-self:start; }.area-callout h3 { font-size:19px; } }
+@media(max-width:420px) { .area-universe { grid-template-columns:1fr; }.area-logo { grid-column:1; } }

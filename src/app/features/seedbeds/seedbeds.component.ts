@@ -1,3 +1,4 @@
+import { SeedbedReviewsComponent } from './reviews/seedbed-reviews.component';
 import { Component, LOCALE_ID, computed, inject, signal } from '@angular/core';
 import { DatePipe, formatDate } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -12,7 +13,7 @@ type ProjectFilter = 'Todos' | Project['status'];
 @Component({
   selector: 'app-seedbeds',
   standalone: true,
-  imports: [RouterLink, DatePipe, DashboardComponent, SiteFooterComponent, KnowledgeGraphComponent],
+  imports: [SeedbedReviewsComponent, RouterLink, DatePipe, DashboardComponent, SiteFooterComponent, KnowledgeGraphComponent],
   templateUrl: './seedbeds.component.html',
   styleUrl: './seedbeds.component.css'
 })
@@ -61,7 +62,7 @@ export class SeedbedsComponent {
   }
   constructor() {
     void this.loadEvents();
-    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.load(params.get('id')));
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.load(params.get('id') ?? params.get('nombre')));
   }
   async loadEvents(): Promise<void> {
     this.eventsState.set('loading');
@@ -78,7 +79,7 @@ export class SeedbedsComponent {
     this.state.set('loading');
     try {
       if (!this.seedbeds().length) this.seedbeds.set(await this.service.list());
-      const seedbed = this.seedbeds().find(item => item.id === id) ?? this.seedbeds()[0];
+      const seedbed = this.seedbeds().find(item => item.id === id || (!!id && (item.name.toLocaleLowerCase() === id.toLocaleLowerCase() || seedbedAbbreviation(item.name).toLocaleLowerCase() === id.toLocaleLowerCase()))) ?? this.seedbeds()[0];
       if (!seedbed) {
         if (request === this.loadId) this.state.set('empty');
         return;
@@ -102,7 +103,7 @@ export class SeedbedsComponent {
       if (request === this.loadId) this.state.set('error');
     }
   }
-  retry(): void { void this.load(this.route.snapshot.queryParamMap.get('id')); }
+  retry(): void { void this.load(this.route.snapshot.queryParamMap.get('id') ?? this.route.snapshot.queryParamMap.get('nombre')); }
   projectCount(status: ProjectFilter): number { return this.projects().filter(project => status === 'Todos' || project.status === status).length; }
   get filteredProjects(): Project[] { return this.projects().filter(project => this.selectedStatus === 'Todos' || project.status === this.selectedStatus); }
   get filteredEvents(): PublicEvent[] {

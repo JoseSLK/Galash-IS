@@ -56,3 +56,6 @@ button:focus-visible, input:focus-visible { outline: 2px solid #f5c518; outline-
 @media(max-width: 480px) { .admin-page { padding-inline: 18px; }.person-editor { padding: 20px 16px; }.editor-actions { flex-direction: column; }.editor-actions button { width: 100%; } }
 @media(prefers-reduced-motion: reduce) { .switch span { transition: none; } }
 .search-status { min-height: 1.6em; margin: 0 0 10px; color: #c3ccd4; font-size: 12px; }
+
+.sections-dropdown .review-count { display:inline-grid; min-width:22px; height:22px; padding-inline:4px; box-sizing:border-box; place-items:center; border-radius:20px; background:#f5c518; color:#0a1420; font-size:11px; font-weight:700; }
+.sections-dropdown button:not(:disabled) { cursor:pointer; }

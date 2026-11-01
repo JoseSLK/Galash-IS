@@ -1,0 +1,25 @@
+<app-dashboard #header [headerOnly]="true" activePage="nosotros" />
+<div class="nosotros-shell" [inert]="header.registrationOpen">
+<main id="contenido" class="nosotros-page">
+  @switch (state()) {
+    @case ('loading') {<div class="state-panel" aria-busy="true" role="status"><p class="u-label">CONECTANDO EL UNIVERSO GALASH</p><h1>Cargando Nosotros…</h1><div class="skeleton title"></div><div class="skeleton line"></div><div class="skeleton line short"></div><div class="u-grid"><div class="skeleton block"></div><div class="skeleton block"></div><div class="skeleton block"></div></div></div>}
+    @case ('error') {<div class="state-panel"><p class="u-label">NO PUDIMOS CONECTAR</p><h1>Algo no salió como esperábamos</h1><p role="alert">No se pudo cargar el contenido institucional. Inténtalo de nuevo.</p><button class="u-button primary" type="button" (click)="load()">Reintentar</button></div>}
+    @case ('empty') {<div class="state-panel"><h1>Contenido en preparación</h1></div>}
+    @case ('ready') {
+      @if (datos(); as data) {
+        <app-nosotros-hero [contenido]="data.contenido" />
+        <div class="universe-content">
+          <app-nosotros-mision-vision [contenido]="data.contenido" />
+          <app-nosotros-objetivos [objetivos]="data.contenido.objetivos" />
+          <app-nosotros-galeria [titulo]="data.contenido.galeriaTitulo" [fotos]="data.contenido.galeria" />
+          <app-nosotros-areas [logoUrl]="data.contenido.logoUrl" [areas]="data.contenido.areas" />
+          <app-nosotros-enlaces [enlaces]="data.enlaces" [ubicacion]="data.ubicacion" />
+          <app-nosotros-colaborar />
+          <p class="editorial-meta">{{ data.autor }} · Actualización: {{ data.actualizadoEn }}</p>
+        </div>
+      }
+    }
+  }
+</main>
+<app-site-footer />
+</div>

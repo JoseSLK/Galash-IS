@@ -1,9 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Signika+Negative:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Open+Sans:wght@300;400;600;700&family=Signika+Negative:wght@700&display=swap');
 @import './app/shared/directives/specular-button.css';
 
 /* Tailwind está configurado en postcss.config.js para incorporarlo por etapas. */
 
 :root {
+  --galash-bg: #0A1420;
+  --galash-deep: #070D14;
+  --galash-surface: #102332;
+  --galash-mint: #9BE8B8;
+  --galash-yellow: #F5C518;
+  --galash-error: #FF8F8A;
+  --galash-text: #C3CCD4;
+  --galash-muted: #8FA1AD;
+  --galash-mono: 'JetBrains Mono', monospace;
   --fuente-titulo: 'Signika Negative', 'Arial Narrow', Arial, sans-serif;
   --fuente-texto: 'Open Sans', system-ui, sans-serif;
   --font-display: var(--fuente-titulo);
