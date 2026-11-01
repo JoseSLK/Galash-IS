@@ -6,14 +6,17 @@ type Rgb = [number, number, number];
 const vec3 = ([r, g, b]: Rgb): string => `vec3(${r.toFixed(4)}, ${g.toFixed(4)}, ${b.toFixed(4)})`;
 
 // Token colors are inlined as GLSL constants (not uniforms) so the compiler can fold them; software WebGL is measurably slower with uniforms.
-const fragmentShader = (c: { base: Rgb; ribbonA: Rgb; ribbonB: Rgb; star: Rgb }) => `
+const fragmentShader = (c: { base: Rgb; wave: Rgb; highlight: Rgb }) => `
 precision highp float;
 uniform float uTime;
 uniform vec2 uResolution;
 const vec3 uBase = ${vec3(c.base)};
-const vec3 uRibbonA = ${vec3(c.ribbonA)};
-const vec3 uRibbonB = ${vec3(c.ribbonB)};
-const vec3 uStar = ${vec3(c.star)};
+const vec3 uWave = ${vec3(c.wave)};
+const vec3 uHighlight = ${vec3(c.highlight)};
+// Wave intensity: keeps the crest dark enough for muted text (#8FA1AD) to stay at 4.5:1 or more over it.
+const float WAVE_GAIN = 0.60;
+// Grain and scanlines tinted with the wave hue instead of neutral gray.
+const vec3 TINT = uWave / max(max(uWave.r, uWave.g), uWave.b);
 varying vec2 vUv;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -27,21 +30,21 @@ vec3 field(vec2 uv) {
   float ribbon = exp(-abs(p.y + 0.30 + drift) * 24.0);
   float broad = exp(-abs(p.y + 0.30 + drift) * 6.0);
   float center = exp(-p.x * p.x * 1.9);
-  vec3 neon = mix(uRibbonA, uRibbonB, sin(p.x * 2.0 + t * 0.13) * 0.5 + 0.5);
+  vec3 neon = mix(uWave, uHighlight, (sin(p.x * 2.0 + t * 0.13) * 0.5 + 0.5) * 0.15) * WAVE_GAIN;
   color += neon * (ribbon * 0.47 + broad * 0.16) * (0.4 + center * 0.6);
-  color += uRibbonA * 0.5 * exp(-length((p - vec2(0.28 * sin(t * 0.1), -0.40)) * vec2(1.1, 2.8)) * 2.3) * 0.55;
+  color += uWave * WAVE_GAIN * 0.5 * exp(-length((p - vec2(0.28 * sin(t * 0.1), -0.40)) * vec2(1.1, 2.8)) * 2.3) * 0.55;
 
   float depth = max(0.045, 0.47 - uv.y);
   vec2 world = vec2((uv.x - 0.5) * aspect / depth, 1.0 / depth + t * 0.16);
   vec2 cell = abs(fract(world * 1.4) - 0.5);
   float lines = max(1.0 - smoothstep(0.0, 0.018, cell.x), 1.0 - smoothstep(0.0, 0.025, cell.y));
   float floorMask = (1.0 - smoothstep(0.18, 0.45, uv.y)) * smoothstep(0.0, 0.10, uv.y);
-  color += neon * lines * floorMask * 0.20;
+  color += uWave * WAVE_GAIN * lines * floorMask * 0.20;
 
   vec2 stars = uv * vec2(85.0, 46.0);
   vec2 starCell = floor(stars);
   float star = (1.0 - smoothstep(0.015, 0.08, length(fract(stars) - 0.5))) * step(0.982, hash(starCell));
-  color += uStar * star * (0.35 + sin(t * 0.3 + hash(starCell) * 6.28) * 0.15);
+  color += uHighlight * star * (0.35 + sin(t * 0.3 + hash(starCell) * 6.28) * 0.15);
   return color;
 }
 
@@ -54,10 +57,11 @@ void main() {
   float shift = 0.0015 + glitch * 0.006;
   vec3 color = vec3(field(uv + vec2(shift, 0.0)).r, field(uv).g, field(uv - vec2(shift, 0.0)).b);
   float grain = hash(gl_FragCoord.xy + floor(uTime * 12.0)) - 0.5;
-  color += grain * 0.024;
+  color += TINT * grain * 0.024;
   float scan = sin(gl_FragCoord.y * 1.7) * 0.005;
-  color += scan;
-  color *= 0.85 + 0.15 * smoothstep(0.0, 0.45, min(vUv.x, 1.0 - vUv.x));
+  color += TINT * scan;
+  // Vignette fades toward the navy base, not toward black/gray.
+  color = mix(uBase, color, 0.85 + 0.15 * smoothstep(0.0, 0.45, min(vUv.x, 1.0 - vUv.x)));
   gl_FragColor = vec4(max(color, 0.0), 1.0);
 }`;
 
@@ -108,7 +112,7 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
         uniforms: { uTime: { value: this.elapsed }, uResolution: { value: new Vector2(1, 1) } },
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
         // Colors come from CSS tokens (styles.css), never duplicated here.
-        fragmentShader: fragmentShader({ base: cssColor('--galash-deep'), ribbonA: cssColor('--galash-secondary'), ribbonB: cssColor('--galash-link'), star: cssColor('--galash-text') }),
+        fragmentShader: fragmentShader({ base: cssColor('--galash-deep'), wave: cssColor('--galash-wave'), highlight: cssColor('--galash-link') }),
         depthTest: false, depthWrite: false
       }));
       this.scene.add(this.mesh);

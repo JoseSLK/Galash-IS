@@ -23,6 +23,7 @@ Comparaciones: `docs/design/refresh-visual-direcciones.html`,
 | link | `#B4BEDA` (9.98:1 / 8.65:1) | Solo enlaces de texto, siempre subrayados. |
 | focus | `#FFFFFF` + halo navy | `outline: 2px solid; outline-offset: 2px; box-shadow: 0 0 0 2px #0A1420`. |
 | secondary | Glaucous `#7785AC` (5.06:1 sobre navy) | Gráficos, íconos y números repetidos; solo texto grande o UI. Agregado en el Lote 2 para no repetir Jonquil. |
+| wave | `#3D7BE0` (azul saturado, 4.51:1 sobre navy) | **DECORATIVO**: solo el shader y la grilla del hero del Home. Prohibido en botones, texto, enlaces, estados, bordes y nodos del grafo. No es un acento. |
 | success | neutro + check + texto | Desviación: la marca indica relleno Celadon `#A5E6BA`. Se descarta por ser casi idéntico a la menta. |
 | pending | neutro, borde punteado `#8FA1AD` + reloj + texto | Sin amarillo. |
 | danger | `#FF8F8A` (8.42:1), borde sólido + triángulo + texto | Sin cambios. |
@@ -84,6 +85,23 @@ P2, elegida el 2026-11-01. Es una evolución de marca registrada en `minimal-sys
 - Se cargan con `<link>` + `preconnect` en `src/index.html`; no se usa `@import`.
 - Un `font-weight` declarado que no está cargado se dibuja con el peso más cercano,
   sin negrita sintética (comprobado en Chromium): 700 → 600, 300 → 400, mono 600 → 500.
+
+## Fondo del hero (la ola)
+
+La cinta ondulada y la grilla del shader del hero usan azules, sin grises:
+`--galash-wave` mezclado como máximo un 15% con `--galash-link`; grano, líneas
+de escaneo y viñeteo se tiñen hacia el azul o el navy, nunca hacia gris neutro.
+La cresta medida es `#1B3152` (HSL 216°/51%/21%; antes `#4B566B`, 18% de
+saturación). Su intensidad (`WAVE_GAIN`) está limitada para que el texto muted
+`#8FA1AD` conserve 4.5:1 o más sobre la parte más brillante de la cinta (4.90:1
+medido a 320px). Los colores salen de los tokens con `cssColor()` como constantes
+GLSL. Con `prefers-reduced-motion: reduce` se dibuja un solo frame estático.
+
+## Exploraciones descartadas
+
+- Intensidad del Home (2026-11-01): bloque Jonquil a ancho completo, bandas de
+  azul saturado, título del hero gigante y duotono navy/Jonquil. Se descartó
+  visualmente; queda como referencia en la etiqueta `explore/intensidad-descartada`.
 
 ## Rechazado
 
