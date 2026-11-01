@@ -24,7 +24,7 @@
       <div class="receipt-code"><span>Número de solicitud</span><strong>{{ result.id }}</strong></div>
       <div class="receipt-code"><span>Clave de seguimiento</span><strong>{{ result.trackingToken }}</strong><button type="button" class="secondary" (click)="copyCode()">{{ copied ? 'Copiado' : 'Copiar datos' }}</button></div>
       <p aria-live="polite">{{ copyError }}</p>
-      <dl class="receipt-details"><div><dt>Estado</dt><dd class="mint">● {{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
+      <dl class="receipt-details"><div><dt>Estado</dt><dd class="status-pending"><svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>{{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
       <p>Guarda el número y la clave: la clave solo se muestra una vez y la necesitas para consultar el estado.</p>
       <div class="success-actions"><a class="secondary" routerLink="/mi-solicitud" [queryParams]="{ id: result.id }">Consultar mi estado</a><a class="primary" routerLink="/">Volver al inicio</a></div>
     </section>
@@ -38,7 +38,7 @@
           <section class="account-card" aria-labelledby="account-title">
             <div class="account-heading"><h2 id="account-title">Datos de tu cuenta</h2>
               <button id="complete-profile" type="button" class="edit" (click)="header.openRegistration()" [disabled]="loading">{{ profileComplete() ? 'Actualizar →' : 'Completar datos →' }}</button></div>
-            <dl>@for (item of accountData(); track item.label) {<div><dt>{{ item.label }}</dt><dd [class.pending]="!item.value">{{ item.value || 'Falta registrar' }}</dd></div>}</dl>
+            <dl>@for (item of accountData(); track item.label) {<div><dt>{{ item.label }}</dt><dd [class.pending]="!item.value">@if (!item.value) {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>}{{ item.value || 'Falta registrar' }}</dd></div>}</dl>
             @if (!profileComplete()) {<p class="error" role="alert">Tu cuenta no tiene documento, teléfono o fecha de nacimiento. Complétalos para continuar.</p>}
           </section>
         }

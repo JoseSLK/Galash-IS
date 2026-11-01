@@ -35,16 +35,11 @@
   justify-content:space-between;
   gap:20px
 }
-.page-top>span,.eyebrow {
-  font-size:12px;
-  letter-spacing:2px;
-  color:#9be8b8;
-  font-weight:600
-}
+.page-top>span,.eyebrow {color:var(--galash-muted);font:500 12px/1.3 var(--galash-mono);letter-spacing:.12em;text-transform:uppercase}
 .status-link,.edit {
   border:0;
   background:none;
-  color:#9be8b8;
+  color:var(--galash-link);
   font:600 12px var(--fuente-texto)
 }
 .status-link:disabled {
@@ -59,8 +54,8 @@
   position:relative;
   margin-top:28px;
   background:#0a1420;
-  border:1px solid rgb(155 232 184 / 22%);
-  border-left:5px solid #9be8b8;
+  border:1px solid var(--galash-border);
+  border-left:5px solid var(--galash-border-strong);
   border-radius:14px;
   padding:26px
 }
@@ -70,9 +65,9 @@
   border-radius:0
 }
 .seedbed-chip {
-  border:1px solid rgb(155 232 184 / 35%);
+  border:1px solid var(--galash-border-strong);
   border-radius:20px;
-  color:#9be8b8;
+  color:var(--galash-text-strong);
   padding:7px 12px;
   font-size:11px
 }
@@ -91,8 +86,7 @@
   color:#94a4b2
 }
 .progress li.reached {
-  border-color:#9be8b8
-}
+  border-color:var(--galash-text-strong)}
 .progress li.current {
   color:#fff;
   font-weight:600
@@ -114,8 +108,7 @@ h1 {
 }
 h1 em {
   font-style:normal;
-  color:#f7c500
-}
+  color:var(--galash-accent)}
 .step-intro p,.confirmation>p {
   font-size:16px;
   font-weight:400;
@@ -125,8 +118,7 @@ h1 em {
 .step-number {
   font:600 100px/1 var(--fuente-titulo);
   color:transparent;
-  -webkit-text-stroke:1px rgb(155 232 184 / 20%)
-}
+  -webkit-text-stroke:1px var(--galash-border)}
 .fields {
   padding:0;
   margin:0;
@@ -143,8 +135,7 @@ h1 em {
   margin-bottom:8px
 }
 .required {
-  color:#f7c500
-}
+  color:var(--galash-text-strong)}
 .optional {
   font-weight:400;
   color:#8fa4b4
@@ -176,14 +167,14 @@ option {
   position:absolute;
   right:14px;
   top:9px;
-  color:#9be8b8;
+  color:var(--galash-muted);
   pointer-events:none
 }
 .valid-check {
   position:absolute;
   right:14px;
   top:12px;
-  color:#9be8b8;
+  color:var(--galash-text-strong);
   font-size:14px;
   pointer-events:none
 }
@@ -198,8 +189,7 @@ input[type=date]::-webkit-calendar-picker-indicator {
   border-color:#ff8f8a
 }
 .valid input,.valid select {
-  border-color:rgb(155 232 184 / 60%)
-}
+  border-color:var(--galash-border-strong)}
 .error {
   font-size:11.5px;
   color:#ff8f8a;
@@ -207,7 +197,7 @@ input[type=date]::-webkit-calendar-picker-indicator {
   margin:7px 0 0
 }
 .form-actions {
-  border-top:1px solid rgb(155 232 184 / 15%);
+  border-top:1px solid var(--galash-border);
   padding-top:24px;
   margin-top:32px
 }
@@ -224,10 +214,9 @@ input[type=date]::-webkit-calendar-picker-indicator {
   cursor:pointer
 }
 .primary {
-  background:#9be8b8;
-  color:#0a1420;
-  border:1.5px solid #9be8b8
-}
+  background:var(--galash-accent);
+  color:var(--galash-accent-fg);
+  border:1.5px solid var(--galash-accent)}
 .secondary {
   border:1.5px solid #fff;
   background:transparent;
@@ -256,8 +245,7 @@ button:disabled {
 }
 .review-section {
   padding:20px 0;
-  border-bottom:1px solid rgb(155 232 184 / 15%)
-}
+  border-bottom:1px solid var(--galash-border)}
 h2 {
   font:600 22px var(--fuente-titulo);
   margin:0
@@ -296,12 +284,11 @@ dd {
 }
 .receipt-code strong {
   font-size:20px;
-  color:#f7c500;
+  color:var(--galash-text-strong);
   overflow-wrap:anywhere
 }
-.mint {
-  color:#9be8b8
-}
+.status-pending{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border:1.5px dashed var(--galash-muted);border-radius:999px;color:var(--galash-text-strong)}
+.status-icon{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .success-actions {
   justify-content:flex-start;
   margin-top:30px
@@ -309,10 +296,9 @@ dd {
 .account-card {
   margin-bottom:28px;
   padding:20px 22px;
-  border:1px solid rgb(155 232 184 / 22%);
+  border:1px solid var(--galash-border);
   border-radius:12px;
-  background:rgb(155 232 184 / 4%)
-}
+  background:color-mix(in srgb, var(--galash-text-strong) 4%, transparent)}
 .account-heading {
   display:flex;
   align-items:center;
@@ -329,8 +315,7 @@ dd {
   margin:16px 0 0
 }
 .pending {
-  color:#f7c500
-}
+  color:var(--galash-muted);display:inline-flex;align-items:center;gap:6px}
 .sr-only {
   position:absolute;
   width:1px;
@@ -340,10 +325,7 @@ dd {
   clip-path:inset(50%);
   white-space:nowrap
 }
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible {
-  outline:2px solid #f7c500;
-  outline-offset:4px
-}
+
 h1:focus {
   outline:none
 }

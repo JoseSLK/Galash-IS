@@ -8,7 +8,7 @@
         <aside>
           <div class="dial" [class.rejected]="status.estado === 'Rechazada'" [class.approved]="status.estado === 'Aprobada'">
             <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="track" cx="100" cy="100" r="87"/><circle class="arc" cx="100" cy="100" r="87" pathLength="100" [attr.stroke-dasharray]="progress() + ' 100'"/></svg>
-            <div><span>ESTADO ACTUAL</span><strong>{{ status.estado }}</strong></div>
+            <div><span>ESTADO ACTUAL</span>@switch (status.estado) { @case ('Aprobada') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>} @case ('Rechazada') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14H1z"/><path d="M8 6v3.5M8 11.5v.5"/></svg>} @default {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>} }<strong>{{ status.estado }}</strong></div>
           </div>
           <span class="eyebrow">CÓDIGO DE TU SOLICITUD</span><p class="code">{{ submittedCode() }}</p>
         </aside>

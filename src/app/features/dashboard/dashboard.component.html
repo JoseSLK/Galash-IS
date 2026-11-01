@@ -14,8 +14,8 @@
       <div #authMenu class="auth-menu">
         <button #authMenuTrigger id="header-auth-button" class="button auth-trigger" type="button"
           [appSpecularButton]="!authService.isAuthenticated()"
-          size="lg" [radius]="18" tint="#ffffff" [tintOpacity]="0.04"
-          textColor="#f5f5f5" lineColor="#9be8b8" baseColor="#102b40"
+          size="lg" [radius]="18" tint="var(--galash-text-strong)" [tintOpacity]="0.04"
+          textColor="var(--galash-text-strong)" lineColor="var(--galash-accent)" baseColor="var(--galash-surface)"
           [intensity]="1" [idleIntensity]="0.35" [shineSize]="10" [shineFade]="34"
           [thickness]="1.2" [glow]="1" [followMouse]="true" [proximity]="250"
           [attr.aria-expanded]="authMenuOpen" aria-controls="header-auth-dropdown"
