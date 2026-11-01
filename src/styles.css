@@ -11,6 +11,7 @@
   --galash-accent-fg: #0A1420;       /* texto sobre Jonquil, 11.41:1 */
   --galash-yellow: var(--galash-accent);
   --galash-link: #B4BEDA;            /* enlaces subrayados, 9.98:1 */
+  --galash-secondary: #7785AC;       /* Glaucous (marca): gráficos, íconos y números repetidos; solo texto grande, 5.06:1 */
   --galash-focus: #FFFFFF;           /* anillo de foco con halo navy */
   --galash-border: rgb(255 255 255 / .12);
   --galash-border-strong: rgb(255 255 255 / .28);
