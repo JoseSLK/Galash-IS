@@ -1,6 +1,6 @@
 import { ScrollStackComponent } from '../../shared/components/scroll-stack/scroll-stack.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
@@ -9,6 +9,7 @@ import { ApiService } from '../../core/services/api.service';
 import { Seedbed, SeedbedsService } from '../seedbeds/seedbeds.service';
 import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
 import { SpecularButtonDirective } from '../../shared/directives/specular-button.directive';
+import { INITIAL_HEADER_SCROLL, nextHeaderState } from './header-scroll';
 
 const MEMBER_COUNT_LIMIT = 100;
 
@@ -41,7 +42,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   headerScrolled = false;
   headerCompact = false;
   activeSection = 'nosotros';
-  private previousScrollY = 0;
+  private readonly zone = inject(NgZone);
+  private headerState = INITIAL_HEADER_SCROLL;
+  private scrollFrame = 0;
+  private removeScrollListener?: () => void;
 
   get seedbedIcon(): string {
     const name = this.currentSeedbed?.name.toLocaleLowerCase('es') ?? '';
@@ -53,14 +57,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get currentSeedbed(): Seedbed | undefined { return this.seedbeds()[this.activeSeedbed]; }
 
-  @HostListener('window:scroll')
-  onWindowScroll(): void {
-    const currentScrollY = Math.max(0, window.scrollY);
-    if (currentScrollY === 0) this.headerCompact = false;
-    else if (currentScrollY !== this.previousScrollY) this.headerCompact = currentScrollY > this.previousScrollY;
-    this.previousScrollY = currentScrollY;
-    this.headerScrolled = currentScrollY > 80;
+  /** Runs once per frame outside Angular; re-enters the zone only when the header state changes. */
+  private syncHeader(): void {
+    this.scrollFrame = 0;
+    const y = Math.max(0, window.scrollY);
+    this.headerState = nextHeaderState(this.headerState, y);
+    const scrolled = y > 80;
+    const section = this.activeSection;
     this.updateActiveSection();
+    if (this.headerState.compact !== this.headerCompact || scrolled !== this.headerScrolled || section !== this.activeSection) {
+      this.zone.run(() => { this.headerCompact = this.headerState.compact; this.headerScrolled = scrolled; });
+    }
   }
 
   ngOnInit(): void {
@@ -79,8 +86,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.updateActiveSection();
+    this.zone.runOutsideAngular(() => {
+      const onScroll = () => { if (!this.scrollFrame) this.scrollFrame = requestAnimationFrame(() => this.syncHeader()); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      this.removeScrollListener = () => window.removeEventListener('scroll', onScroll);
+    });
   }
-  ngOnDestroy(): void { document.body.style.overflow = ''; }
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+    cancelAnimationFrame(this.scrollFrame);
+    this.removeScrollListener?.();
+  }
 
   selectSeedbed(index: number): void { this.activeSeedbed = index; }
   toggleMenu(): void {

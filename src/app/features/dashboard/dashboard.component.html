@@ -2,7 +2,7 @@
   <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
-      <svg class="nav-logo-filter" aria-hidden="true" width="0" height="0"><defs><filter id="nav-logo-contrast" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncA type="linear" slope="5"/></feComponentTransfer></filter></defs></svg><img class="nav-emblem" src="/assets/galash-emblema-sin-fondo.svg#menu" alt="" width="48" height="48"><span>GALASH</span>
+      <img class="nav-emblem" src="/assets/galash-emblema-nav-96.webp" srcset="/assets/galash-emblema-nav-96.webp 1x, /assets/galash-emblema-nav-144.webp 1.5x" alt="" width="48" height="47" decoding="async"><span>GALASH</span>
     </a>
     <nav #mobileNav id="site-navigation" class="site-nav mobile-nav" aria-label="Principal">
       <a [attr.href]="headerOnly ? '/#semilleros' : '#semilleros'" [attr.aria-current]="!headerOnly && activeSection === 'semilleros' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
