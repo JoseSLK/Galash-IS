@@ -6,7 +6,7 @@ input { width: 100%; min-width: 0; padding: 12px 0; border: 0; background: trans
 input::placeholder { color: #99a9bb; }
 .filters { display: flex; flex-wrap: wrap; gap: 7px; margin: 15px 0; }
 .filters button, .pagination button, .empty button { padding: 8px 12px; border: 1px solid #9be8b840; border-radius: 24px; color: #c3ccd4; background: transparent; font-size: 11px; cursor: pointer; }
-.filters button.active { background: #f7c500; border-color: #f7c500; color: #0a1420; font-weight: 700; }
+.filters button.active { background: #f7c500; border-color: #f7c500; color: #0a1420; font-weight: 600; }
 .seedbed-filter { display: flex; align-items: center; gap: 12px; margin: 17px 0; font-size: 12px; color: #c3ccd4; }
 select { flex: 1; min-width: 0; min-height: 38px; padding: 8px 12px; background: #0f2433; border: 1px solid #9be8b838; border-radius: 8px; color: #fff; color-scheme: dark; font-size: 12px; }
 .list-meta { display: flex; justify-content: space-between; gap: 12px; margin: 18px 0 10px; color: #91a5b8; font-size: 11px; }
@@ -19,7 +19,7 @@ select { flex: 1; min-width: 0; min-height: 38px; padding: 8px 12px; background:
 strong { font-size: 13px; overflow-wrap: anywhere; }
 .membership>span { color: #c3ccd4; font-size: 11px; }
 small { color: #91a5b8; font-size: 10px; overflow-wrap: anywhere; }
-.status { display: inline-flex; align-items: center; gap: 6px; justify-self: end; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.status { display: inline-flex; align-items: center; gap: 6px; justify-self: end; font-size: 10px; font-weight: 600; white-space: nowrap; }
 .status::before { content: ''; width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: currentColor; }
 .status.active { color: #9be8b8; }
 .status.inactive { color: #a9b6c5; }

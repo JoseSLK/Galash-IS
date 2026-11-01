@@ -95,7 +95,7 @@
 }
 .progress li.current {
   color:#fff;
-  font-weight:700
+  font-weight:600
 }
 .step-intro {
   display:flex;
@@ -108,7 +108,7 @@
   max-width:730px
 }
 h1 {
-  font:700 48px/1.12 var(--fuente-titulo);
+  font:600 48px/1.12 var(--fuente-titulo);
   margin:0 0 15px;
   scroll-margin-top:140px
 }
@@ -118,12 +118,12 @@ h1 em {
 }
 .step-intro p,.confirmation>p {
   font-size:16px;
-  font-weight:300;
+  font-weight:400;
   color:#c3ccd4;
   line-height:1.7
 }
 .step-number {
-  font:700 100px/1 var(--fuente-titulo);
+  font:600 100px/1 var(--fuente-titulo);
   color:transparent;
   -webkit-text-stroke:1px rgb(155 232 184 / 20%)
 }
@@ -219,7 +219,7 @@ input[type=date]::-webkit-calendar-picker-indicator {
   min-height:44px;
   padding:10px 24px;
   border-radius:30px;
-  font:700 14px var(--fuente-texto);
+  font:600 14px var(--fuente-texto);
   text-decoration:none;
   cursor:pointer
 }
@@ -259,7 +259,7 @@ button:disabled {
   border-bottom:1px solid rgb(155 232 184 / 15%)
 }
 h2 {
-  font:700 22px var(--fuente-titulo);
+  font:600 22px var(--fuente-titulo);
   margin:0
 }
 .edit {

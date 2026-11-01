@@ -33,6 +33,7 @@
 html, body { min-width: 320px; }
 body { margin: 0; background: #0a1420; color: #fff; }
 button, input { font: inherit; }
+h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 600; } /* Sora y Plex Sans solo cargan 600 como negrita */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--galash-focus);
   outline-offset: 2px;
