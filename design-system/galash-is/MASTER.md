@@ -22,6 +22,7 @@ Comparaciones: `docs/design/refresh-visual-direcciones.html`,
 | accent-fg | navy `#0A1420` (11.41:1) | Desviación: la marca indica Eerie black `#1E1A17`. |
 | link | `#B4BEDA` (9.98:1 / 8.65:1) | Solo enlaces de texto, siempre subrayados. |
 | focus | `#FFFFFF` + halo navy | `outline: 2px solid; outline-offset: 2px; box-shadow: 0 0 0 2px #0A1420`. |
+| secondary | Glaucous `#7785AC` (5.06:1 sobre navy) | Gráficos, íconos y números repetidos; solo texto grande o UI. Agregado en el Lote 2 para no repetir Jonquil. |
 | success | neutro + check + texto | Desviación: la marca indica relleno Celadon `#A5E6BA`. Se descarta por ser casi idéntico a la menta. |
 | pending | neutro, borde punteado `#8FA1AD` + reloj + texto | Sin amarillo. |
 | danger | `#FF8F8A` (8.42:1), borde sólido + triángulo + texto | Sin cambios. |
