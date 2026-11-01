@@ -84,7 +84,7 @@
           @for (project of filteredProjects; track project.id) {
             <article class="project-card">
               <div class="card-body">
-                <div class="project-heading"><span class="project-line">{{ selected()?.name }}</span><span class="status" [class.status--finished]="project.status === 'Finalizado'" [class.status--filed]="project.status === 'Radicado'"><span class="status-dot" aria-hidden="true"></span>{{ projectStatusLabel(project.status) }}</span></div>
+                <div class="project-heading"><span class="project-line">{{ selected()?.name }}</span><span class="status" [class.status--finished]="project.status === 'Finalizado'" [class.status--filed]="project.status === 'Radicado'">@switch (project.status) { @case ('Finalizado') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>} @case ('Radicado') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>} @default {<span class="status-dot" aria-hidden="true"></span>} }{{ projectStatusLabel(project.status) }}</span></div>
                 <div class="card-copy"><h3>{{ project.title }}</h3><p>{{ project.summary }}</p></div>
                 <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + project.title" (click)="$event.preventDefault(); openDetails(detailsDialog, { title: project.title, description: project.summary }, 'Proyecto', projectStatusLabel(project.status))">Ver más detalles <span aria-hidden="true">↗</span></a>
               </div>
