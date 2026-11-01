@@ -2,7 +2,7 @@
 canvas { position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; mask-image:linear-gradient(to bottom,#000 65%,transparent 100%); }
 .hero-layout { position:relative; z-index:1; width:100%; min-width:0; display:grid; grid-template-columns:1.25fr 1fr; gap:32px; align-items:center; }.hero-copy { pointer-events:none; min-width:0; }
 .acrostic { display:grid; gap:8px; margin:0; font:700 clamp(24px,min(3vw,4.5svh),40px)/1.16 var(--fuente-titulo); letter-spacing:-.015em; }
-.acrostic-row { display:grid; grid-template-columns:1.1em minmax(0,1fr); align-items:baseline; }.acrostic-initial { color:var(--galash-mint); font-size:1.4em; line-height:1; text-align:center; }.acrostic-meaning { color:#fff; min-width:0; }
+.acrostic-row { display:grid; grid-template-columns:1.1em minmax(0,1fr); align-items:baseline; }.acrostic-initial { color:var(--galash-accent); font-size:1.4em; line-height:1; text-align:center; }.acrostic-meaning { color:#fff; min-width:0; }
 .hero-emblem { width:100%; max-width:520px; justify-self:center; }.hero-emblem img { display:block; width:100%; height:auto; max-height:calc(100svh - 170px); object-fit:contain; }
 @media(max-width:767px) { .universe-hero { padding:24px 22px; }.hero-layout { grid-template-columns:1fr; gap:20px; }.acrostic { font-size:clamp(21px,min(5.7vw,3.6svh),30px); gap:5px; }.hero-emblem { max-width:300px; }.hero-emblem img { max-height:30svh; } }
 

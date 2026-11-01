@@ -382,3 +382,9 @@
 {"v": 1, "id": "X20261101-pr-T059-v2", "t": "result", "run": "R20261101-pr-validation", "test": "T059-v2", "s": "pass"}
 {"v": 1, "id": "X20261101-pr-T060", "t": "result", "run": "R20261101-pr-validation", "test": "T060", "s": "pass"}
 {"v": 1, "id": "D003-verified-20261101", "t": "defect", "defect": "D003", "test": "T031", "run": "R20261101-pr-validation", "s": "closed", "name": "Home contrast issue no longer reproduced by axe in three viewports; obsolete expected-failure marker removed."}
+{"v":1,"id":"R039","t":"run","at":"2026-11-01T19:40:00Z","build":"b3d4d4a","by":"agent","mode":"automated","cmd":"npm run build; npx lhci collect --staticDistDir=dist/src/browser --numberOfRuns=5"}
+{"v":1,"id":"X047","t":"result","run":"R039","test":"T032","s":"pass","ev":["home mobile median: perf 0.82, CLS 0.0027 (baseline 0.0016), LCP 3940 ms (baseline 3957), FCP 2928 ms, a11y 0.98, no render-blocking resources"]}
+{"v":1,"id":"R040","t":"run","at":"2026-11-01T20:05:00Z","build":"wip-color-tokens","by":"agent","mode":"automated","cmd":"npm run build; npm test -- --watch=false; npx playwright test; axe script on / /nosotros /semilleros /eventos /unete /mi-solicitud at 320 and 1280"}
+{"v":1,"id":"X048","t":"result","run":"R040","test":"T030","s":"pass","ev":["playwright home desktop/tablet/mobile pass"]}
+{"v":1,"id":"X049","t":"result","run":"R040","test":"T031","s":"pass","ev":["axe home 0 violations desktop/tablet/mobile; ad hoc axe WCAG 2.2 AA 0 violations on 6 routes at 320/1280, no horizontal scroll"]}
+{"v":1,"id":"N001","t":"note","run":"R040","text":"Vitest 21/21 pass. e2e/reviews.spec.ts fails 12/12 (app-seedbed-reviews not found on /semilleros?id=s1) and fails identically on 0b3380b before this change: pre-existing, not caused by the refresh. Uncataloged spec, no T ID."}

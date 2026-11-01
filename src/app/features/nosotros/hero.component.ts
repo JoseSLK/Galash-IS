@@ -69,7 +69,7 @@ export class NosotrosHeroComponent implements AfterViewInit, OnDestroy {
       ctx.globalAlpha = (1 - distance / 180) * .5; ctx.strokeStyle = '#9BE8B8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }
     ctx.globalAlpha = .8;
-    for (const star of this.stars) { ctx.fillStyle = star.near ? '#F5C518' : '#9BE8B8'; ctx.beginPath(); ctx.arc(star.x, star.y, star.near ? 3 : 2.2, 0, Math.PI * 2); ctx.fill(); }
+    for (const star of this.stars) { ctx.fillStyle = star.near ? '#F7C500' : '#9BE8B8'; ctx.beginPath(); ctx.arc(star.x, star.y, star.near ? 3 : 2.2, 0, Math.PI * 2); ctx.fill(); }
     ctx.globalAlpha = 1;
   }
   ngOnDestroy(): void {

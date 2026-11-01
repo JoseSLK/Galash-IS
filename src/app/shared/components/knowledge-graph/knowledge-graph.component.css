@@ -6,9 +6,9 @@ svg { display: block; width: 100%; height: 360px; overflow: hidden; }
 .central circle { fill: #0b2b33; stroke: #9be8b8; stroke-width: 2.5; }.central text { fill: #fff; font: 700 18px var(--fuente-titulo); }
 .satellite { cursor: grab; outline: none; touch-action: none; transition: opacity 400ms; }.satellite:active { cursor: grabbing; }
 .node-visual { transform: scale(1); transition: transform 180ms; }.node-visual.active { transform: scale(1.15); }
-.node-circle { fill: #0f2433; stroke: #9be8b8; stroke-width: 1.5; }.yellow-dot { fill: #f5c518; }.hit-area { fill: transparent; stroke: none; }
+.node-circle { fill: #0f2433; stroke: #9be8b8; stroke-width: 1.5; }.yellow-dot { fill: #f7c500; }.hit-area { fill: transparent; stroke: none; }
 .node-label { fill: #daddf0; font: 600 13px var(--fuente-texto); pointer-events: none; }.compact .node-label { font-size: 12px; }
-.satellite:focus-visible .node-circle { stroke: #f5c518; stroke-width: 2.5; }
+.satellite:focus-visible .node-circle { stroke: #f7c500; stroke-width: 2.5; }
 .arriving .satellite { transition: transform 400ms ease-out, opacity 400ms; }.arriving .node-visual { transition-duration: 400ms; }
 .arriving .link { transition: transform 400ms ease-out, opacity 400ms, stroke-opacity 150ms; }.enter .link { transform: scale(0); }
 .exit .satellite { opacity: 0; }.exit .node-visual, .enter .node-visual { transform: scale(0); transition-duration: 400ms; }.exit .link, .enter .satellite, .enter .link { opacity: 0; }

@@ -19,6 +19,6 @@ button.rb-specular::after {
   opacity: var(--spec-strength, .35);
 }
 button.rb-specular > * { position: relative; z-index: 1; }
-button.rb-specular:focus-visible { outline: 2px solid #f5c518; outline-offset: 4px; }
+button.rb-specular:focus-visible { outline: 2px solid #f7c500; outline-offset: 4px; }
 button.rb-specular:disabled::before, button.rb-specular:disabled::after { opacity: .12; }
 @media (prefers-reduced-motion: no-preference) { button.rb-specular { transition: box-shadow 160ms ease; } }
