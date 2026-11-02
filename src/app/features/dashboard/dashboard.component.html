@@ -1,13 +1,13 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'proyectos' ? '/proyectos' : activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <img class="nav-emblem" src="/assets/galash-emblema-nav-96.webp" srcset="/assets/galash-emblema-nav-96.webp 1x, /assets/galash-emblema-nav-144.webp 1.5x" alt="" width="48" height="47" decoding="async"><span>GALASH</span>
     </a>
     <nav #mobileNav id="site-navigation" class="site-nav mobile-nav" aria-label="Principal">
-      <a [attr.href]="headerOnly ? '/#semilleros' : '#semilleros'" [attr.aria-current]="!headerOnly && activeSection === 'semilleros' ? 'page' : null" (click)="closeMenu()">Únete<span aria-hidden="true"></span></a>
       <a routerLink="/nosotros" [attr.aria-current]="headerOnly && activePage === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
       <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
+      <a routerLink="/proyectos" [attr.aria-current]="headerOnly && activePage === 'proyectos' ? 'page' : null" (click)="closeMenu()">Proyectos<span aria-hidden="true"></span></a>
       <a routerLink="/eventos" [attr.aria-current]="headerOnly && activePage === 'eventos' ? 'page' : null" (click)="closeMenu()">Eventos<span aria-hidden="true"></span></a>
       <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     <div class="header-actions">

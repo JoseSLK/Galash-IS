@@ -1,3 +1,4 @@
+import {ProjectsPageComponent} from '../projects/projects-page.component';
 import { Component, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -7,7 +8,7 @@ import { SiteFooterComponent } from '../../shared/components/site-footer/site-fo
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [DashboardComponent, SiteFooterComponent],
+  imports: [ProjectsPageComponent,DashboardComponent, SiteFooterComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

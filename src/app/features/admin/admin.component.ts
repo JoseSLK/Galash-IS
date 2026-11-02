@@ -1,3 +1,4 @@
+import {ProjectsPageComponent} from '../projects/projects-page.component';
 import { ReviewsAdminComponent } from './reviews/reviews-admin.component';
 import { SeedbedReviewsService } from '../seedbeds/reviews/seedbed-reviews.service';
 import { Component, ElementRef, HostListener, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
@@ -17,14 +18,14 @@ import { EventsAdminComponent } from './events/events-admin.component';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
+  imports: [ProjectsPageComponent,ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnDestroy {
   @ViewChild('sectionMenu') private sectionMenu?: ElementRef<HTMLDetailsElement>;
-  readonly upcomingSections = ['Semilleros', 'Proyectos', 'Auditoría'];
-  readonly activeSection = signal<'users' | 'requests' | 'events' | 'reviews'>('users');
+  readonly upcomingSections = ['Semilleros', 'Auditoría'];
+  readonly activeSection = signal<'users' | 'requests' | 'events' | 'reviews' | 'projects'>('users');
   readonly auth = inject(AuthService);
   readonly reviews = inject(SeedbedReviewsService);
   readonly users = inject(MembersAdminService);
@@ -59,7 +60,7 @@ export class AdminComponent implements OnDestroy {
     menu.querySelector('summary')?.focus();
   }
 
-  showSection(section: 'users' | 'requests' | 'events' | 'reviews', menu: HTMLDetailsElement): void {
+  showSection(section: 'users' | 'requests' | 'events' | 'reviews' | 'projects', menu: HTMLDetailsElement): void {
     this.activeSection.set(section);
     this.closeSections(menu);
   }
