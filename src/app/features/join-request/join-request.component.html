@@ -1,7 +1,22 @@
 <app-dashboard #header [headerOnly]="true" activePage="unete" />
 <main id="contenido" class="join-page" [inert]="header.registrationOpen">
-  <div class="page-top"><span>ÚNETE A GALASH</span><button type="button" class="status-link" disabled aria-describedby="status-notice">¿Ya enviaste una solicitud? Consulta tu estado →</button></div>
-  <p id="status-notice" class="notice">La consulta de estado estará disponible próximamente.</p>
+  @if (!canJoin()) {
+    <section class="session-gate" aria-labelledby="session-title" [attr.aria-busy]="auth.sessionStatus() === 'checking'">
+      <span class="eyebrow">ÚNETE A GALASH</span>
+      @if (auth.sessionStatus() === 'checking') {
+        <h1 id="session-title">Verificando tu <em>sesión</em></h1>
+        <p role="status">Espera un momento para continuar con tu solicitud.</p>
+      } @else {
+        <h1 id="session-title">Inicia sesión para <em>unirte</em></h1>
+        <p>Necesitas iniciar sesión antes de solicitar tu ingreso a un semillero. Usaremos tu nombre, documento, teléfono y fecha de nacimiento de tu cuenta, y podrás continuar con el semillero que elegiste.</p>
+        @if (auth.sessionStatus() === 'unavailable') {<p role="status">No pudimos verificar tu sesión. Intenta iniciar sesión de nuevo.</p>}
+        @if (auth.sessionStatus() === 'expired') {<p role="status">Tu sesión ha caducado. Inicia sesión de nuevo para continuar.</p>}
+        <div class="success-actions"><button type="button" class="primary" (click)="header.continueWithGoogle()" [disabled]="header.authLoading">{{ header.authLoading ? 'Conectando con Google…' : 'Iniciar sesión con Google' }}</button><a class="secondary" routerLink="/semilleros" [queryParams]="{ id: form.controls['seedbed'].value || null }">Volver a semilleros</a></div>
+        @if (header.authErrorMessage) {<p class="error" role="alert">{{ header.authErrorMessage }}</p>}
+      }
+    </section>
+  } @else {
+  <div class="page-top"><span>ÚNETE A GALASH</span><a class="status-link" routerLink="/mi-solicitud">¿Ya enviaste una solicitud? Consulta tu estado →</a></div>
   @if (receipt; as result) {
     <section class="form-card confirmation">
       <span class="eyebrow">SOLICITUD</span>
@@ -9,9 +24,9 @@
       <div class="receipt-code"><span>Número de solicitud</span><strong>{{ result.id }}</strong></div>
       <div class="receipt-code"><span>Clave de seguimiento</span><strong>{{ result.trackingToken }}</strong><button type="button" class="secondary" (click)="copyCode()">{{ copied ? 'Copiado' : 'Copiar datos' }}</button></div>
       <p aria-live="polite">{{ copyError }}</p>
-      <dl class="receipt-details"><div><dt>Estado</dt><dd class="mint">● {{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
+      <dl class="receipt-details"><div><dt>Estado</dt><dd class="status-pending"><svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>{{ result.status }}</dd></div><div><dt>Fecha</dt><dd>{{ result.submittedAt | date:'dd/MM/yyyy, HH:mm' }}</dd></div>@if (result.seedbed) {<div><dt>Semillero</dt><dd>{{ seedbedLabel(result.seedbed) }}</dd></div>}</dl>
       <p>Guarda el número y la clave: la clave solo se muestra una vez y la necesitas para consultar el estado.</p>
-      <div class="success-actions"><button type="button" class="secondary" disabled aria-describedby="status-notice">Consultar mi estado</button><a class="primary" routerLink="/">Volver al inicio</a></div>
+      <div class="success-actions"><a class="secondary" routerLink="/mi-solicitud" [queryParams]="{ id: result.id }">Consultar mi estado</a><a class="primary" routerLink="/">Volver al inicio</a></div>
     </section>
   } @else {
     <section class="form-card">
@@ -19,6 +34,14 @@
       <ol class="progress" aria-label="Progreso de la solicitud">@for (section of steps; track section.label; let index = $index) {<li [class.reached]="index <= step" [class.current]="index === step" [attr.aria-current]="index === step ? 'step' : null"><span>{{ section.label }}</span></li>}</ol>
       <div class="step-intro"><div><h1 #stepTitle tabindex="-1">{{ currentStep.title }} <em>{{ currentStep.accent }}</em></h1><p>{{ currentStep.help }}</p></div><span class="step-number" aria-hidden="true">0{{ step + 1 }}</span></div>
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (step === 0) {
+          <section class="account-card" aria-labelledby="account-title">
+            <div class="account-heading"><h2 id="account-title">Datos de tu cuenta</h2>
+              <button id="complete-profile" type="button" class="edit" (click)="header.openRegistration()" [disabled]="loading">{{ profileComplete() ? 'Actualizar →' : 'Completar datos →' }}</button></div>
+            <dl>@for (item of accountData(); track item.label) {<div><dt>{{ item.label }}</dt><dd [class.pending]="!item.value">@if (!item.value) {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>}{{ item.value || 'Falta registrar' }}</dd></div>}</dl>
+            @if (!profileComplete()) {<p class="error" role="alert">Tu cuenta no tiene documento, teléfono o fecha de nacimiento. Complétalos para continuar.</p>}
+          </section>
+        }
         @if (step < 3) {
           <fieldset class="fields" [disabled]="loading"><legend class="sr-only">{{ currentStep.label }}</legend>
             @for (field of currentStep.fields; track field.key) {
@@ -36,14 +59,15 @@
             }
           </fieldset>
         } @else {
-          <div class="review">@for (section of steps.slice(0, 3); track section.label; let index = $index) {<section class="review-section"><div class="review-heading"><h2>{{ section.label }}</h2><button type="button" class="edit" (click)="edit(index)" [disabled]="loading" [attr.aria-label]="'Editar ' + section.label">Editar →</button></div><dl>@for (field of section.fields; track field.key) {<div><dt>{{ field.label }}</dt><dd>{{ valueLabel(field) }}</dd></div>}</dl></section>}</div>
+          <div class="review">@for (section of steps.slice(0, 3); track section.label; let index = $index) {<section class="review-section"><div class="review-heading"><h2>{{ section.label }}</h2><button type="button" class="edit" (click)="edit(index)" [disabled]="loading" [attr.aria-label]="'Editar ' + section.label">Editar →</button></div><dl>@if (index === 0) {@for (item of accountData(); track item.label) {<div><dt>{{ item.label }}</dt><dd>{{ item.value || 'Falta registrar' }}</dd></div>}}@for (field of section.fields; track field.key) {<div><dt>{{ field.label }}</dt><dd>{{ valueLabel(field) }}</dd></div>}</dl></section>}</div>
         }
         @if (submitError) {<p class="error" role="alert">{{ submitError }}</p>}
         <div class="form-actions"><div>@if (step > 0) {<button class="secondary" type="button" (click)="edit(step - 1)" [disabled]="loading">← Volver</button>}</div><div class="advance"><span class="missing" aria-live="polite">@if (step < 3) {{{ missing }} campos obligatorios por completar}</span><button type="submit" class="primary" [disabled]="loading">{{ loading ? 'Enviando…' : step === 3 ? 'Enviar solicitud' : 'Continuar →' }}</button></div></div>
         <p class="privacy">Tus datos personales solo los verán quienes evalúan tu solicitud.</p>
-        <p class="notice">Demostración con catálogos temporales. El envío es simulado y los datos no se guardan al salir.</p>
+        <p class="notice">Los catálogos de formación, vinculación y convocatorias son temporales.</p>
       </form>
     </section>
+  }
   }
 </main>
 <app-site-footer [inert]="header.registrationOpen" />

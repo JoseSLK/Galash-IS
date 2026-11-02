@@ -6,8 +6,10 @@
   <header class="drawer-heading">
     <div>
       <p class="eyebrow">GALASH · UPTC</p>
-      <h2 id="register-title">Completa tu registro</h2>
-      <p id="register-intro" class="registration-notice" role="status">Debes completar y enviar estos datos para crear tu perfil en GALASH.</p>
+      <h2 id="register-title">{{ updating ? 'Completa tus datos' : 'Completa tu registro' }}</h2>
+      <p id="register-intro" class="registration-notice" role="status">{{ updating
+        ? 'Actualiza tus datos básicos: los usamos en tus solicitudes y en tu perfil.'
+        : 'Debes completar y enviar estos datos para crear tu perfil en GALASH.' }}</p>
     </div>
     <button class="close-button" type="button" aria-label="Cancelar registro" (click)="cancel()" [disabled]="loading">×</button>
   </header>
@@ -55,6 +57,32 @@
       </div>
     </div>
 
+    <div class="form-grid">
+      <div class="field">
+        <label for="fecha_nacimiento">Fecha de nacimiento</label>
+        <input id="fecha_nacimiento" type="date" formControlName="fecha_nacimiento" autocomplete="bday" [max]="maxDate" />
+        @if (submitted && registerForm.controls.fecha_nacimiento.invalid) {
+          <small class="error">{{ registerForm.controls.fecha_nacimiento.hasError('future') ? 'La fecha no puede ser futura.' : 'Ingresa tu fecha de nacimiento.' }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="telefono">Teléfono</label>
+        <input id="telefono" type="tel" inputmode="numeric" formControlName="telefono" autocomplete="tel-national" />
+        @if (submitted && registerForm.controls.telefono.invalid) {
+          <small class="error">Ingresa entre 7 y 10 dígitos.</small>
+        }
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="codigo_estudiantil">Código estudiantil <span class="optional">(opcional)</span></label>
+      <input id="codigo_estudiantil" type="text" inputmode="numeric" formControlName="codigo_estudiantil" autocomplete="off" />
+      @if (submitted && registerForm.controls.codigo_estudiantil.invalid) {
+        <small class="error">Ingresa solo números.</small>
+      }
+    </div>
+
     <div class="field">
       <label for="email">Correo de Google</label>
       <input id="email" type="email" formControlName="email" autocomplete="email" />
@@ -69,7 +97,7 @@
 
     <div class="form-actions">
       <button class="submit-button" type="submit" [disabled]="loading">
-        {{ loading ? 'Guardando…' : 'Enviar registro' }}
+        {{ loading ? 'Guardando…' : updating ? 'Guardar datos' : 'Enviar registro' }}
       </button>
       <button class="cancel-button" type="button" (click)="cancel()" [disabled]="loading">Cancelar</button>
     </div>

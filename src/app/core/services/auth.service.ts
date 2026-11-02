@@ -19,6 +19,9 @@ export interface RegistrationData {
   tipo_dni: string;
   dni: string;
   email: string;
+  fecha_nacimiento: string;
+  telefono: string;
+  codigo_estudiantil: string;
 }
 
 export interface SessionUser {
@@ -30,6 +33,9 @@ export interface SessionUser {
   email?: string;
   document_type?: string;
   document_number?: string;
+  student_code?: string;
+  birth_date?: string;
+  phone?: string;
 }
 
 interface BackendUser extends SessionUser {
@@ -50,6 +56,7 @@ interface RegistrationResponse {
 
 export class RegistrationRequiredError extends Error {}
 export class RegistrationSaveError extends Error {}
+export class RegistrationConflictError extends Error {}
 export class RegistrationSessionError extends Error {}
 
 @Injectable({ providedIn: 'root' })
@@ -142,9 +149,13 @@ export class AuthService {
         apellido: data.apellido.trim(),
         tipo_dni: data.tipo_dni,
         dni: data.dni.trim(),
-        email: user.email?.trim() ?? data.email.trim()
+        email: user.email?.trim() ?? data.email.trim(),
+        fecha_nacimiento: data.fecha_nacimiento,
+        telefono: data.telefono.trim(),
+        codigo_estudiantil: data.codigo_estudiantil.trim()
       }, authorizationHeader(token));
-    } catch {
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse && error.status === 409) throw new RegistrationConflictError();
       throw new RegistrationSaveError();
     }
     if (!isRegistrationResponse(result, user.uid)) throw new RegistrationSaveError();
@@ -197,6 +208,9 @@ export class AuthService {
       email: user.email,
       document_type: user.document_type,
       document_number: user.document_number,
+      student_code: user.student_code,
+      birth_date: user.birth_date,
+      phone: user.phone,
       status: user.status
     });
     this.isAuthenticated.set(true);

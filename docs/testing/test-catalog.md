@@ -51,6 +51,8 @@ spec name.
 |---|---|---|---|---|---|
 |T030|public-home|public home renders main content|Smoke check of the public home on desktop, tablet and mobile with mocked backend|`e2e/home.spec.ts`|PT-NF-02|
 |T031|accessibility|public home has no WCAG 2 A/AA violations|Automated axe scan of the public home; covers only the automatable part of keyboard and screen-reader checks|`e2e/home.spec.ts`|PT-NF-06|
+|T044|public-home|header compact class and emblem box ignore ±10px scroll jitter|Guards the nav emblem against size jumps: compact state uses scroll hysteresis and only scales the emblem, so layout box and header height stay fixed|`e2e/nav-emblem.spec.ts`|PT-NF-02|
+|T045|accessibility|glitch background honors prefers-reduced-motion|Counts animation frames on the home: under reduce the WebGL hero background draws one static frame (no rAF loop) and it resumes or stops when the preference changes|`e2e/glitch-reduced-motion.spec.ts`|PT-NF-06|
 
 ## Build tests
 

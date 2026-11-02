@@ -1,10 +1,17 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Output, ViewChild, inject } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import {
   AuthService,
+  RegistrationConflictError,
   RegistrationSaveError,
   RegistrationSessionError
 } from '../../../core/services/auth.service';
+
+function today(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+const notFuture: ValidatorFn = control => !control.value || control.value <= today() ? null : { future: true };
 
 @Component({
   selector: 'app-register',
@@ -22,13 +29,20 @@ export class RegisterComponent implements AfterViewInit {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly authService = inject(AuthService);
   readonly email = this.authService.currentUser()?.email ?? '';
+  // With a backend session open, the drawer completes the basic data of an existing account.
+  readonly updating = this.authService.isAuthenticated();
+  readonly maxDate = today();
+  private readonly account = this.authService.backendUser();
   private readonly googleNameParts = (this.authService.currentUser()?.displayName ?? '').trim().split(/\s+/).filter(Boolean);
   readonly registerForm = this.formBuilder.group({
-    nombre: [this.googleNameParts[0] ?? '', [Validators.required, Validators.pattern(/\S/)]],
-    apellido: [this.googleNameParts.slice(1).join(' '), [Validators.required, Validators.pattern(/\S/)]],
-    tipo_dni: ['', [Validators.required]],
-    dni: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9-]+$/)]],
-    email: [this.email, [Validators.required, Validators.email]]
+    nombre: [this.account?.name || this.googleNameParts[0] || '', [Validators.required, Validators.pattern(/\S/)]],
+    apellido: [this.account?.last_name || this.googleNameParts.slice(1).join(' '), [Validators.required, Validators.pattern(/\S/)]],
+    tipo_dni: [this.account?.document_type ?? '', [Validators.required]],
+    dni: [this.account?.document_number ?? '', [Validators.required, Validators.pattern(/^[A-Za-z0-9-]+$/)]],
+    email: [this.email, [Validators.required, Validators.email]],
+    fecha_nacimiento: [this.account?.birth_date ?? '', [Validators.required, notFuture]],
+    telefono: [this.account?.phone ?? '', [Validators.required, Validators.pattern(/^\d{7,10}$/)]],
+    codigo_estudiantil: [this.account?.student_code ?? '', [Validators.pattern(/^\d*$/)]]
   });
 
   submitted = false;
@@ -53,7 +67,9 @@ export class RegisterComponent implements AfterViewInit {
       await this.authService.registerGoogleUser(this.registerForm.getRawValue());
       this.completed.emit();
     } catch (error: unknown) {
-      if (error instanceof RegistrationSessionError) {
+      if (error instanceof RegistrationConflictError) {
+        this.errorMessage = 'El documento o el código estudiantil ya pertenecen a otra cuenta.';
+      } else if (error instanceof RegistrationSessionError) {
         this.errorMessage = 'El registro se guardó, pero no se pudo iniciar la sesión. Intenta continuar con Google de nuevo.';
       } else if (error instanceof RegistrationSaveError) {
         this.errorMessage = 'No se pudo guardar el registro. Revisa los datos e inténtalo de nuevo.';

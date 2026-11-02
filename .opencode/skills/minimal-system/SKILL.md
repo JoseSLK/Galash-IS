@@ -42,8 +42,9 @@ unless instructed otherwise.
 - Use one primary action and one accent: Jonquil.
 - Delft Blue is ink for headings, links, and the logo; it is not a second
   accent.
-- Use Signika for headings, Open Sans for body text, and Arial Narrow for
-  labels.
+- Use Sora 600 for headings, IBM Plex Sans 400/600 for body text, and IBM Plex
+  Mono 500 for labels, codes, and data (typography evolution, 2026-11-01; see
+  `references/galash-brand.md` section 2).
 - Use the official logo without modification. Use the hexagonal geometry only
   when it has a clear purpose.
 - Use actionable copy: verb + object. Errors explain what happened and how to

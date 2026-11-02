@@ -39,6 +39,21 @@ export interface Activity {
   date: string | null;
 }
 
+export interface PublicEvent {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  startAt: string;
+  endAt?: string | null;
+  venue?: string;
+  meetingUrl?: string;
+  imageUrl?: string;
+  registrationUrl?: string;
+  organizerName?: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -49,6 +64,12 @@ export interface Project {
 @Injectable({ providedIn: 'root' })
 export class SeedbedsService {
   private readonly api = inject(ApiService);
+
+  async publishedEvents(): Promise<PublicEvent[]> {
+    const response = await this.api.get<{ events: PublicEvent[] | null }>('/events');
+    // An administrator receives drafts and hidden/cancelled events too.
+    return (response.events ?? []).filter(event => event.status === 'publicado');
+  }
 
   async list(): Promise<Seedbed[]> {
     return (await this.api.get<{ seedbeds: Seedbed[] | null }>('/seedbeds')).seedbeds ?? [];

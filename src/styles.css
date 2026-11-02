@@ -1,10 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Signika+Negative:wght@700&display=swap');
+@import './app/shared/directives/specular-button.css';
 
 /* Tailwind está configurado en postcss.config.js para incorporarlo por etapas. */
 
 :root {
-  --fuente-titulo: 'Signika Negative', 'Arial Narrow', Arial, sans-serif;
-  --fuente-texto: 'Open Sans', system-ui, sans-serif;
+  --galash-bg: #0A1420;
+  --galash-deep: #070D14;
+  --galash-surface: #102332;
+  /* Roles de color: design-system/galash-is/MASTER.md */
+  --galash-accent: #F7C500;          /* Jonquil: acción primaria y uso expresivo */
+  --galash-accent-fg: #0A1420;       /* texto sobre Jonquil, 11.41:1 */
+  --galash-yellow: var(--galash-accent);
+  --galash-link: #B4BEDA;            /* enlaces subrayados, 9.98:1 */
+  --galash-secondary: #7785AC;       /* Glaucous (marca): gráficos, íconos y números repetidos; solo texto grande, 5.06:1 */
+  --galash-wave: #3D7BE0;            /* DECORATIVO: solo shader y grilla del hero. Prohibido en botones, texto, enlaces, estados, bordes y nodos del grafo. */
+  --galash-focus: #FFFFFF;           /* anillo de foco con halo navy */
+  --galash-border: rgb(255 255 255 / .12);
+  --galash-border-strong: rgb(255 255 255 / .28);
+  --galash-error: #FF8F8A;
+  --galash-text: #C3CCD4;
+  --galash-text-strong: #FFFFFF;
+  --galash-muted: #8FA1AD;
+  --galash-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --fuente-titulo: 'Sora', system-ui, sans-serif;
+  --fuente-texto: 'IBM Plex Sans', system-ui, sans-serif;
   --font-display: var(--fuente-titulo);
   --font-body: var(--fuente-texto);
   --galash-home-image: url('/assets/fondo.png');
@@ -17,3 +35,9 @@
 html, body { min-width: 320px; }
 body { margin: 0; background: #0a1420; color: #fff; }
 button, input { font: inherit; }
+h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 600; } /* Sora y Plex Sans solo cargan 600 como negrita */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--galash-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--galash-bg); /* separa el anillo de fondos Jonquil */
+}

@@ -32,7 +32,6 @@ export class KnowledgeGraphComponent implements AfterViewInit, OnChanges, OnDest
   private simulation?: Simulation<GraphNode, undefined>;
   private resizeObserver?: ResizeObserver;
   private intersectionObserver?: IntersectionObserver;
-  private motion?: MediaQueryList;
   private transitionTimer?: ReturnType<typeof setTimeout>;
   private animationFrame = 0;
   private initialized = false;
@@ -45,6 +44,7 @@ export class KnowledgeGraphComponent implements AfterViewInit, OnChanges, OnDest
   private moved = false;
   private suppressClick = false;
   private phaseTime = 0;
+  private lastOrbitTick = 0;
   width = 440;
   readonly height = 360;
   nodes: GraphNode[] = [];
@@ -115,11 +115,9 @@ export class KnowledgeGraphComponent implements AfterViewInit, OnChanges, OnDest
 
   ngAfterViewInit(): void {
     this.initialized = true;
-    this.motion = matchMedia('(prefers-reduced-motion: reduce)');
-    this.reducedMotion = this.motion.matches;
+    this.reducedMotion = false;
     this.width = Math.max(240, this.container.nativeElement.clientWidth);
     this.createGraph();
-    this.motion.addEventListener('change', this.onMotionChange);
     document.addEventListener('visibilitychange', this.onVisibilityChange);
     this.resizeObserver = new ResizeObserver(entries => {
       const width = entries[0].contentRect.width;
@@ -161,10 +159,20 @@ export class KnowledgeGraphComponent implements AfterViewInit, OnChanges, OnDest
       this.simulation.tick(90);
       this.constrain();
       this.simulation.on('tick', () => {
-        this.phaseTime += .009;
+        const now = performance.now();
+        const elapsed = Math.min(.05, Math.max(0, (now - this.lastOrbitTick) / 1000));
+        this.lastOrbitTick = now;
         if (!this.reducedMotion) {
-          this.simulation?.force('x', forceX<GraphNode>(node => node.homeX + (node.central ? 0 : Math.sin(this.phaseTime + node.id * 1.8) * 10)).strength(.065));
-          this.simulation?.force('y', forceY<GraphNode>(node => node.homeY + (node.central ? 0 : Math.cos(this.phaseTime * .7 + node.id) * 9)).strength(.065));
+          // One revolution every 36 seconds; stop advancing while a node is being read or dragged.
+          if (this.activeId === null && !this.dragged) this.phaseTime += elapsed * Math.PI * 2 / 36;
+          const target = (node: GraphNode, axis: 'x' | 'y'): number => {
+            if (node.central) return axis === 'x' ? this.cx : this.cy;
+            const angle = Math.atan2(node.homeY - this.cy, node.homeX - this.cx) + this.phaseTime;
+            const radius = Math.hypot(node.homeX - this.cx, node.homeY - this.cy);
+            return axis === 'x' ? this.centerX + Math.cos(angle) * radius : this.centerY + Math.sin(angle) * radius;
+          };
+          this.simulation?.force('x', forceX<GraphNode>(node => target(node, 'x')).strength(.065));
+          this.simulation?.force('y', forceY<GraphNode>(node => target(node, 'y')).strength(.065));
         }
         this.constrain();
         if (!this.destroyed) this.detector.detectChanges();
@@ -199,18 +207,10 @@ export class KnowledgeGraphComponent implements AfterViewInit, OnChanges, OnDest
     }
     const run = this.visible && !document.hidden && this.phase === 'visible';
     if (!run || (this.reducedMotion && !this.dragged)) { this.simulation?.stop(); return; }
+    this.lastOrbitTick = performance.now();
     this.zone.runOutsideAngular(() => this.simulation?.alphaTarget(this.reducedMotion ? 0 : .18).alpha(.3).restart());
   }
   private readonly onVisibilityChange = (): void => this.updateRunning();
-  private readonly onMotionChange = (event: MediaQueryListEvent): void => {
-    this.reducedMotion = event.matches;
-    this.arriving = false;
-    clearTimeout(this.transitionTimer);
-    this.phase = 'visible';
-    this.createGraph();
-    this.detector.detectChanges();
-  };
-
   position(node: GraphNode): string {
     return this.phase === 'enter' ? `translate(${this.cx}px, ${this.cy}px)` : `translate(${node.x}px, ${node.y}px)`;
   }
@@ -266,7 +266,6 @@ export class KnowledgeGraphComponent implements AfterViewInit, OnChanges, OnDest
     this.simulation?.on('tick', null).stop();
     this.resizeObserver?.disconnect();
     this.intersectionObserver?.disconnect();
-    this.motion?.removeEventListener('change', this.onMotionChange);
     document.removeEventListener('visibilitychange', this.onVisibilityChange);
     clearTimeout(this.transitionTimer);
     cancelAnimationFrame(this.animationFrame);

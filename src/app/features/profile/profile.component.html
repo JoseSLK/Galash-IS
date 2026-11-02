@@ -21,11 +21,14 @@
               <div class="full-width"><dt>Correo electrónico</dt><dd>{{ auth.profileEmail() || 'No disponible' }}</dd></div>
               <div><dt>Tipo de documento</dt><dd>{{ auth.backendUser()?.document_type || 'No disponible' }}</dd></div>
               <div><dt>Número de documento</dt><dd>{{ auth.backendUser()?.document_number || 'No disponible' }}</dd></div>
+              <div><dt>Teléfono</dt><dd>{{ auth.backendUser()?.phone || 'No disponible' }}</dd></div>
+              <div><dt>Fecha de nacimiento</dt><dd>{{ auth.backendUser()?.birth_date ? (auth.backendUser()?.birth_date ?? '').split('-').reverse().join('/') : 'No disponible' }}</dd></div>
+              <div><dt>Código estudiantil</dt><dd>{{ auth.backendUser()?.student_code || 'No registrado' }}</dd></div>
             </dl>
           </section>
           <section class="information-card account-card" aria-labelledby="account-title">
             <p class="eyebrow">Tu acceso</p><h2 id="account-title">Cuenta GALASH</h2>
-            <dl><div><dt>Rol en la plataforma</dt><dd>{{ auth.profileRole() }}</dd></div><div><dt>Estado de la cuenta</dt><dd>{{ accountStatus() }}</dd></div><div><dt>Sesión</dt><dd class="session-active"><span aria-hidden="true"></span>Iniciada</dd></div></dl>
+            <dl><div><dt>Rol en la plataforma</dt><dd>{{ auth.profileRole() }}</dd></div><div><dt>Estado de la cuenta</dt><dd>{{ accountStatus() }}</dd></div><div><dt>Sesión</dt><dd class="session-active"><svg class="session-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>Iniciada</dd></div></dl>
             <p class="account-note">Tu rol determina las funciones autorizadas dentro de GALASH.</p>
           </section>
         </div>

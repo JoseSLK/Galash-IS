@@ -15,9 +15,19 @@ filas o marcar disponible solo con registro/handoff del backend.
 
 Sesion por cookie HttpOnly. `POST /auth/register` crea o sincroniza la cuenta,
 independiente de las solicitudes del M3. Requiere `Authorization: Bearer
-<FIREBASE_ID_TOKEN>` y `{"nombre","apellido","tipo_dni","dni","email"}`;
-sin password ni rol, email igual al token. El rol nuevo es `visitante` y el
-re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/handler.go`.
+<FIREBASE_ID_TOKEN>` y `{"nombre","apellido","tipo_dni","dni","email",
+"fecha_nacimiento","telefono"}` obligatorios (`fecha_nacimiento` en `AAAA-MM-DD`)
+más `codigo_estudiantil` opcional; sin password ni rol, email igual al token.
+`409` si `dni` o `codigo_estudiantil` ya son de otra cuenta. El rol nuevo es
+`visitante` y el re-registro conserva el rol existente. `GET /users/me`
+devuelve además `document_type`, `document_number`, `student_code`,
+`birth_date` y `phone` para prellenar formularios.
+
+`POST /registration-requests` (Únete) exige sesión (`401` sin ella). No envía
+`nombre`, `cc`, `telefono` ni `fechaNacimiento`: salen de la cuenta. `cod` es
+opcional (vacío se ignora; con valor actualiza la cuenta, `409` si es de otra).
+`400` si falta un campo académico o la cuenta no tiene documento, teléfono o
+fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 
 | Metodo | Ruta | Descripcion | Contrato | Uso |
 |---|---|---|---|---|
@@ -44,12 +54,12 @@ re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/
 | GET | `/seedbeds/{id}/members` | integrantes | M2 | [x] |
 | POST | `/seedbeds/{id}/members` | vincula | M2 | [ ] |
 | DELETE | `/seedbeds/{id}/members/{userId}` | retiro | M2 | [ ] |
-| POST | `/registration-requests` | radica solicitud pública | M3 | [x] |
-| GET | `/registration-requests/{id}/status` | consulta propia con token/sesión | M3 | [ ] |
+| POST | `/registration-requests` | radica solicitud de la cuenta en sesión | M3 | [x] |
+| GET | `/registration-requests/{id}/status` | consulta propia con token/sesión | M3 | [x] |
 | GET | `/admin/registration-requests` | lista administrativa | M3 | [x] |
 | GET | `/admin/registration-requests/{id}` | detalle e historial administrativo | M3 | [x] |
 | PATCH | `/admin/registration-requests/{id}/status` | actualiza estado y auditoría | M3 | [x] |
-| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [x] |
+| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [ ] |
 | POST | `/seedbeds/{seedbedId}/activities` | registra actividad | M4 | [ ] |
 | GET | `/activities/{id}` | detalle de actividad | M4 | [ ] |
 | PATCH | `/activities/{id}` | modifica actividad | M4 | [ ] |
@@ -68,13 +78,13 @@ re-registro conserva el rol existente. Rutas en `internal/adapters/inbound/http/
 | POST | `/seedbeds/{seedbedId}/reviews` | crea reseña | M4 | [ ] |
 | GET | `/admin/seedbed-reviews` | lista reseñas | M4 | [ ] |
 | PATCH | `/admin/seedbed-reviews/{id}/moderation` | modera reseña | M4 | [ ] |
-| GET | `/events` | agenda pública filtrable; Admin autenticado ve todos los estados | M6 | [ ] |
-| POST | `/events` | crea evento en borrador | M6 | [ ] |
-| GET | `/events/{id}` | detalle publicado/autorizado | M6 | [ ] |
-| PATCH | `/events/{id}` | edita evento | M6 | [ ] |
-| POST | `/events/{id}/publish` | publica evento | M6 | [ ] |
-| POST | `/events/{id}/cancel` | cancela evento | M6 | [ ] |
-| POST | `/events/{id}/hide` | oculta evento | M6 | [ ] |
+| GET | `/events` | agenda pública filtrable; Admin autenticado ve todos los estados | M6 | [x] |
+| POST | `/events` | crea evento en borrador | M6 | [x] |
+| GET | `/events/{id}` | detalle publicado/autorizado | M6 | [x] |
+| PATCH | `/events/{id}` | edita evento | M6 | [x] |
+| POST | `/events/{id}/publish` | publica evento | M6 | [x] |
+| POST | `/events/{id}/cancel` | cancela evento | M6 | [x] |
+| POST | `/events/{id}/hide` | oculta evento | M6 | [x] |
 
 Payloads M4 en camelCase (`id`, `seedbedId`, `responsibleIds`, `memberIds`,
 `progress`, ...). `GET /research-proposals/{id}` incluye `history` y

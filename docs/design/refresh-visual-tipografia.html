@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pairings tipográficos GALASH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Solo para comparar: carga las cuatro opciones a la vez. En producción se carga una. -->
+<link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@700&family=Open+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@700&family=Inter:wght@400;600&family=Sora:wght@600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&family=Fraunces:opsz,wght@9..144,600&family=Atkinson+Hyperlegible+Next:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0A1420; --surface: #102332; --text: #C3CCD4; --text-strong: #FFFFFF; --muted: #8FA1AD;
+  --border: rgb(255 255 255 / 0.12); --border-strong: rgb(255 255 255 / 0.28);
+  --accent: #F7C500; --accent-fg: #0A1420; --link: #B4BEDA; --r: 10px;
+  --ui: "Inter", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { min-width: 320px; }
+body { margin: 0; background: var(--navy); color: var(--text); font: 400 1rem/1.55 var(--ui); }
+main { max-width: 1120px; margin: 0 auto; padding: 32px 16px 96px; }
+.page-h1 { font: 700 clamp(1.75rem, 1.3rem + 2vw, 2.5rem)/1.15 var(--ui); color: var(--text-strong); margin: 0 0 8px; }
+.page-h2 { font: 700 1.5rem/1.2 var(--ui); color: var(--text-strong); margin: 56px 0 8px; }
+p { max-width: 65ch; }
+code { font-size: .875em; color: var(--text-strong); }
+:is(a, button):focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; box-shadow: 0 0 0 2px var(--navy); }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr)); }
+.spec { min-width: 0; padding: 24px 20px; border: 1px solid var(--border); border-radius: var(--r); }
+.spec.current { border-style: dashed; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 20px; padding: 0 0 12px; border-bottom: 1px solid var(--border); font: 400 .875rem/1.4 var(--ui); color: var(--muted); }
+.meta strong { color: var(--text-strong); font-weight: 600; }
+
+/* Cada pairing define sus tres fuentes y la muestra las consume. */
+.p0 { --f-title: "Signika Negative", "Arial Narrow", Arial, sans-serif; --w-title: 700; --f-body: "Open Sans", system-ui, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, monospace; --w-mono: 600; }
+.p1 { --f-title: "Space Grotesk", Arial, sans-serif; --w-title: 700; --f-body: "Inter", system-ui, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, monospace; --w-mono: 600; }
+.p2 { --f-title: "Sora", Arial, sans-serif; --w-title: 600; --f-body: "IBM Plex Sans", system-ui, sans-serif; --f-mono: "IBM Plex Mono", ui-monospace, monospace; --w-mono: 500; }
+.p3 { --f-title: "Fraunces", Georgia, serif; --w-title: 600; --f-body: "Atkinson Hyperlegible Next", system-ui, sans-serif; --f-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace; --w-mono: 600; }
+
+.sample { font-family: var(--f-body); }
+.eyebrow { margin: 0 0 8px; font: var(--w-mono) .75rem/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.title { margin: 0 0 16px; font: var(--w-title) clamp(2rem, 1.5rem + 2vw, 2.75rem)/1.1 var(--f-title); color: var(--text-strong); }
+.title .num { color: var(--accent); } /* uso expresivo: una cifra por hero */
+.underline { display: block; width: 48px; height: 4px; margin: 0 0 20px; background: var(--accent); border-radius: 2px; } /* uso expresivo: subrayado de título */
+.h2 { margin: 24px 0 8px; font: var(--w-title) 1.375rem/1.2 var(--f-title); color: var(--text-strong); }
+.body { margin: 0 0 16px; font-size: 1rem; }
+.small { font-size: .875rem; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 16px 0; }
+.btn { min-height: 44px; padding: 0 20px; border-radius: var(--r); font: 600 1rem var(--f-body); cursor: pointer; border: 1px solid transparent; }
+.btn-primary { background: var(--accent); color: var(--accent-fg); }
+.btn-secondary { background: transparent; color: var(--text-strong); border-color: var(--border-strong); }
+.sample a { color: var(--link); text-underline-offset: 3px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border-radius: 999px; font: 600 .875rem var(--f-body); border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text-strong); }
+.chip svg { width: 16px; height: 16px; flex: none; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9375rem; }
+th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { font: var(--w-mono) .75rem/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+td.mono { font-family: var(--f-mono); color: var(--text-strong); }
+.glyphs { font-size: .9375rem; color: var(--text-strong); word-break: break-word; }
+
+.cmp th { font: 600 .875rem var(--ui); letter-spacing: 0; text-transform: none; color: var(--text-strong); }
+.cmp td { white-space: normal; }
+ul { padding-left: 20px; max-width: 70ch; }
+li { margin: 6px 0; }
+</style>
+</head>
+<body>
+<main id="main">
+  <h1 class="page-h1">Pairings tipográficos sobre navy</h1>
+  <p>Hay tres alternativas a Signika + Open Sans, comparadas con la actual. Todas usan los colores decididos: Jonquil solo como acción o como uso expresivo, foco blanco, éxito neutro y eyebrow en muted con fuente mono.</p>
+  <p><strong>Choque con la marca:</strong> el contrato de <code>minimal-system</code> fija Signika para títulos y Open Sans para cuerpo. Elegir P1, P2 o P3 es una desviación de marca y debe quedar registrada en <code>MASTER.md</code>.</p>
+
+  <div class="grid">
+    <section class="spec current p0" aria-label="P0 Actual">
+      <p class="meta"><strong>P0 · Actual (marca)</strong><span>Signika Negative 700 · Open Sans 400/600 · JetBrains Mono 400/600</span><span>≈ 100 KB hoy, 90 KB sin pesos 300/700</span></p>
+      <div class="sample">
+        <p class="eyebrow">Semilleros · UPTC</p>
+        <h2 class="title" id="p0h"><span class="num">12</span> semilleros de investigación</h2>
+        <span class="underline" aria-hidden="true"></span>
+        <p class="body">Únete a un semillero, presenta tu propuesta y sigue el estado de tu solicitud desde tu perfil. Revisión en máximo 10 días hábiles.</p>
+        <div class="row"><button class="btn btn-primary" type="button">Enviar solicitud</button><button class="btn btn-secondary" type="button">Cancelar</button><a href="#p0h">Ver requisitos</a></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Ejemplo de tabla P0"><table><thead><tr><th scope="col">Código</th><th scope="col">Fecha</th><th scope="col">Estado</th></tr></thead><tbody><tr><td class="mono">SOL-2026-0148</td><td class="mono">01/11/2026</td><td><span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Aprobada</span></td></tr></tbody></table></div>
+        <p class="glyphs">Ññ Áá Éé Íí Óó Úú Üü ¿? ¡! 0O 1lI — 3,14 % 25 °C</p>
+      </div>
+    </section>
+
+    <section class="spec p1" aria-label="P1 Técnico">
+      <p class="meta"><strong>P1 · Técnico</strong><span>Space Grotesk 700 · Inter 400/600 · JetBrains Mono 400/600</span><span>≈ 79–89 KB</span></p>
+      <div class="sample">
+        <p class="eyebrow">Semilleros · UPTC</p>
+        <h2 class="title" id="p1h"><span class="num">12</span> semilleros de investigación</h2>
+        <span class="underline" aria-hidden="true"></span>
+        <p class="body">Únete a un semillero, presenta tu propuesta y sigue el estado de tu solicitud desde tu perfil. Revisión en máximo 10 días hábiles.</p>
+        <div class="row"><button class="btn btn-primary" type="button">Enviar solicitud</button><button class="btn btn-secondary" type="button">Cancelar</button><a href="#p1h">Ver requisitos</a></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Ejemplo de tabla P1"><table><thead><tr><th scope="col">Código</th><th scope="col">Fecha</th><th scope="col">Estado</th></tr></thead><tbody><tr><td class="mono">SOL-2026-0148</td><td class="mono">01/11/2026</td><td><span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Aprobada</span></td></tr></tbody></table></div>
+        <p class="glyphs">Ññ Áá Éé Íí Óó Úú Üü ¿? ¡! 0O 1lI — 3,14 % 25 °C</p>
+      </div>
+    </section>
+
+    <section class="spec p2" aria-label="P2 Plex">
+      <p class="meta"><strong>P2 · Plex (recomendada)</strong><span>Sora 600 · IBM Plex Sans 400/600 · IBM Plex Mono 500</span><span>≈ 73 KB</span></p>
+      <div class="sample">
+        <p class="eyebrow">Semilleros · UPTC</p>
+        <h2 class="title" id="p2h"><span class="num">12</span> semilleros de investigación</h2>
+        <span class="underline" aria-hidden="true"></span>
+        <p class="body">Únete a un semillero, presenta tu propuesta y sigue el estado de tu solicitud desde tu perfil. Revisión en máximo 10 días hábiles.</p>
+        <div class="row"><button class="btn btn-primary" type="button">Enviar solicitud</button><button class="btn btn-secondary" type="button">Cancelar</button><a href="#p2h">Ver requisitos</a></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Ejemplo de tabla P2"><table><thead><tr><th scope="col">Código</th><th scope="col">Fecha</th><th scope="col">Estado</th></tr></thead><tbody><tr><td class="mono">SOL-2026-0148</td><td class="mono">01/11/2026</td><td><span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Aprobada</span></td></tr></tbody></table></div>
+        <p class="glyphs">Ññ Áá Éé Íí Óó Úú Üü ¿? ¡! 0O 1lI — 3,14 % 25 °C</p>
+      </div>
+    </section>
+
+    <section class="spec p3" aria-label="P3 Académico accesible">
+      <p class="meta"><strong>P3 · Académico accesible</strong><span>Fraunces 600 · Atkinson Hyperlegible Next 400/700 · Atkinson Hyperlegible Mono 400/600</span><span>≈ 84 KB</span></p>
+      <div class="sample">
+        <p class="eyebrow">Semilleros · UPTC</p>
+        <h2 class="title" id="p3h"><span class="num">12</span> semilleros de investigación</h2>
+        <span class="underline" aria-hidden="true"></span>
+        <p class="body">Únete a un semillero, presenta tu propuesta y sigue el estado de tu solicitud desde tu perfil. Revisión en máximo 10 días hábiles.</p>
+        <div class="row"><button class="btn btn-primary" type="button">Enviar solicitud</button><button class="btn btn-secondary" type="button">Cancelar</button><a href="#p3h">Ver requisitos</a></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Ejemplo de tabla P3"><table><thead><tr><th scope="col">Código</th><th scope="col">Fecha</th><th scope="col">Estado</th></tr></thead><tbody><tr><td class="mono">SOL-2026-0148</td><td class="mono">01/11/2026</td><td><span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Aprobada</span></td></tr></tbody></table></div>
+        <p class="glyphs">Ññ Áá Éé Íí Óó Úú Üü ¿? ¡! 0O 1lI — 3,14 % 25 °C</p>
+      </div>
+    </section>
+  </div>
+
+  <h2 class="page-h2">Peso y Lighthouse</h2>
+  <p>Medido el 01/11/2026: subconjunto <code>latin</code> en woff2 servido por Google Fonts a Chrome, que cubre el español. Google sirve un archivo variable por familia, así que cada opción descarga 3 archivos.</p>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Peso de fuentes por opción">
+    <table class="cmp">
+      <thead><tr><th scope="col">Opción</th><th scope="col">Título</th><th scope="col">Cuerpo</th><th scope="col">Mono</th><th scope="col">Total</th></tr></thead>
+      <tbody>
+        <tr><td>P0 actual</td><td>Signika Negative 700 · 23 KB</td><td>Open Sans 300–700 · 47 KB</td><td>JetBrains Mono 400–600 · 30 KB</td><td>100 KB</td></tr>
+        <tr><td>P1 Técnico</td><td>Space Grotesk 700 · 12 KB</td><td>Inter 400–600 · 47 KB</td><td>JetBrains Mono 400 · 20 KB (400–600 · 30 KB)</td><td>79–89 KB</td></tr>
+        <tr><td>P2 Plex</td><td>Sora 600 · 14 KB</td><td>IBM Plex Sans 400–600 · 44 KB</td><td>IBM Plex Mono 500 · 14 KB</td><td>73 KB</td></tr>
+        <tr><td>P3 Académico</td><td>Fraunces 600 · 34 KB</td><td>Atkinson Hyperlegible Next 400–700 · 33 KB</td><td>Atkinson Hyperlegible Mono 400–600 · 17 KB</td><td>84 KB</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><strong>Peso:</strong> la diferencia entre opciones es de 11 a 27 KB. Ninguna cambia por sí sola la puntuación de Lighthouse.</li>
+    <li><strong>Lo que sí afecta hoy:</strong> las fuentes se cargan con <code>@import</code> dentro de <code>styles.css</code>. Eso encadena las peticiones (HTML → CSS → CSS de Google → woff2) y retrasa FCP y LCP. Pasarlas a <code>&lt;link rel="preconnect"&gt;</code> + <code>&lt;link rel="stylesheet"&gt;</code> en <code>index.html</code> mejora más que cambiar de fuente. Aplica a cualquier opción.</li>
+    <li><strong>CLS:</strong> P3 cambia más al reemplazar la fuente de respaldo, porque Fraunces es ancha y su respaldo es Georgia. P1 y P2 se parecen más a Arial y system-ui.</li>
+    <li><strong>Etiquetas:</strong> <code>--font-label</code> (Arial Narrow) no es fuente web. En el repo solo aparece como respaldo de <code>--fuente-titulo</code>. Se elimina, y las etiquetas usan la fuente mono de la opción elegida, sin peso extra.</li>
+  </ul>
+</main>
+</body>
+</html>

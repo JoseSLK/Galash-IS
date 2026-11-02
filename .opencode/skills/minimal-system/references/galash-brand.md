@@ -22,14 +22,18 @@ Contrast (computed, WCAG relative luminance):
 Not in the manual, therefore derived (marked in `tokens.css`): warm off-white background, sunken/raised surfaces, hairline borders, dark surface step, a danger red for errors, lighter Glaucous for links on dark. Keep them few and neutral.
 
 ## 2. Typography
-- Titles: **Signika** semi-bold (600), plus **Arial Narrow** as the manual's second title face.
-- Text: **Open Sans**; vary weight/style to build hierarchy.
-- Web: load Signika and Open Sans from Google Fonts. Arial Narrow is a system font that cannot be assumed or embedded, so it is used (a) as fallback in the display stack and (b) for tracked uppercase micro-labels, which echoes the wide-tracked GALASH wordmark.
+Typography evolution (2026-11-01): the web identity moves from Signika + Open Sans + Arial Narrow to the system below. It is a deliberate evolution, not a deviation. Reasons: a more technical voice for a research group in systems engineering, one coherent sans + mono family (Plex) for UI, codes and data, fewer bytes (latin woff2 ≈ 73 KB vs ≈ 100 KB), and dropping Arial Narrow, which is not a web font and renders as a different face on Linux and Android.
+
+- Titles: **Sora** semi-bold (600). Only this weight is loaded.
+- Text: **IBM Plex Sans** 400 and 600; build hierarchy with size and these two weights.
+- Labels, codes, dates, and data: **IBM Plex Mono** 500, uppercase micro-labels with +0.12em tracking.
+- Web: load from Google Fonts with `<link rel="preconnect">` + `<link rel="stylesheet">` in the HTML head (no CSS `@import`), `display=swap`. Request only the weights above. Generic fallbacks keep metrics close and avoid layout shift.
 ```
---font-display: "Signika", "Arial Narrow", Arial, sans-serif;   /* 600 */
---font-body:    "Open Sans", system-ui, sans-serif;             /* 400/500/600 */
---font-label:   "Arial Narrow", "Liberation Sans Narrow", Arial, sans-serif; /* uppercase, +0.14em */
+--font-display: "Sora", system-ui, sans-serif;               /* 600 */
+--font-body:    "IBM Plex Sans", system-ui, sans-serif;      /* 400/600 */
+--font-mono:    "IBM Plex Mono", ui-monospace, monospace;    /* 500; labels, codes, data */
 ```
+Print material made from the manual may keep Signika and Arial Narrow.
 
 ## 3. Logo
 - Two official arrangements: **vertical** (mark above wordmark) and **horizontal** (mark left of wordmark).

@@ -1,18 +1,22 @@
+import { ScrollStackComponent } from '../../shared/components/scroll-stack/scroll-stack.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
 import { ApiService } from '../../core/services/api.service';
 import { Seedbed, SeedbedsService } from '../seedbeds/seedbeds.service';
+import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
+import { SpecularButtonDirective } from '../../shared/directives/specular-button.directive';
+import { INITIAL_HEADER_SCROLL, nextHeaderState } from './header-scroll';
 
 const MEMBER_COUNT_LIMIT = 100;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RegisterComponent, SiteFooterComponent],
+  imports: [RouterLink, RegisterComponent, SiteFooterComponent, GlitchBackgroundComponent, SpecularButtonDirective, ScrollStackComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -28,6 +32,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly seedbedsService = inject(SeedbedsService);
   readonly seedbeds = signal<Seedbed[]>([]);
   readonly memberCount = signal('—');
+  readonly seedbedCount = signal('—');
   activeSeedbed = 0;
   menuOpen = false;
   authMenuOpen = false;
@@ -37,24 +42,38 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   headerScrolled = false;
   headerCompact = false;
   activeSection = 'nosotros';
-  private previousScrollY = 0;
+  private readonly zone = inject(NgZone);
+  private headerState = INITIAL_HEADER_SCROLL;
+  private scrollFrame = 0;
+  private removeScrollListener?: () => void;
+
+  get seedbedIcon(): string {
+    const name = this.currentSeedbed?.name.toLocaleLowerCase('es') ?? '';
+    if (name.includes('ciber')) return 'security';
+    if (name.includes('inteligencia')) return 'ai';
+    if (name.includes('realidad')) return 'ar';
+    return 'research';
+  }
 
   get currentSeedbed(): Seedbed | undefined { return this.seedbeds()[this.activeSeedbed]; }
 
-  @HostListener('window:scroll')
-  onWindowScroll(): void {
-    const currentScrollY = Math.max(0, window.scrollY);
-    if (currentScrollY === 0) this.headerCompact = false;
-    else if (currentScrollY !== this.previousScrollY) this.headerCompact = currentScrollY > this.previousScrollY;
-    this.previousScrollY = currentScrollY;
-    this.headerScrolled = currentScrollY > 80;
+  /** Runs once per frame outside Angular; re-enters the zone only when the header state changes. */
+  private syncHeader(): void {
+    this.scrollFrame = 0;
+    const y = Math.max(0, window.scrollY);
+    this.headerState = nextHeaderState(this.headerState, y);
+    const scrolled = y > 80;
+    const section = this.activeSection;
     this.updateActiveSection();
+    if (this.headerState.compact !== this.headerCompact || scrolled !== this.headerScrolled || section !== this.activeSection) {
+      this.zone.run(() => { this.headerCompact = this.headerState.compact; this.headerScrolled = scrolled; });
+    }
   }
 
   ngOnInit(): void {
     // Every page embeds this component as its header; only the home page shows this content.
     if (this.headerOnly) return;
-    this.seedbedsService.list().then(items => this.seedbeds.set(items), () => undefined);
+    this.seedbedsService.list().then(items => { this.seedbeds.set(items); this.seedbedCount.set(String(items.length).padStart(2, '0')); }, () => undefined);
     // GET /members has no total; it returns at most MEMBER_COUNT_LIMIT public profiles.
     this.api.get<{ members: unknown[] | null }>(`/members?limit=${MEMBER_COUNT_LIMIT}`).then(
       ({ members }) => {
@@ -67,8 +86,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.updateActiveSection();
+    this.zone.runOutsideAngular(() => {
+      const onScroll = () => { if (!this.scrollFrame) this.scrollFrame = requestAnimationFrame(() => this.syncHeader()); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      this.removeScrollListener = () => window.removeEventListener('scroll', onScroll);
+    });
   }
-  ngOnDestroy(): void { document.body.style.overflow = ''; }
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+    cancelAnimationFrame(this.scrollFrame);
+    this.removeScrollListener?.();
+  }
 
   selectSeedbed(index: number): void { this.activeSeedbed = index; }
   toggleMenu(): void {
@@ -98,9 +126,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.authMenuOpen = false;
     } catch (error: unknown) {
       if (error instanceof RegistrationRequiredError) {
-        this.authMenuOpen = false;
-        this.registrationOpen = true;
-        document.body.style.overflow = 'hidden';
+        this.openRegistration();
       } else {
         // Endpoint, status and CORS details stay out of the UI; they are only logged in development.
         if (isDevMode()) console.warn('[auth] inicio de sesión fallido', error);
@@ -113,14 +139,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /** Opens the signup drawer; with a session open it completes the account's basic data. */
+  openRegistration(): void {
+    this.authMenuOpen = false;
+    this.registrationOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
   async cancelGoogleRegistration(): Promise<void> {
     this.registrationOpen = false;
     this.authMenuOpen = false;
     document.body.style.overflow = '';
-    try {
-      await this.authService.cancelGoogleRegistration();
-    } catch {
-      this.authErrorMessage = 'No se pudo cerrar el acceso de Google. Inténtalo de nuevo.';
+    // Closing the data completion of a signed-in account must not end its session.
+    if (!this.authService.isAuthenticated()) {
+      try {
+        await this.authService.cancelGoogleRegistration();
+      } catch {
+        this.authErrorMessage = 'No se pudo cerrar el acceso de Google. Inténtalo de nuevo.';
+      }
     }
     setTimeout(() => this.authMenuTrigger?.nativeElement.focus(), 0);
   }

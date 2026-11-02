@@ -1,0 +1,25 @@
+<app-dashboard #header [headerOnly]="true" activePage="eventos" />
+<main id="contenido" [inert]="header.registrationOpen">
+  <span class="eyebrow">GALASH · EVENTOS</span><h1>Eventos</h1>
+  <p class="intro">Encuentros, talleres, charlas y convocatorias del grupo.</p>
+  <div class="toolbar"><nav aria-label="Filtrar eventos por fecha">@for (option of filters; track option.id) {<button type="button" [class.active]="filter() === option.id" [attr.aria-pressed]="filter() === option.id" (click)="filter.set(option.id)">{{ option.label }} ({{ count(option.id) }})</button>}</nav><span class="general">Agenda general del grupo</span></div>
+  @if (state() === 'loading') {<p role="status">Cargando eventos publicados…</p>}
+  @else if (state() === 'error') {<div class="empty"><p role="alert">No pudimos cargar los eventos.</p><button class="retry" type="button" (click)="load()">Reintentar</button></div>}
+  @else {
+    <p class="sr-only" role="status">{{ filtered().length }} eventos encontrados.</p>
+    @if (featured(); as event) {<app-event-card [event]="event" [featured]="true" [now]="now()" (details)="showDetails($event, detailDialog)" />}
+    <div class="event-grid">@for (event of cards(); track event.id) {<app-event-card [event]="event" [now]="now()" (details)="showDetails($event, detailDialog)" />}</div>
+    @if (!filtered().length) {<div class="empty"><h2>No hay eventos {{ filter() === 'next' ? 'próximos' : filter() === 'past' ? 'anteriores' : 'publicados' }}</h2><p>Consulta las otras fechas para explorar la agenda del grupo.</p></div>}
+  }
+</main>
+<app-site-footer [inert]="header.registrationOpen" />
+<dialog #detailDialog aria-labelledby="event-detail-title">
+  @if (selected(); as event) {
+    <div class="dialog-top"><span class="eyebrow">{{ event.type }} · GENERAL</span><button type="button" (click)="detailDialog.close()" aria-label="Cerrar detalles" autofocus>×</button></div>
+    <h2 id="event-detail-title">{{ event.title }}</h2><p class="date">{{ event.startAt | date:'dd/MM/yyyy, HH:mm' }}@if (event.endAt) { — {{ event.endAt | date:'dd/MM/yyyy, HH:mm' }}}</p>
+    <p class="description">{{ event.description }}</p>
+    @if (event.venue) {<p><strong>Lugar:</strong> {{ event.venue }}</p>}
+    @if (event.organizerName) {<p><strong>Organizador:</strong> {{ event.organizerName }}</p>}
+    <div class="links">@if (safeUrl(event.meetingUrl); as url) {<a [href]="url" target="_blank" rel="noopener noreferrer">Enlace virtual ↗</a>}@if (safeUrl(event.registrationUrl); as url) {<a [href]="url" target="_blank" rel="noopener noreferrer">Inscribirme ↗</a>}</div>
+  }
+</dialog>
