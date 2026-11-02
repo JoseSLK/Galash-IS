@@ -11,3 +11,5 @@ dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px 18
 .session-message { max-width: 680px; margin: 70px auto; padding: 24px; color: #c3ccd4; text-align: center; }.session-message h1 { font-size: 28px; }
 @media (max-width: 650px) { .profile-content { width: calc(100% - 32px); margin-top: 90px; }.identity-card { padding-inline: 20px; }.identity-bottom { margin-inline: -20px; padding: 16px 20px; flex-direction: column; }.profile-grid { grid-template-columns: 1fr; gap: 16px; }.information-card { padding: 24px; }.profile-avatar { width: 124px; height: 124px; top: -62px; font-size: 38px; } }
 @media (max-width: 380px) { dl { grid-template-columns: 1fr; }.full-width { grid-column: auto; } }
+
+.my-projects-section {margin-top:36px;min-width:0;}.my-projects-section h2 {font:600 clamp(24px,3vw,34px) var(--fuente-titulo);margin:0 0 12px;}.my-projects-intro {font:13px/1.8 var(--fuente-texto);color:var(--galash-text);margin:0 0 20px;}

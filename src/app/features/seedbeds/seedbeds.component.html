@@ -78,6 +78,7 @@
           }
         </nav>
       </div>
+      @if(seedbedProjects().length) {<p class="demo-projects-note">Se incluyen proyectos de demostración del catálogo del grupo.</p>}
       <p class="result-count" aria-live="polite">{{ filteredProjects.length }} {{ filteredProjects.length === 1 ? 'proyecto' : 'proyectos' }} · {{ selectedStatus }}</p>
       <div class="project-list" [class.scrollable]="filteredProjects.length > 3" tabindex="0" role="region" aria-label="Lista de proyectos">
         <div class="project-stack">
@@ -86,7 +87,7 @@
               <div class="card-body">
                 <div class="project-heading"><span class="project-line">{{ selected()?.name }}</span><span class="status" [class.status--finished]="project.status === 'Finalizado'" [class.status--filed]="project.status === 'Radicado'">@switch (project.status) { @case ('Finalizado') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>} @case ('Radicado') {<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 1.5"/></svg>} @default {<span class="status-dot" aria-hidden="true"></span>} }{{ projectStatusLabel(project.status) }}</span></div>
                 <div class="card-copy"><h3>{{ project.title }}</h3><p>{{ project.summary }}</p></div>
-                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + project.title" (click)="$event.preventDefault(); openDetails(detailsDialog, { title: project.title, description: project.summary }, 'Proyecto', projectStatusLabel(project.status))">Ver más detalles <span aria-hidden="true">↗</span></a>
+                <a class="details-link" href="#detalles" [attr.aria-label]="'Ver más detalles de ' + project.title" (click)="$event.preventDefault(); openProjectDetails(detailsDialog, project)">Ver más detalles <span aria-hidden="true">↗</span></a>
               </div>
             </article>
           } @empty {<p>No hay proyectos en este estado.</p>}
@@ -103,7 +104,9 @@
   <div class="dialog-heading"><span class="card-category">{{ selectedDetail?.kind }}</span><button type="button" aria-label="Cerrar detalles" (click)="detailsDialog.close()" autofocus>×</button></div>
   <h2 id="detail-title">{{ selectedDetail?.title }}</h2>
   <p class="detail-meta">{{ selectedDetail?.metadata }}</p>
+  @if(selectedDetail?.kind==='Proyecto') {<h3>Sinopsis / introducción</h3>}
   <p>{{ selectedDetail?.description }}</p>
+  @if(selectedDetail?.kind==='Proyecto') {<dl class="project-detail-facts"><div><dt>Director</dt><dd>{{selectedDetail?.project?.director || selectedDetail?.project?.responsible?.[0] || 'Información no disponible'}}</dd></div><div><dt>Fecha de inicio</dt><dd>{{selectedDetail?.project?.startDate ? (selectedDetail?.project?.startDate | date:'dd/MM/yyyy':'UTC') : 'Información no disponible'}}</dd></div><div><dt>Integrantes</dt><dd><ul>@for(member of selectedDetail?.project?.members;track member.userId) {<li>{{member.name}}</li>} @empty {<li>Información de integrantes no disponible.</li>}</ul></dd></div></dl>}
   @if (selectedDetail?.event; as event) {
     @if (safeEventLink(event.imageUrl); as imageUrl) {
       <img class="event-image" [src]="imageUrl" [alt]="event.title" decoding="async" />
