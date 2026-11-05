@@ -13,3 +13,11 @@ dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px 18
 @media (max-width: 380px) { dl { grid-template-columns: 1fr; }.full-width { grid-column: auto; } }
 
 .my-projects-section {margin-top:36px;min-width:0;}.my-projects-section h2 {font:600 clamp(24px,3vw,34px) var(--fuente-titulo);margin:0 0 12px;}.my-projects-intro {font:13px/1.8 var(--fuente-texto);color:var(--galash-text);margin:0 0 20px;}
+.assignment-badges { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.assignment-label { max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; border-color: var(--galash-accent); }
+.profile-assignments { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--galash-border); }
+.profile-assignments h3 { margin: 0 0 14px; font: 600 19px var(--fuente-titulo); }
+.profile-assignments ul { margin: 0 0 16px; padding: 0; list-style: none; }
+.profile-assignments li { display: grid; gap: 6px; margin: 14px 0; overflow-wrap: anywhere; }
+.profile-assignments strong { font-size: 14px; color: var(--galash-text-strong); }
+.profile-assignments span, .profile-assignments p, .profile-assignments li, .profile-assignments small { font-size: 12px; line-height: 1.6; }

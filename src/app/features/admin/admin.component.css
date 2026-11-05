@@ -12,6 +12,7 @@ h1 span { color: var(--galash-accent); }
 .section-menu[open] .section-chevron { transform: rotate(225deg) translate(-2px, -2px); }
 .section-menu summary:hover { background: #ffffff08; }
 .sections-dropdown { position: absolute; z-index: 5; top: calc(100% + 10px); right: 0; width: 300px; max-width: calc(100vw - 36px); padding: 6px; border: 1px solid var(--galash-border); border-radius: 12px; background: #102633; box-shadow: 0 14px 30px #0005; }
+.center-menu .sections-dropdown { box-sizing: border-box; left: 50%; right: auto; transform: translateX(calc(-50% + var(--menu-shift, 0px))); }
 .sections-dropdown button { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; min-height: 44px; padding: 12px; border: 0; border-radius: 6px; background: transparent; color: #c3ccd4; text-align: left; font: 400 12px var(--fuente-texto); }
 .sections-dropdown .current-section { border-left: 3px solid var(--galash-accent); background: #1b3542; color: #fff; cursor: pointer; font-weight: 600; }
 .sections-dropdown button:disabled { opacity: 1; color: #8fa2b2; }

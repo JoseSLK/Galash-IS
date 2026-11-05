@@ -8,6 +8,11 @@
         <section class="identity-card" aria-labelledby="profile-name">
           <div class="profile-avatar" aria-hidden="true">{{ auth.profileInitials() }}</div>
           <p class="eyebrow">Mi perfil · GALASH</p><span class="role-label">{{ auth.profileRole() }}</span>
+          <div class="assignment-badges" aria-label="Funciones en semilleros">
+            @for (assignment of assignments(); track assignment.id) {
+              <span class="role-label assignment-label">{{ assignment.function }} · {{ assignment.name }}</span>
+            }
+          </div>
           <h1 id="profile-name">{{ auth.profileName() }}</h1><span class="identity-accent" aria-hidden="true"></span>
           <p class="profile-email">{{ auth.profileEmail() || 'Correo no disponible' }}</p>
           <div class="identity-bottom"><span>Sistema de información GALASH</span><span>UPTC · Seccional Sogamoso</span></div>
@@ -30,6 +35,18 @@
             <p class="eyebrow">Tu acceso</p><h2 id="account-title">Cuenta GALASH</h2>
             <dl><div><dt>Rol en la plataforma</dt><dd>{{ auth.profileRole() }}</dd></div><div><dt>Estado de la cuenta</dt><dd>{{ accountStatus() }}</dd></div><div><dt>Sesión</dt><dd class="session-active"><svg class="session-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8.5 3 3 7-7"/></svg>Iniciada</dd></div></dl>
             <p class="account-note">Tu rol determina las funciones autorizadas dentro de GALASH.</p>
+            <div class="profile-assignments">
+              <h3>Funciones en semilleros</h3>
+              @if (assignmentsLoading()) {<p role="status">Actualizando tus funciones…</p>}
+              @else if (assignmentsError()) {<p role="alert">{{ assignmentsError() }}</p>}
+              @else {
+                <ul>@for (assignment of assignments(); track assignment.id) {
+                  <li><strong>{{ assignment.function }}</strong><span>{{ assignment.name }}</span>
+                    @if (assignment.unavailable) {<small>No se pudo consultar el detalle de este semillero.</small>}
+                  </li>
+                } @empty {<li>Sin funciones de líder o delegado asignadas.</li>}</ul>
+              }
+            </div>
           </section>
         </div>
         <section class="my-projects-section" aria-labelledby="my-projects-title"><h2 id="my-projects-title">Mi proyecto</h2><p class="my-projects-intro">Proyectos donde tu cuenta figura como integrante o responsable.</p><app-projects-page [embedded]="true" [personal]="true"/></section>
