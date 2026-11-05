@@ -22,6 +22,8 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 - **Acceso:** cada endpoint indica uno o más de estos roles. Además del rol, el backend debe validar el contexto, por ejemplo, que el `Docente` sea responsable del semillero.
 - **Director y delegados (relaciones, no roles):** el director de un semillero es su docente responsable (`responsibleTeacherId`). El director (o `Admin`) puede designar hasta 2 delegados entre los integrantes activos del semillero (`Estudiante` o `Docente` con cuenta activa). Director y delegados son los *gestores* del semillero: atienden sus solicitudes de registro, eventos, cronograma interno y actividades. Los delegados no editan el semillero, sus integrantes ni sus delegados. Retirar a un integrante le quita la delegación.
 
+- **Director y delegados (relaciones, no roles):** el director de un semillero es su docente responsable (`responsibleTeacherId`). El director (o `Admin`) puede designar hasta 2 delegados entre los integrantes activos del semillero (`Estudiante` o `Docente` con cuenta activa). Director y delegados son los *gestores* del semillero: atienden sus solicitudes de registro, eventos, cronograma interno y actividades. Los delegados no editan el semillero, sus integrantes ni sus delegados. Retirar a un integrante le quita la delegación.
+
 ## 3. Módulos funcionales
 
 ### Módulo 1. Autenticación y sesión
