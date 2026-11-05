@@ -1,5 +1,5 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'proyectos' ? '/proyectos' : activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'proyectos' ? '/proyectos' : activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'leader' ? '/gestion-semillero' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <img class="nav-emblem" src="/assets/galash-emblema-nav-96.webp" srcset="/assets/galash-emblema-nav-96.webp 1x, /assets/galash-emblema-nav-144.webp 1.5x" alt="" width="48" height="47" decoding="async"><span>GALASH</span>
@@ -41,6 +41,12 @@
               <a class="profile-menu-link" routerLink="/mi-perfil" (click)="authMenuOpen = false; closeMenu()">Mi perfil <span aria-hidden="true">↗</span></a>
               @if (authService.isAdmin()) {
                 <a class="profile-menu-link" routerLink="/administracion" (click)="authMenuOpen = false; closeMenu()">Administración <span aria-hidden="true">↗</span></a>
+              } @else if (ownedSeedbeds().length) {
+                <a class="profile-menu-link" routerLink="/gestion-semillero" [queryParams]="ownedSeedbeds().length === 1 ? { seedbedId: ownedSeedbeds()[0].id } : {}" (click)="authMenuOpen = false; closeMenu()">Administrar mi semillero <span aria-hidden="true">↗</span></a>
+              } @else if (checkingLeadership()) {
+                <p class="auth-status" role="status">Comprobando acceso al semillero…</p>
+              } @else if (leadershipError()) {
+                <button class="profile-menu-link" type="button" (click)="checkLeadership()">Reintentar acceso al semillero</button>
               }
               @if (authErrorMessage) { <p class="auth-error" role="alert">{{ authErrorMessage }}</p> }
               <button class="dropdown-action" type="button" [disabled]="authLoading" (click)="logout()">

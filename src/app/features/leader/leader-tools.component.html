@@ -1,0 +1,39 @@
+<section class="editor" [attr.aria-busy]="busy() || loading()">
+  @if (loading()) {<p role="status">Cargando datos de tu semillero…</p>}
+  @else {
+    @if (section() === 'seedbed') {
+      <h3>Datos de mi semillero</h3>
+      <form [formGroup]="form" (ngSubmit)="saveSeedbed()"><fieldset [disabled]="busy()">
+        <label for="leader-name">Nombre</label><input id="leader-name" formControlName="name" required />
+        <label for="leader-description">Descripción</label><textarea id="leader-description" formControlName="description" required></textarea>
+        <label for="leader-line">Línea de investigación</label><input id="leader-line" formControlName="researchLine" required />
+        <label for="leader-objective">Objetivo</label><textarea id="leader-objective" formControlName="objective" required></textarea>
+        <label for="leader-contact">Correo de contacto</label><input id="leader-contact" type="email" formControlName="contactEmail" required />
+        <button class="primary" type="submit" [disabled]="form.pristine">Guardar datos</button>
+      </fieldset></form>
+      <p>Visibilidad actual: {{ current()?.visibility }}</p><div class="actions">
+        @for (status of ['Publicado','Oculto','Inactivo']; track status) {<button class="outline" type="button" [disabled]="busy() || form.dirty || current()?.visibility === status" (click)="visibility(status)">{{ status === 'Publicado' ? 'Publicar' : status === 'Oculto' ? 'Ocultar' : 'Desactivar semillero' }}</button>}
+      </div>
+    }
+    @if (section() === 'members') {
+      <h3>Integrantes y delegados de mi semillero</h3><p>Puedes asignar hasta dos delegados. Retirar un integrante también retira su delegación.</p>
+      <ul class="event-list">@for (member of members(); track member.userId) {<li class="event-row"><strong>{{ member.name }} {{ member.lastName }}</strong><span>{{ member.delegate ? 'Delegado' : 'Integrante' }}</span><div class="actions"><button class="outline" type="button" [disabled]="busy()" (click)="delegate(member)">{{ member.delegate ? 'Quitar delegación' : 'Asignar delegado' }}: {{ member.name }}</button><button class="outline" type="button" [disabled]="busy()" (click)="removeMember(member.userId)">Retirar a {{ member.name }}</button></div></li>} @empty {<li class="event-row">Este semillero no tiene integrantes activos.</li>}</ul>
+      <form (submit)="$event.preventDefault(); searchMembers()"><label for="leader-member-search">Buscar integrante por nombre</label><input id="leader-member-search" [formControl]="query" minlength="2" /><button class="primary" type="submit" [disabled]="busy()">Buscar integrante</button></form>
+      <p>La búsqueda consulta el directorio público. La gestión general de cuentas y roles corresponde al administrador.</p>
+      <ul class="event-list">@for (candidate of candidates(); track candidate.id) {<li class="event-row">{{ candidate.name }} {{ candidate.last_name }}<button class="outline" type="button" [disabled]="busy() || hasMember(candidate.id)" (click)="addMember(candidate.id)">{{ hasMember(candidate.id) ? 'Ya es integrante' : 'Vincular a ' + candidate.name }}</button></li>}</ul>
+    }
+    @if (section() === 'activities') {
+      <h3>Actividades de mi semillero</h3><button class="outline" type="button" [disabled]="busy()" (click)="newActivity()">Nueva actividad</button>
+      <ul class="event-list">@for (item of activities(); track item.id) {<li class="event-row"><strong>{{ item.title }}</strong><span>{{ item.status }} · {{ item.date ? (item.date | date:'dd/MM/yyyy') : 'Sin fecha' }}</span><button class="outline" type="button" [disabled]="busy()" (click)="editActivity(item.id)">Editar {{ item.title }}</button></li>} @empty {<li class="event-row">No hay actividades registradas en este semillero.</li>}</ul>
+      <form [formGroup]="activityForm" (ngSubmit)="saveActivity()"><fieldset [disabled]="busy()"><legend>{{ editing() ? 'Editar actividad' : 'Registrar actividad' }}</legend>
+        <label for="activity-title">Título</label><input id="activity-title" formControlName="title" required />
+        <label for="activity-description">Descripción</label><textarea id="activity-description" formControlName="description"></textarea>
+        <label for="activity-status">Estado</label><select id="activity-status" formControlName="status">@for (status of ['próxima','en curso','finalizada']; track status) {<option [value]="status">{{ status }}</option>}</select>
+        <label for="activity-date">Fecha (opcional)</label><input id="activity-date" type="date" formControlName="date" />
+        <button class="primary" type="submit">Guardar actividad</button>
+      </fieldset></form>
+    }
+  }
+  @if (error()) {<p class="error" role="alert">{{ error() }}</p><button class="outline" type="button" [disabled]="busy()" (click)="load()">Volver a cargar sección</button>}
+  <p class="feedback" role="status">{{ feedback() }}</p>
+</section>

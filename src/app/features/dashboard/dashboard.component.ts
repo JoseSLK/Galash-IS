@@ -10,6 +10,7 @@ import { Seedbed, SeedbedsService } from '../seedbeds/seedbeds.service';
 import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
 import { SpecularButtonDirective } from '../../shared/directives/specular-button.directive';
 import { INITIAL_HEADER_SCROLL, nextHeaderState } from './header-scroll';
+import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
 
 const MEMBER_COUNT_LIMIT = 100;
 
@@ -30,6 +31,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly authService = inject(AuthService);
   private readonly api = inject(ApiService);
   private readonly seedbedsService = inject(SeedbedsService);
+  private readonly leaderService = inject(LeaderService);
+  readonly ownedSeedbeds = signal<LeaderSeedbed[]>([]);
+  readonly checkingLeadership = signal(false);
+  readonly leadershipError = signal(false);
+  private leadershipRequest = 0;
   readonly seedbeds = signal<Seedbed[]>([]);
   readonly memberCount = signal('—');
   readonly seedbedCount = signal('—');
@@ -93,6 +99,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
+    this.leadershipRequest++;
     document.body.style.overflow = '';
     cancelAnimationFrame(this.scrollFrame);
     this.removeScrollListener?.();
@@ -113,7 +120,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   toggleAuthMenu(): void {
     if (this.authService.sessionStatus() === 'checking' || this.authLoading) return;
     this.authMenuOpen = !this.authMenuOpen;
-    if (this.authMenuOpen) this.authErrorMessage = '';
+    if (this.authMenuOpen) {
+      this.authErrorMessage = '';
+      if (this.authService.isAuthenticated() && !this.authService.isAdmin()) void this.checkLeadership();
+    }
+  }
+
+  async checkLeadership(): Promise<void> {
+    const request = ++this.leadershipRequest;
+    const userId = this.authService.backendUser()?.id;
+    this.ownedSeedbeds.set([]); this.checkingLeadership.set(true); this.leadershipError.set(false);
+    try {
+      const owned = await this.leaderService.owned();
+      if (request === this.leadershipRequest && userId === this.authService.backendUser()?.id) this.ownedSeedbeds.set(owned);
+    } catch { if (request === this.leadershipRequest) this.leadershipError.set(true); }
+    finally { if (request === this.leadershipRequest) this.checkingLeadership.set(false); }
   }
 
   async continueWithGoogle(): Promise<void> {

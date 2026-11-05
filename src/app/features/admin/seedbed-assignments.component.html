@@ -1,0 +1,24 @@
+<section aria-labelledby="seedbed-function-title">
+  <h3 id="seedbed-function-title">Función en un semillero</h3>
+  <p>El rol de la cuenta se conserva. Elige el semillero donde tendrá esta función.</p>
+  <label for="assignment-seedbed">Semillero</label>
+  <select id="assignment-seedbed" [value]="seedbedId()" [disabled]="loadingList() || saving()" (change)="seedbedId.set($any($event.target).value)">
+    <option value="">Selecciona un semillero</option>
+    @for (seedbed of seedbeds(); track seedbed.id) {<option [value]="seedbed.id">{{ seedbed.name }}</option>}
+  </select>
+  @if (loadingList() || loading()) {<p role="status">Cargando semilleros…</p>}
+  @if (!loadingList() && !seedbeds().length) {<p>No hay semilleros disponibles.</p><button type="button" (click)="loadList()">Volver a cargar</button>}
+  @if (current()) {
+    <p class="current" role="status">Función actual: {{ isLeader() ? 'Líder de semillero' : isDelegate() ? 'Delegado' : 'Sin función de gestión' }}.</p>
+    <fieldset [disabled]="saving()"><legend>Asignar función</legend>
+      <label class="option"><input type="radio" name="seedbed-function" value="leader" [checked]="choice() === 'leader'" [disabled]="!canLead()" (change)="choice.set('leader')" /><span><strong>Líder de semillero</strong><small>Debe ser docente con cuenta activa. Sustituye al líder actual de este semillero.</small></span></label>
+      <label class="option"><input type="radio" name="seedbed-function" value="delegate" [checked]="choice() === 'delegate'" [disabled]="!canDelegate()" (change)="choice.set('delegate')" /><span><strong>Delegado</strong><small>Debe ser estudiante o docente activo e integrante del semillero. Máximo dos delegados.</small></span></label>
+    </fieldset>
+    <p>Delegados asignados: {{ delegates().length }} de 2.
+      @for (member of delegates(); track member.userId) {<span class="delegate">{{ member.name }} {{ member.lastName }}</span>}
+    </p>
+    <button class="save" type="button" [disabled]="!canSave()" (click)="save()">{{ saving() ? 'Guardando…' : 'Guardar función' }}</button>
+  }
+  @if (error()) {<p class="error" role="alert">{{ error() }}</p>}
+  @if (feedback()) {<p class="feedback" role="status">{{ feedback() }}</p>}
+</section>

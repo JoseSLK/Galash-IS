@@ -4,7 +4,7 @@ import { SeedbedReviewsService } from '../seedbeds/reviews/seedbed-reviews.servi
 import { Component, ElementRef, HostListener, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
@@ -14,18 +14,32 @@ import { USER_ROLES, UserRole } from '../../core/models/role.model';
 import { AccountStatus } from '../../shared/components/people-directory/person-directory.model';
 import { RegistrationRequestsComponent } from './requests/registration-requests.component';
 import { EventsAdminComponent } from './events/events-admin.component';
+import { SeedbedAssignmentsComponent } from './seedbed-assignments.component';
+import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
+import { LeaderToolsComponent } from '../leader/leader-tools.component';
+
+type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ProjectsPageComponent,ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
+  imports: [LeaderToolsComponent, SeedbedAssignmentsComponent, ProjectsPageComponent,ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+  private readonly leaderService = inject(LeaderService);
+  readonly leaderMode = this.route.snapshot.data['leaderMode'] === true;
+  readonly scopedSeedbeds = signal<LeaderSeedbed[]>([]);
+  readonly scopeId = signal('');
+  readonly scopeLoading = signal(this.leaderMode);
+  readonly scopeError = signal('');
+  readonly scopedSeedbed = computed(() => this.scopedSeedbeds().find(item => item.id === this.scopeId()) ?? null);
+  readonly canManage = computed(() => this.leaderMode ? !!this.scopedSeedbed() : this.auth.isAdmin());
   @ViewChild('sectionMenu') private sectionMenu?: ElementRef<HTMLDetailsElement>;
   readonly upcomingSections = ['Semilleros', 'Auditoría'];
-  readonly activeSection = signal<'users' | 'requests' | 'events' | 'reviews' | 'projects'>('users');
+  readonly activeSection = signal<AdminSection>(this.leaderMode ? 'requests' : 'users');
   readonly auth = inject(AuthService);
   readonly reviews = inject(SeedbedReviewsService);
   readonly users = inject(MembersAdminService);
@@ -46,8 +60,9 @@ export class AdminComponent implements OnDestroy {
   private readonly router = inject(Router);
 
   constructor() {
+    if (this.leaderMode) void this.loadScope();
     effect(() => {
-      if (this.auth.sessionStatus() !== 'checking' && !this.auth.isAdmin()) void this.router.navigateByUrl('/');
+      if (this.auth.sessionStatus() !== 'checking' && (this.leaderMode ? !this.auth.isAuthenticated() : !this.auth.isAdmin())) void this.router.navigateByUrl('/');
     });
     effect(() => {
       const person = this.selected();
@@ -55,12 +70,36 @@ export class AdminComponent implements OnDestroy {
     });
   }
 
+  async loadScope(): Promise<void> {
+    this.scopeLoading.set(true); this.scopeError.set(''); this.scopeId.set('');
+    try {
+      const items = await this.leaderService.owned(); this.scopedSeedbeds.set(items);
+      const requested = this.route.snapshot.queryParamMap.get('seedbedId');
+      const chosen = requested ? items.find(item => item.id === requested) : items[0];
+      if (requested && !chosen) this.scopeError.set('No tienes acceso como líder a este semillero.');
+      else if (!chosen) this.scopeError.set('No tienes semilleros asignados como líder.');
+      this.scopeId.set(chosen?.id ?? '');
+    } catch { this.scopeError.set('No pudimos comprobar tus semilleros. Inténtalo de nuevo.'); }
+    finally { this.scopeLoading.set(false); }
+  }
+
   closeSections(menu: HTMLDetailsElement): void {
     menu.open = false;
     menu.querySelector('summary')?.focus();
   }
 
-  showSection(section: 'users' | 'requests' | 'events' | 'reviews' | 'projects', menu: HTMLDetailsElement): void {
+  alignSectionMenu(menu: HTMLDetailsElement): void {
+    if (!menu.open || !menu.classList.contains('center-menu')) return;
+    const dropdown = menu.querySelector<HTMLElement>('.sections-dropdown');
+    if (!dropdown) return;
+    dropdown.style.removeProperty('--menu-shift');
+    const bounds = dropdown.getBoundingClientRect();
+    const shift = Math.max(16 - bounds.left, 0) + Math.min(window.innerWidth - 16 - bounds.right, 0);
+    dropdown.style.setProperty('--menu-shift', `${shift}px`);
+  }
+
+  showSection(section: AdminSection, menu: HTMLDetailsElement): void {
+    if (this.leaderMode && section === 'users') return;
     this.activeSection.set(section);
     this.closeSections(menu);
   }
@@ -73,6 +112,7 @@ export class AdminComponent implements OnDestroy {
 
   // GET /admin/members needs a query, so the directory box searches the server after a pause.
   queueSearch(query: string): void {
+    if (this.leaderMode) return;
     clearTimeout(this.searchTimer);
     if (query.trim().length < 2) {
       this.searchId++;
@@ -121,6 +161,7 @@ export class AdminComponent implements OnDestroy {
   }
 
   async save(): Promise<void> {
+    if (this.leaderMode) return;
     const person = this.selected();
     if (!person || this.saving() || this.form.invalid || this.form.pristine) return;
     this.saving.set(true);

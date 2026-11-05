@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
@@ -22,7 +22,8 @@ function localDate(value: string | null | undefined): string {
   imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './events-admin.component.html', styleUrl: './events-admin.component.css'
 })
-export class EventsAdminComponent {
+export class EventsAdminComponent implements OnInit {
+  readonly seedbedId = input('');
   private readonly service = inject(EventsAdminService);
   readonly auth = inject(AuthService);
   readonly events = signal<ManagedEvent[]>([]);
@@ -48,9 +49,10 @@ export class EventsAdminComponent {
     imageUrl: new FormControl('', { nonNullable: true, validators: [url] }),
     registrationUrl: new FormControl('', { nonNullable: true, validators: [url] })
   });
-  constructor() { void this.load(); }
+  ngOnInit(): void { if (this.seedbedId()) { this.loading.set(false); this.newEvent(); } else void this.load(); }
   count(status: EventStatus | 'todos'): number { return status === 'todos' ? this.events().length : this.events().filter(event => event.status === status).length; }
   async load(): Promise<void> {
+    if (this.seedbedId()) return;
     this.loading.set(true); this.error.set('');
     try { this.events.set(await this.service.list()); }
     catch { this.error.set('No pudimos cargar los eventos. Inténtalo de nuevo.'); }
@@ -77,7 +79,7 @@ export class EventsAdminComponent {
     this.reset(event);
   }
   async save(): Promise<void> {
-    if (this.busy() || !this.auth.isAdmin()) return;
+    if (this.busy() || (!this.auth.isAdmin() && !this.seedbedId())) return;
     this.form.markAllAsTouched(); this.error.set(''); this.feedback.set('');
     if (this.form.invalid) { this.error.set('Completa los campos obligatorios y revisa que los enlaces sean válidos.'); return; }
     const value = this.form.getRawValue();
@@ -88,14 +90,14 @@ export class EventsAdminComponent {
     this.busy.set(true);
     try {
       const selected = this.selected();
-      const event = selected ? await this.service.update(selected.id, data) : await this.service.create(data);
+      const event = selected ? await this.service.update(selected.id, data) : await this.service.create({ ...data, ...(this.seedbedId() ? { seedbedId: this.seedbedId() } : {}) });
       this.remember(event); this.feedback.set(selected ? 'Cambios guardados.' : 'Evento creado como borrador.');
     } catch (error: unknown) { this.showError(error); }
     finally { this.busy.set(false); }
   }
   async action(action: 'publish' | 'hide' | 'cancel'): Promise<void> {
     const selected = this.selected();
-    if (!selected || this.busy() || !this.auth.isAdmin() || this.form.dirty) return;
+    if (!selected || this.busy() || (!this.auth.isAdmin() && !this.seedbedId()) || this.form.dirty) return;
     this.busy.set(true); this.error.set(''); this.feedback.set('');
     try { this.remember(await this.service.action(selected.id, action)); this.feedback.set('Estado del evento actualizado.'); }
     catch (error: unknown) { this.showError(error); }

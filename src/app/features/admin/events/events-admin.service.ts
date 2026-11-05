@@ -3,6 +3,7 @@ import { ApiService } from '../../../core/services/api.service';
 
 export type EventStatus = 'borrador' | 'publicado' | 'oculto' | 'cancelado';
 export interface EventData {
+  seedbedId?: string;
   title: string;
   description: string;
   type: string;
@@ -27,7 +28,7 @@ export class EventsAdminService {
   }
   detail(id: string): Promise<ManagedEvent> { return this.api.get(`/events/${encodeURIComponent(id)}`); }
   create(data: EventData): Promise<ManagedEvent> { return this.api.post('/events', data); }
-  update(id: string, data: EventData): Promise<ManagedEvent> { return this.api.patch(`/events/${encodeURIComponent(id)}`, data); }
+  update(id: string, data: EventData): Promise<ManagedEvent> { const { seedbedId, ...fields } = data; return this.api.patch(`/events/${encodeURIComponent(id)}`, fields); }
   action(id: string, action: 'publish' | 'hide' | 'cancel'): Promise<ManagedEvent> {
     return this.api.post(`/events/${encodeURIComponent(id)}/${action}`, {});
   }

@@ -31,8 +31,11 @@ export class RegistrationRequestsService {
   private readonly state = signal<readonly RegistrationRequest[]>([]);
   readonly requests = this.state.asReadonly();
 
-  async load(): Promise<void> {
-    this.state.set((await this.api.get<{ requests: RegistrationRequest[] | null }>('/admin/registration-requests')).requests ?? []);
+  async load(seedbedId = ''): Promise<void> {
+    this.state.set([]);
+    const suffix = seedbedId ? `?seedbedId=${encodeURIComponent(seedbedId)}` : '';
+    const items = (await this.api.get<{ requests: RegistrationRequest[] | null }>(`/admin/registration-requests${suffix}`)).requests ?? [];
+    this.state.set(seedbedId ? items.filter(item => item.seedbedId === seedbedId) : items);
   }
 
   detail(id: string): Promise<RegistrationDetail> {
