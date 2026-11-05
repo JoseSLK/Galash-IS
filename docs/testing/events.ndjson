@@ -473,3 +473,44 @@
 {"v": 1, "id": "X20261102-pr-T071", "t": "result", "run": "R20261102-projects-pr-unit", "test": "T071", "s": "pass", "note": "6 pruebas unitarias aprobadas en los dos archivos de proyectos."}
 {"v": 1, "id": "X20261102-pr-T072", "t": "result", "run": "R20261102-projects-pr-unit", "test": "T072", "s": "pass", "note": "6 pruebas unitarias aprobadas en los dos archivos de proyectos."}
 {"v": 1, "id": "X20261102-pr-T077", "t": "result", "run": "R20261102-projects-pr-unit", "test": "T077", "s": "pass", "note": "6 pruebas unitarias aprobadas en los dos archivos de proyectos."}
+{"v":1,"t":"test","area":"admin","name":"Lista administrativa inicial sin texto y regresión de búsquedas y actualizaciones","p":"must","file":"src/app/features/admin/admin-services.spec.ts","id":"T2026110401"}
+{"mode":"automated","at":"2026-11-04T17:41:19.2939714Z","id":"R2026110401","v":1,"runtime":"Node 22.14.0","t":"run","command":"ng test --watch=false --include=src/app/features/admin/admin-services.spec.ts","by":"codex"}
+{"reason":"jsdom/undici requiere createZstdDecompress ausente en Node 22.14","v":1,"t":"result","s":"block","run":"R2026110401","test":"T2026110401","id":"X2026110401"}
+{"mode":"automated","at":"2026-11-04T17:41:19.2939714Z","id":"R2026110402","v":1,"runtime":"Node 24.22.1 incluido en Codex","t":"run","command":"ng test --watch=false --include=src/app/features/admin/admin-services.spec.ts","by":"codex"}
+{"v":1,"t":"result","s":"pass","count":5,"run":"R2026110402","test":"T2026110401","id":"X2026110402"}
+{"name":"Revertido por solicitud de la usuaria","area":"admin-members","v":1,"at":"2026-11-04T17:51:25.7598442Z","detail":"Las pruebas T2026110401 corresponden a la implementación retirada; no describen el comportamiento vigente.","id":"N2026110401","t":"note"}
+{"area":"admin","v":1,"file":"src/app/features/admin/seedbed-assignments.service.spec.ts","p":"must","t":"test","id":"T2026110403","name":"Asignación de líder conserva campos; delegados conserva existentes y respeta membresía y máximo dos"}
+{"area":"admin","v":1,"file":"e2e/seedbed-assignments.spec.ts","p":"must","t":"test","id":"T2026110404","name":"Asignación de líder y delegado desde gestión de usuarios en escritorio y móvil con API simulada"}
+{"mode":"automated","by":"codex","t":"run","at":"2026-11-04T18:13:30.6854295Z","runtime":"Node 24.22.1","v":1,"id":"R2026110403","command":"ng test --watch=false --include=src/app/features/admin/seedbed-assignments.service.spec.ts"}
+{"v":1,"run":"R2026110403","test":"T2026110403","t":"result","id":"X2026110403","s":"fail","reason":"El test comprobaba la petición PUT antes de completar la segunda microtarea; corregida la espera del test."}
+{"mode":"automated","by":"codex","t":"run","at":"2026-11-04T18:13:30.6854295Z","runtime":"Node 24.22.1","v":1,"id":"R2026110404","command":"ng test --watch=false --include=src/app/features/admin/seedbed-assignments.service.spec.ts"}
+{"v":1,"run":"R2026110404","count":5,"test":"T2026110403","t":"result","id":"X2026110404","s":"pass"}
+{"v":1,"mode":"automated","by":"codex","at":"2026-11-04T18:13:30.6854295Z","t":"run","id":"R2026110405","command":"playwright test e2e/seedbed-assignments.spec.ts --project=desktop --project=mobile --workers=1"}
+{"run":"R2026110405","s":"pass","t":"result","v":1,"count":2,"test":"T2026110404","ev":["R20261104-assignments/desktop.png","R20261104-assignments/mobile.png"],"id":"X2026110405"}
+{"v":1,"id":"T2026110405","file":"src/app/features/profile/profile-assignments.service.spec.ts","p":"must","t":"test","area":"profile","name":"Funciones del perfil: líder, delegado, ausencia de funciones y detalle no accesible"}
+{"v":1,"id":"T2026110406","file":"e2e/profile-assignments.spec.ts","p":"must","t":"test","area":"profile","name":"Perfil muestra y actualiza líder/delegado sin reemplazar rol global, escritorio y móvil"}
+{"mode":"automated","by":"codex","runtime":"Node 24.22.1","v":1,"command":"ng test --watch=false --include=src/app/features/profile/profile-assignments.service.spec.ts","id":"R2026110406","at":"2026-11-04T18:37:25.3229049Z","t":"run"}
+{"v":1,"id":"X2026110406","run":"R2026110406","count":3,"t":"result","s":"pass","test":"T2026110405"}
+{"v":1,"id":"R2026110407","mode":"automated","t":"run","at":"2026-11-04T18:37:25.3229049Z","by":"codex","command":"playwright test e2e/profile-assignments.spec.ts --project=desktop --project=mobile --workers=1"}
+{"v":1,"ev":["R20261104-profile-functions/desktop.png","R20261104-profile-functions/mobile.png"],"test":"T2026110406","count":2,"id":"X2026110407","run":"R2026110407","s":"pass","t":"result"}
+{"area":"leader","p":"must","v":1,"id":"T2026110407","file":"src/app/features/leader/leader.service.spec.ts","t":"test","name":"Ámbito del líder, errores de consulta, delegados y solicitudes filtradas; regresión de servicios administrativos"}
+{"area":"leader","p":"must","v":1,"id":"T2026110408","file":"e2e/leader-panel.spec.ts","t":"test","name":"Acceso desde perfil, revisión de solicitudes propias, datos, membresía, delegación, actividades y eventos; rechazo de otro semillero"}
+{"at":"2026-11-04T22:08:47.0787880Z","runtime":"Node 24.22.1","v":1,"t":"run","mode":"automated","by":"codex","command":"ng test --watch=false --include=src/app/features/leader/leader.service.spec.ts --include=src/app/features/admin/admin-services.spec.ts","id":"R2026110408"}
+{"test":"T2026110407","v":1,"run":"R2026110408","id":"X2026110408","s":"pass","t":"result","count":10}
+{"v":1,"command":"playwright test e2e/leader-panel.spec.ts --project=desktop --project=mobile --workers=1","id":"R2026110409","mode":"automated","t":"run","by":"codex","at":"2026-11-04T22:08:47.0787880Z"}
+{"s":"pass","run":"R2026110409","v":1,"t":"result","test":"T2026110408","count":4,"ev":["R20261104-leader/desktop.png","R20261104-leader/mobile.png"],"id":"X2026110409"}
+{"p":"must","v":1,"file":"e2e/leader-panel.spec.ts","area":"leader-menu","name":"Menú de cuenta: Administrar mi semillero solo para líder; Admin conserva Administración; docente y estudiante delegados no reciben acceso de líder","t":"test","id":"T2026110409"}
+{"id":"R2026110410","note":"Intento inicial detenido para corregir paso de navegación móvil del test.","by":"codex","command":"playwright test e2e/leader-panel.spec.ts --project=desktop --project=mobile --workers=1","at":"2026-11-04T22:19:28.6251398Z","v":1,"mode":"automated","t":"run"}
+{"v":1,"test":"T2026110409","run":"R2026110410","reason":"El test pulsaba la cuenta antes de abrir el menú móvil; corregido el recorrido del test.","s":"fail","t":"result","id":"X2026110410"}
+{"mode":"automated","v":1,"command":"playwright test e2e/leader-panel.spec.ts --project=desktop --project=mobile --workers=1","at":"2026-11-04T22:19:28.6251398Z","t":"run","by":"codex","id":"R2026110411"}
+{"id":"X2026110411","count":6,"ev":["R20261104-leader-menu/account-menu.png"],"run":"R2026110411","test":"T2026110409","s":"pass","v":1,"t":"result"}
+{"id":"X2026110412","count":4,"ev":["R20261104-leader/desktop.png","R20261104-leader/mobile.png"],"run":"R2026110411","test":"T2026110408","s":"pass","v":1,"t":"result"}
+{"p":"must","name":"Admin y líder cargan app-admin y la misma plantilla; conserva menú de cuenta y ámbitos de consultas y acciones","t":"test","area":"shared-admin","v":1,"file":"e2e/leader-panel.spec.ts","id":"T2026110410"}
+{"p":"must","name":"Perfil conserva funciones y elimina enlace de gestión y botón Actualizar funciones; se refresca al recargar","t":"test","area":"profile","v":1,"file":"e2e/profile-assignments.spec.ts","id":"T2026110411"}
+{"command":"playwright test e2e/leader-panel.spec.ts e2e/profile-assignments.spec.ts --project=desktop --project=mobile --workers=1","mode":"automated","t":"run","at":"2026-11-04T22:27:39.9774046Z","by":"codex","v":1,"id":"R2026110412"}
+{"count":10,"id":"X2026110413","ev":["R20261104-leader/desktop.png","R20261104-leader/mobile.png"],"test":"T2026110410","s":"pass","v":1,"run":"R2026110412","t":"result"}
+{"count":2,"id":"X2026110414","ev":["R20261104-profile-functions/desktop.png","R20261104-profile-functions/mobile.png"],"test":"T2026110411","s":"pass","v":1,"run":"R2026110412","t":"result"}
+{"command":"ng test --watch=false --include=src/app/features/leader/leader.service.spec.ts --include=src/app/features/admin/admin-services.spec.ts","mode":"automated","runtime":"Node 24.22.1","id":"R2026110413","at":"2026-11-04T22:27:39.9774046Z","v":1,"t":"run","by":"codex"}
+{"count":10,"test":"T2026110407","run":"R2026110413","t":"result","s":"pass","v":1,"id":"X2026110415"}
+{"by":"codex","command":"playwright test e2e/leader-panel.spec.ts --project=desktop --project=mobile --workers=1","v":1,"t":"run","at":"2026-11-05T00:21:58.7492614Z","mode":"automated","id":"R2026110414"}
+{"s":"pass","v":1,"count":10,"run":"R2026110414","t":"result","test":"T2026110410","id":"X2026110416"}
