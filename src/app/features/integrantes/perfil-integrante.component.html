@@ -1,0 +1,32 @@
+<app-dashboard #header [headerOnly]="true" activePage="integrantes" />
+<div [inert]="header.registrationOpen">
+  <main id="contenido" class="profile-page">
+    @switch (state()) {
+      @case ('loading') {<div role="status" aria-busy="true" class="loading"><p class="eyebrow">Cargando perfil…</p><div class="skeleton"></div></div>}
+      @case ('error') {<section class="state-panel"><h1 id="perfil-title" tabindex="-1">No pudimos cargar este perfil</h1><p role="alert">Inténtalo nuevamente en un momento.</p><button type="button" class="primary" (click)="cargar()">Reintentar</button><a routerLink="/integrantes" [queryParams]="params">← Volver a integrantes</a></section>}
+      @case ('ready') {
+        @if (persona(); as p) {
+          <section class="profile-layout" [attr.aria-label]="'Perfil de ' + p.nombre">
+            <div class="portrait" [attr.data-person]="p.id">
+              @if (p.fotoUrl && !imageFailed()) {<img [src]="p.fotoUrl" [alt]="'Retrato de ' + p.nombre" (error)="imageFailed.set(true)" />}
+              @else {<div class="placeholder" role="img" [attr.aria-label]="'Foto pendiente de ' + p.nombre"><svg viewBox="0 0 200 240" aria-hidden="true"><circle cx="100" cy="84" r="38"/><path d="M24 240v-38a76 76 0 0 1 152 0v38"/></svg><span>[FOTO]</span></div>}
+              <span class="portrait-number" aria-hidden="true">{{ numero(index() + 1) }}</span>
+            </div>
+            <div class="profile-copy">
+              <div class="topline"><a routerLink="/integrantes" [queryParams]="params">← Volver a integrantes</a><span class="eyebrow">{{ numero(index() + 1) }} / {{ numero(personas().length) }}</span></div>
+              <p class="eyebrow">{{ tipoLabel(p.tipo).toUpperCase() }} · {{ p.semilleros.join(' · ') }}</p>
+              <h1 id="perfil-title" tabindex="-1">{{ nombre() }}<br><span>{{ apellidos() }}</span></h1>
+              <p class="role">{{ p.cargo }}</p><p class="education">{{ p.formacion }}</p>
+
+
+              <dl><div><dt>ÁREA</dt><dd>{{ p.area }}</dd></div>@if (p.correo) {<div><dt>CORREO</dt><dd><a [href]="'mailto:' + p.correo">{{ p.correo }}</a></dd></div>}@if (p.tipo === 'docente') {<div><dt>CVLAC</dt><dd>@if (safeLink(p.cvlacUrl); as url) {<a [href]="url" target="_blank" rel="noopener noreferrer">Ver CvLAC ↗</a>} @else {<span>[Enlace CvLAC pendiente]</span>}</dd></div>}</dl>
+            </div>
+          </section>
+          <section class="publications" aria-labelledby="publications-title"><p class="eyebrow">PRODUCCIÓN ACADÉMICA</p><h2 id="publications-title">Artículos y publicaciones</h2><ol>@for (publicacion of p.publicaciones; track $index; let index = $index) {<li><span class="publication-number">{{ numero(index + 1) }}</span><h3>@if (safeLink(publicacion.url); as url) {<a [href]="url" target="_blank" rel="noopener noreferrer">{{ publicacion.titulo }} ↗</a>} @else {{{ publicacion.titulo }}}</h3><span class="year">{{ publicacion.anio || 'Sin fecha' }}</span></li>} @empty {<li class="no-publications">Aún no hay publicaciones registradas.</li>}</ol></section>
+          <nav class="profile-navigation" aria-label="Otros integrantes">@if (anterior(); as previous) {<a [routerLink]="['/integrantes', previous.id]" [queryParams]="params"><span class="eyebrow">ANTERIOR</span><span>← {{ previous.nombre }}</span></a>}@if (siguiente(); as next) {<a [routerLink]="['/integrantes', next.id]" [queryParams]="params"><span class="eyebrow">SIGUIENTE</span><span>{{ next.nombre }} →</span></a>}</nav>
+        } @else {<section class="state-panel"><p class="eyebrow">PERFIL NO DISPONIBLE</p><h1 id="perfil-title" tabindex="-1">No encontramos este integrante</h1><p>El perfil no existe o no está disponible públicamente.</p><a routerLink="/integrantes" [queryParams]="params">← Volver a integrantes</a></section>}
+      }
+    }
+  </main>
+  <app-site-footer />
+</div>

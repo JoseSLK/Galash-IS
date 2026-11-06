@@ -55,3 +55,5 @@ h2 { margin: 0; font: 600 28px/1.1 var(--fuente-titulo); overflow-wrap: anywhere
 .phase { display: inline-flex; align-items: center; gap: 6px; }
 .stat.pending .stat-ring { border-style: dashed; }
 .status-icon { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.request-filters,.stat{justify-content:center}table{text-align:center}

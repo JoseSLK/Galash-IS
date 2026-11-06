@@ -1,0 +1,34 @@
+<div class="search-row">
+  <div class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg>
+    <input #search type="search" aria-label="Buscar por nombre, semillero o área" placeholder="Buscar por nombre, semillero o área" [value]="filtros().q" (input)="busqueda.emit(search.value)" />
+    @if (filtros().q) {<button type="button" aria-label="Borrar búsqueda" (click)="busqueda.emit(''); search.focus()">✕</button>}
+  </div>
+  <div class="views" role="group" aria-label="Vista del directorio">
+    <button type="button" [attr.aria-pressed]="filtros().vista === 'retratos'" (click)="cambio.emit({vista: 'retratos', page: 1})">Retratos</button>
+    <span aria-hidden="true">/</span>
+    <button type="button" [attr.aria-pressed]="filtros().vista === 'tabla'" (click)="cambio.emit({vista: 'tabla', page: 1})">Tabla</button>
+  </div>
+</div>
+<div class="filter-row">
+  <span class="filter-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8Z"/></svg>FILTRAR</span>
+  <div class="filter-scroll">
+    @for (menu of menus; track menu.key) {
+      <div class="filter">
+        <button type="button" class="filter-button" [id]="'boton-' + menu.key" [class.selected]="!!filtros()[menu.key]" aria-haspopup="menu" [attr.aria-controls]="'filtro-' + menu.key" [attr.aria-expanded]="abierto() === menu.key" (click)="toggle(menu.key)" (keydown.arrowdown)="$event.preventDefault(); abierto() !== menu.key && toggle(menu.key)">
+          {{ menu.label }}{{ filtros()[menu.key] ? ': ' + label(menu.key) : '' }}<span class="chevron" [class.rotated]="abierto() === menu.key" aria-hidden="true">▾</span>
+        </button>
+        @if (abierto() === menu.key) {
+          <div class="backdrop" (click)="cerrar()" aria-hidden="true"></div>
+          <div class="filter-menu" [id]="'filtro-' + menu.key" role="menu" [attr.aria-label]="menu.label" (keydown)="navegar($event, menu.key)">
+            <button type="button" role="menuitem" (click)="elegir(menu.key, '')">Todos <span aria-hidden="true">{{ !filtros()[menu.key] ? '✓' : '' }}</span></button>
+            @for (opcion of opciones()[menu.key]; track opcion.value) {
+              <button type="button" role="menuitem" [class.chosen]="filtros()[menu.key] === opcion.value" (click)="elegir(menu.key, opcion.value)">{{ opcion.label }} <span aria-hidden="true">{{ filtros()[menu.key] === opcion.value ? '✓' : '' }}</span></button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+  <div class="counts"><span role="status">{{ total() }} de {{ personas().length }} integrantes</span>@if (activo()) {<button class="clear" type="button" (click)="limpiar.emit()">✕ Limpiar todo</button>}</div>
+</div>

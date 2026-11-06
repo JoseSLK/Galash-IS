@@ -3,3 +3,5 @@
 .badge { display: inline-flex; align-items: center; gap: 5px; }
 .badge[data-status=oculto] { border-style: dashed; }
 .status-icon { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.toolbar{justify-content:center;flex-wrap:wrap}.tabs,.filters,.actions{justify-content:center}.event-row{text-align:center}.editor-heading{justify-content:center;flex-wrap:wrap}

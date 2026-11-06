@@ -1,23 +1,32 @@
 <app-dashboard #header [headerOnly]="true" activePage="admin" />
-<div [inert]="header.registrationOpen">
+<div class="admin-shell" [class.with-sidebar]="auth.isAdmin() && menuOpen()" [inert]="header.registrationOpen">
+  @if (auth.isAdmin()) {
+          <div class="admin-navigation" [class.collapsed]="!menuOpen()"><button class="menu-toggle" type="button" [attr.aria-label]="menuOpen() ? 'Ocultar menú' : 'Mostrar menú'" [attr.title]="menuOpen() ? 'Ocultar menú' : 'Mostrar menú'" aria-controls="admin-sections" [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="menuOpen() ? 'M14 6l-6 6 6 6' : 'M10 6l6 6-6 6'" /></svg></button>
+          <nav id="admin-sections" class="admin-sidebar" [inert]="!menuOpen()" [attr.aria-hidden]="!menuOpen()" aria-label="Secciones de administración"><p class="navigation-label">ADMINISTRACIÓN</p>
+            <button type="button" [class.current-section]="activeSection() === 'users'" [attr.aria-current]="activeSection() === 'users' ? 'page' : null" (click)="showSection('users')">Usuarios y roles</button>
+            <button type="button" [class.current-section]="activeSection() === 'requests'" [attr.aria-current]="activeSection() === 'requests' ? 'page' : null" (click)="showSection('requests')">Solicitudes de ingreso</button>
+            <button type="button" [class.current-section]="activeSection() === 'events'" [attr.aria-current]="activeSection() === 'events' ? 'page' : null" (click)="showSection('events')">Eventos</button>
+            <button type="button" [class.current-section]="activeSection() === 'reviews'" [attr.aria-current]="activeSection() === 'reviews' ? 'page' : null" (click)="showSection('reviews')"><span>Reseñas</span><span class="review-count" [attr.aria-label]="reviews.pendingCount() + ' reseñas pendientes'">{{ reviews.pendingCount() }}</span></button>
+            <button type="button" [class.current-section]="activeSection() === 'members'" [attr.aria-current]="activeSection() === 'members' ? 'page' : null" (click)="showSection('members')">Integrantes</button>
+            <button type="button" [class.current-section]="activeSection() === 'projects'" [attr.aria-current]="activeSection() === 'projects' ? 'page' : null" (click)="showSection('projects')">Proyectos</button>
+            <button type="button" [class.current-section]="activeSection() === 'communications'" [attr.aria-current]="activeSection() === 'communications' ? 'page' : null" (click)="showSection('communications')">Comunicados y cronograma</button>
+          </nav></div>
+  }
   <main id="contenido" class="admin-page">
     @if (auth.isAdmin()) {
       <p class="eyebrow">PANEL DE ADMINISTRACIÓN</p>
       <div class="title-row">
-        <h1 id="admin-screen-title" tabindex="-1">@if (activeSection() === 'users') {Gestión de <span>usuarios</span>} @else if (activeSection() === 'events') {Eventos} @else if (activeSection() === 'reviews') {Reseñas de <span>semilleros</span>} @else {Solicitudes de ingreso}</h1>
-        <details #sectionMenu class="section-menu" (keydown.escape)="closeSections(sectionMenu)">
-          <summary aria-label="Mostrar secciones de administración"><span class="section-chevron" aria-hidden="true"></span></summary>
-          <nav class="sections-dropdown" aria-label="Secciones de administración">
-            <button type="button" [class.current-section]="activeSection() === 'users'" [attr.aria-current]="activeSection() === 'users' ? 'page' : null" (click)="showSection('users', sectionMenu)">Usuarios y roles</button>
-            <button type="button" [class.current-section]="activeSection() === 'requests'" [attr.aria-current]="activeSection() === 'requests' ? 'page' : null" (click)="showSection('requests', sectionMenu)">Solicitudes de ingreso</button>
-            <button type="button" [class.current-section]="activeSection() === 'events'" [attr.aria-current]="activeSection() === 'events' ? 'page' : null" (click)="showSection('events', sectionMenu)">Eventos</button>
-            <button type="button" [class.current-section]="activeSection() === 'reviews'" [attr.aria-current]="activeSection() === 'reviews' ? 'page' : null" (click)="showSection('reviews', sectionMenu)"><span>Reseñas</span><span class="review-count" [attr.aria-label]="reviews.pendingCount() + ' reseñas pendientes'">{{ reviews.pendingCount() }}</span></button>
-            @for (section of upcomingSections; track section) {<button type="button" disabled><span>{{ section }}</span><small>Próximamente</small></button>}
-          </nav>
-        </details>
+        <h1 id="admin-screen-title" tabindex="-1">@if (activeSection() === 'communications') {Comunicados y <span>cronograma</span>} @else if (activeSection() === 'projects') {Proyectos de investigación} @else if (activeSection() === 'users') {Gestión de <span>usuarios</span>} @else if (activeSection() === 'members') {Gestión de <span>integrantes</span>} @else if (activeSection() === 'events') {Eventos} @else if (activeSection() === 'reviews') {Reseñas de <span>semilleros</span>} @else {Solicitudes de ingreso}</h1>
+
       </div>
-      <p class="intro">{{ activeSection() === 'users' ? 'Busca una cuenta, asigna un rol y activa o desactiva su acceso.' : activeSection() === 'reviews' ? 'Revisa la retroalimentación de los semilleros y decide cuáles reseñas publicar.' : activeSection() === 'events' ? 'Publica, actualiza, oculta o cancela los eventos del grupo.' : 'Consulta las solicitudes y revisa su historial antes de tomar una decisión.' }}</p>
-      @if (activeSection() === 'reviews') {
+      <p class="intro">{{ activeSection() === 'communications' ? 'Organiza los comunicados del grupo, las reuniones y los próximos hitos.' : activeSection() === 'projects' ? 'Consulta y actualiza los proyectos del grupo; cada cambio conserva su autor y fecha.' : activeSection() === 'members' ? 'Consulta los integrantes de cada semillero y su historial de participación.' : activeSection() === 'users' ? 'Busca una cuenta, asigna un rol y activa o desactiva su acceso.' : activeSection() === 'reviews' ? 'Revisa la retroalimentación de los semilleros y decide cuáles reseñas publicar.' : activeSection() === 'events' ? 'Publica, actualiza, oculta o cancela los eventos del grupo.' : 'Consulta las solicitudes y revisa su historial antes de tomar una decisión.' }}</p>
+      @if (activeSection() === 'communications') {
+        <app-comunicados-admin />
+      } @else if (activeSection() === 'projects') {
+        <app-projects-page [embedded]="true" [management]="true" (signIn)="header.continueWithGoogle()" />
+      } @else if (activeSection() === 'members') {
+        <app-integrantes-admin />
+      } @else if (activeSection() === 'reviews') {
         <app-reviews-admin />
       } @else if (activeSection() === 'requests') {
         <app-registration-requests />
@@ -47,5 +56,5 @@
       <p role="status">Comprobando acceso administrativo…</p>
     }
   </main>
-  <app-site-footer />
 </div>
+<app-site-footer />
