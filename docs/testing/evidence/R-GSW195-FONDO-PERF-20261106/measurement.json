@@ -1,0 +1,22 @@
+{
+  "environment": "Headless Chromium, 1920x1080, deviceScaleFactor2; measurements vary by machine",
+  "before": {
+    "canvas": [
+      2880,
+      1371
+    ],
+    "frames": 13,
+    "p95GapMs": 199,
+    "maxStartupTaskMs": 500
+  },
+  "after": {
+    "canvas": [
+      1391,
+      662
+    ],
+    "pixels": 920842,
+    "frames": 32,
+    "p95GapMs": 92,
+    "maxStartupTaskMs": 446
+  }
+}
