@@ -6,7 +6,7 @@ import { SeedbedReviewsService } from '../seedbeds/reviews/seedbed-reviews.servi
 import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
@@ -17,16 +17,30 @@ import { AccountStatus } from '../../shared/components/people-directory/person-d
 import { RegistrationRequestsComponent } from './requests/registration-requests.component';
 import { EventsAdminComponent } from './events/events-admin.component';
 
+import { SeedbedAssignmentsComponent } from './seedbed-assignments.component';
+import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
+import { LeaderToolsComponent } from '../leader/leader-tools.component';
+type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar' | 'communications';
+
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
+  imports: [LeaderToolsComponent, SeedbedAssignmentsComponent, ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+  private readonly leaderService = inject(LeaderService);
+  readonly leaderMode = this.route.snapshot.data['leaderMode'] === true;
+  readonly scopedSeedbeds = signal<LeaderSeedbed[]>([]);
+  readonly scopeId = signal('');
+  readonly scopeLoading = signal(this.leaderMode);
+  readonly scopeError = signal('');
+  readonly scopedSeedbed = computed(() => this.scopedSeedbeds().find(item => item.id === this.scopeId()) ?? null);
+  readonly canManage = computed(() => this.leaderMode ? !!this.scopedSeedbed() : this.auth.isAdmin());
   readonly menuOpen = signal(true);
-  readonly activeSection = signal<'users' | 'requests' | 'events' | 'reviews' | 'members' | 'projects' | 'communications'>('users');
+  readonly activeSection = signal<AdminSection>(this.leaderMode ? 'requests' : 'users');
   readonly auth = inject(AuthService);
   readonly reviews = inject(SeedbedReviewsService);
   readonly users = inject(MembersAdminService);
@@ -48,9 +62,10 @@ export class AdminComponent implements OnDestroy {
   private readonly router = inject(Router);
 
   constructor() {
+    if (this.leaderMode) void this.loadScope();
     effect(() => {
-      if (this.auth.sessionStatus() !== 'checking' && !this.auth.isAdmin()) void this.router.navigateByUrl('/');
-      if (this.auth.isAdmin() && !this.initialLoadStarted) {
+      if (this.auth.sessionStatus() !== 'checking' && (this.leaderMode ? !this.auth.isAuthenticated() : !this.auth.isAdmin())) void this.router.navigateByUrl('/');
+      if (!this.leaderMode && this.auth.isAdmin() && !this.initialLoadStarted) {
         this.initialLoadStarted = true;
         this.users.clear();
         void this.search('');
@@ -62,11 +77,26 @@ export class AdminComponent implements OnDestroy {
     });
   }
 
-  showSection(section: 'users' | 'requests' | 'events' | 'reviews' | 'members' | 'projects' | 'communications'): void {
+  async loadScope(): Promise<void> {
+    this.scopeLoading.set(true); this.scopeError.set(''); this.scopeId.set('');
+    try {
+      const items = await this.leaderService.owned(); this.scopedSeedbeds.set(items);
+      const requested = this.route.snapshot.queryParamMap.get('seedbedId');
+      const chosen = requested ? items.find(item => item.id === requested) : items[0];
+      if (requested && !chosen) this.scopeError.set('No tienes acceso como líder a este semillero.');
+      else if (!chosen) this.scopeError.set('No tienes semilleros asignados como líder.');
+      this.scopeId.set(chosen?.id ?? '');
+    } catch { this.scopeError.set('No pudimos comprobar tus semilleros. Inténtalo de nuevo.'); }
+    finally { this.scopeLoading.set(false); }
+  }
+
+  showSection(section: AdminSection): void {
+    if (this.leaderMode && (section === 'users' || section === 'communications')) return;
     this.activeSection.set(section);
   }
 
   queueSearch(query: string): void {
+    if (this.leaderMode) return;
     clearTimeout(this.searchTimer);
     this.searchId++;
     this.users.clear();
@@ -122,6 +152,7 @@ export class AdminComponent implements OnDestroy {
   }
 
   async save(): Promise<void> {
+    if (this.leaderMode) return;
     const person = this.selected();
     if (!person || this.saving() || this.form.invalid || this.form.pristine) return;
     this.saving.set(true);

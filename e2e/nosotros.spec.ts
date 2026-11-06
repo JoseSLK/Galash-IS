@@ -37,7 +37,7 @@ test('public universe content is reachable, responsive, keyboard operable and ac
   await expect(page.locator('.photo-frame').first()).toHaveCSS('border-radius', '18px');
   const photoSize = await page.locator('.photo-frame img').first().boundingBox();
   expect(photoSize!.height).toBeGreaterThan(300);
-  await expect(page.locator('.site-logo img')).toHaveAttribute('src', '/assets/galash-emblema-sin-fondo.svg#menu');
+  await expect(page.locator('.site-logo img')).toHaveAttribute('src', '/assets/galash-emblema-nav-96.webp');
   const iconShapes = await page.locator('#objetivos svg').evaluateAll(nodes => nodes.map(node => node.innerHTML));
   expect(new Set(iconShapes).size).toBe(3);
   await expect(page.locator('#areas app-institutional-icon')).toHaveCount(4);

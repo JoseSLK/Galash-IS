@@ -1,4 +1,5 @@
 <section aria-label="Administración de eventos">
+  @if (seedbedId()) {<p class="hint" role="note">Los eventos que crees aquí quedan asociados a tu semillero. Pendiente para el líder: el backend aún no ofrece el listado completo de sus eventos, incluidos borradores y ocultos. Aquí solo aparecen los creados durante esta visita; puedes editarlos, publicarlos, ocultarlos o cancelarlos. Al recargar o salir del panel, permanecen guardados, pero su listado completo solo está disponible para el administrador.</p>}
   <div class="toolbar"><span>Eventos ({{ events().length }})</span><button type="button" class="primary" (click)="newEvent()" [disabled]="busy() || loading()">+ Nuevo evento</button></div>
   <div class="filters" aria-label="Filtrar eventos por estado">@for (status of filters; track status) {<button type="button" [class.active]="filter() === status" [attr.aria-pressed]="filter() === status" (click)="setFilter(status)">{{ labels[status] }} ({{ count(status) }})</button>}</div>
   @if (error()) {<p class="error" role="alert">{{ error() }}</p>}

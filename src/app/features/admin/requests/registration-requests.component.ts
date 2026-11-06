@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, computed, effect, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,11 +11,14 @@ type RequestFilter = 'pending' | 'all' | 'resolved';
 
 @Component({
   selector: 'app-registration-requests', standalone: true,
+  providers: [RegistrationRequestsService],
   imports: [DatePipe, ReactiveFormsModule],
   templateUrl: './registration-requests.component.html',
   styleUrl: './registration-requests.component.css'
 })
 export class RegistrationRequestsComponent implements OnDestroy {
+  readonly seedbedId = input('');
+  readonly scopedSeedbedName = input('');
   @ViewChild('reviewDialog') private dialog?: ElementRef<HTMLDialogElement>;
   private readonly detector = inject(ChangeDetectorRef);
   readonly service = inject(RegistrationRequestsService);
@@ -45,12 +48,12 @@ export class RegistrationRequestsComponent implements OnDestroy {
   private previousOverflow = '';
   private scrollLocked = false;
 
-  constructor() { void this.load(); }
+  constructor() { effect(() => { this.seedbedId(); void this.load(); }); }
 
   async load(): Promise<void> {
     this.loadState.set('loading');
     try {
-      const [, seedbeds] = await Promise.all([this.service.load(), this.seedbedsService.list().catch(() => [])]);
+      const [, seedbeds] = await Promise.all([this.service.load(this.seedbedId()), this.seedbedId() ? Promise.resolve([]) : this.seedbedsService.list().catch(() => [])]);
       this.seedbedNames.set(new Map(seedbeds.map(seedbed => [seedbed.id, seedbed.name])));
       this.loadState.set('ready');
     } catch {
@@ -62,6 +65,7 @@ export class RegistrationRequestsComponent implements OnDestroy {
   nextStates(state: RequestState): readonly RequestState[] { return NEXT_STATES[state] ?? []; }
   stateClass(state: RequestState): string { return this.isResolved(state) ? 'resolved' : 'pending'; }
   seedbedName(item: RegistrationRequest): string {
+    if (this.seedbedId() && item.seedbedId === this.seedbedId()) return this.scopedSeedbedName();
     return item.seedbedId ? this.seedbedNames().get(item.seedbedId) ?? 'Semillero no publicado' : 'Solo al grupo';
   }
   initials(name: string): string { return name.split(/\s+/).slice(0, 2).map(word => word[0]).join(''); }
@@ -69,7 +73,9 @@ export class RegistrationRequestsComponent implements OnDestroy {
   async open(item: RegistrationRequest, trigger: HTMLButtonElement): Promise<void> {
     this.feedback.set('');
     try {
-      this.selected.set(await this.service.detail(item.id));
+      const detail = await this.service.detail(item.id);
+      if (this.seedbedId() && detail.seedbedId !== this.seedbedId()) throw new Error('Solicitud de otro semillero');
+      this.selected.set(detail);
     } catch {
       this.feedback.set(`No se pudo cargar la solicitud de ${item.nombre}. Inténtalo de nuevo.`);
       return;

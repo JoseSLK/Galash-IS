@@ -1,3 +1,5 @@
+import {ProjectsService} from '../projects/projects.service';
+import {ResearchProject} from '../projects/project.model';
 import { SeedbedReviewsComponent } from './reviews/seedbed-reviews.component';
 import { Component, LOCALE_ID, computed, inject, signal } from '@angular/core';
 import { DatePipe, formatDate } from '@angular/common';
@@ -19,6 +21,10 @@ type ProjectFilter = 'Todos' | Project['status'];
 })
 export class SeedbedsComponent {
   private readonly service = inject(SeedbedsService);
+  private readonly projectCatalog=inject(ProjectsService);
+  readonly localProjects=signal<ResearchProject[]>([]);
+  readonly seedbedProjects=computed(()=>{const seedbed=this.selected();if(!seedbed)return [];const name=seedbed.name.trim().toLowerCase();const abbreviation=seedbedAbbreviation(seedbed.name).toLowerCase();return this.localProjects().filter(project=>[name,abbreviation].includes(project.seedbed.trim().toLowerCase()));});
+  get allProjects():Project[] {const local=this.seedbedProjects();return [...local,...this.projects().filter(project=>!local.some(item=>item.id===project.id))];}
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly locale = inject(LOCALE_ID);
@@ -43,7 +49,7 @@ export class SeedbedsComponent {
   selectedStatus: ProjectFilter = 'Activo';
   readonly eventOrders = ['Más recientes', 'Más antiguos'];
   selectedEventOrder = 'Más recientes';
-  selectedDetail: { title: string; description: string; kind: string; metadata: string; event?: PublicEvent } | null = null;
+  selectedDetail: { title: string; description: string; kind: string; metadata: string; event?: PublicEvent; project?:ResearchProject } | null = null;
   memberOffset = 0;
 
   get coordinator(): string {
@@ -52,6 +58,7 @@ export class SeedbedsComponent {
   }
   get directorySeedbed(): string { return this.selected()?.name ?? ''; }
   constructor() {
+    this.projectCatalog.list().pipe(takeUntilDestroyed()).subscribe(projects=>this.localProjects.set(projects));
     void this.loadEvents();
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.load(params.get('id') ?? params.get('nombre')));
   }
@@ -110,8 +117,8 @@ export class SeedbedsComponent {
     }
   }
   retry(): void { void this.load(this.route.snapshot.queryParamMap.get('id') ?? this.route.snapshot.queryParamMap.get('nombre')); }
-  projectCount(status: ProjectFilter): number { return this.projects().filter(project => status === 'Todos' || project.status === status).length; }
-  get filteredProjects(): Project[] { return this.projects().filter(project => this.selectedStatus === 'Todos' || project.status === this.selectedStatus); }
+  projectCount(status: ProjectFilter): number { return this.allProjects.filter(project => status === 'Todos' || project.status === status).length; }
+  get filteredProjects(): Project[] { return this.allProjects.filter(project => this.selectedStatus === 'Todos' || project.status === this.selectedStatus); }
   get filteredEvents(): PublicEvent[] {
     const direction = this.selectedEventOrder === 'Más recientes' ? -1 : 1;
     return [...this.events()].sort((first, second) => direction * (Date.parse(first.startAt) - Date.parse(second.startAt)));
@@ -119,6 +126,7 @@ export class SeedbedsComponent {
   eventMetadata(event: PublicEvent): string {
     return [formatDate(event.startAt, 'dd/MM/yyyy, HH:mm', this.locale), event.type, event.venue, event.organizerName].filter(Boolean).join(' · ');
   }
+  openProjectDetails(dialog:HTMLDialogElement,project:Project):void {this.selectedDetail={title:project.title,description:project.summary,kind:'Proyecto',metadata:this.projectStatusLabel(project.status),project:this.localProjects().find(item=>item.id===project.id)};dialog.showModal();}
   openEventDetails(dialog: HTMLDialogElement, event: PublicEvent): void {
     this.selectedDetail = { title: event.title, description: event.description, kind: 'Evento', metadata: this.eventMetadata(event), event };
     dialog.showModal();
@@ -135,7 +143,7 @@ export class SeedbedsComponent {
     return role === 'docente' || role === 'profesor' ? 'Profesor' : role === 'estudiante' ? 'Estudiante' : member.role;
   }
   projectStatusLabel(status: Project['status']): string {
-    return status === 'Activo' ? 'Activa' : status === 'Finalizado' ? 'Finalizada' : 'Radicada';
+    return status;
   }
   openDetails(dialog: HTMLDialogElement, item: { title: string; description: string }, kind: string, metadata: string): void {
     this.selectedDetail = { ...item, kind, metadata };

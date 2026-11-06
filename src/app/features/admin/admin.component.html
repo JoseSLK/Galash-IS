@@ -1,26 +1,40 @@
-<app-dashboard #header [headerOnly]="true" activePage="admin" />
-<div class="admin-shell" [class.with-sidebar]="auth.isAdmin() && menuOpen()" [inert]="header.registrationOpen">
-  @if (auth.isAdmin()) {
+<app-dashboard #header [headerOnly]="true" [activePage]="leaderMode ? 'leader' : 'admin'" />
+<div class="admin-shell" [class.with-sidebar]="canManage() && menuOpen()" [inert]="header.registrationOpen">
+  @if (canManage()) {
           <div class="admin-navigation" [class.collapsed]="!menuOpen()"><button class="menu-toggle" type="button" [attr.aria-label]="menuOpen() ? 'Ocultar menú' : 'Mostrar menú'" [attr.title]="menuOpen() ? 'Ocultar menú' : 'Mostrar menú'" aria-controls="admin-sections" [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="menuOpen() ? 'M14 6l-6 6 6 6' : 'M10 6l6 6-6 6'" /></svg></button>
           <nav id="admin-sections" class="admin-sidebar" [inert]="!menuOpen()" [attr.aria-hidden]="!menuOpen()" aria-label="Secciones de administración"><p class="navigation-label">ADMINISTRACIÓN</p>
-            <button type="button" [class.current-section]="activeSection() === 'users'" [attr.aria-current]="activeSection() === 'users' ? 'page' : null" (click)="showSection('users')">Usuarios y roles</button>
+            @if (!leaderMode) {<button type="button" [class.current-section]="activeSection() === 'users'" [attr.aria-current]="activeSection() === 'users' ? 'page' : null" (click)="showSection('users')">Usuarios y roles</button>}
             <button type="button" [class.current-section]="activeSection() === 'requests'" [attr.aria-current]="activeSection() === 'requests' ? 'page' : null" (click)="showSection('requests')">Solicitudes de ingreso</button>
             <button type="button" [class.current-section]="activeSection() === 'events'" [attr.aria-current]="activeSection() === 'events' ? 'page' : null" (click)="showSection('events')">Eventos</button>
-            <button type="button" [class.current-section]="activeSection() === 'reviews'" [attr.aria-current]="activeSection() === 'reviews' ? 'page' : null" (click)="showSection('reviews')"><span>Reseñas</span><span class="review-count" [attr.aria-label]="reviews.pendingCount() + ' reseñas pendientes'">{{ reviews.pendingCount() }}</span></button>
-            <button type="button" [class.current-section]="activeSection() === 'members'" [attr.aria-current]="activeSection() === 'members' ? 'page' : null" (click)="showSection('members')">Integrantes</button>
+            <button type="button" [class.current-section]="activeSection() === 'reviews'" [attr.aria-current]="activeSection() === 'reviews' ? 'page' : null" (click)="showSection('reviews')"><span>Reseñas</span>@if (!leaderMode) {<span class="review-count" [attr.aria-label]="reviews.pendingCount() + ' reseñas pendientes'">{{ reviews.pendingCount() }}</span>}</button>
+            <button type="button" [class.current-section]="activeSection() === 'members'" [attr.aria-current]="activeSection() === 'members' ? 'page' : null" (click)="showSection('members')">{{ leaderMode ? 'Integrantes y delegados' : 'Integrantes' }}</button>
             <button type="button" [class.current-section]="activeSection() === 'projects'" [attr.aria-current]="activeSection() === 'projects' ? 'page' : null" (click)="showSection('projects')">Proyectos</button>
-            <button type="button" [class.current-section]="activeSection() === 'communications'" [attr.aria-current]="activeSection() === 'communications' ? 'page' : null" (click)="showSection('communications')">Comunicados y cronograma</button>
-          </nav></div>
+            @if (!leaderMode) {<button type="button" [class.current-section]="activeSection() === 'communications'" [attr.aria-current]="activeSection() === 'communications' ? 'page' : null" (click)="showSection('communications')">Comunicados y cronograma</button>}
+          @if (leaderMode) {
+ <button type="button" [class.current-section]="activeSection() === 'seedbed'" (click)="showSection('seedbed')">Mi semillero</button>
+ <button type="button" [class.current-section]="activeSection() === 'activities'" (click)="showSection('activities')">Actividades</button>
+ <button type="button" [class.current-section]="activeSection() === 'calendar'" (click)="showSection('calendar')">Cronograma</button>
+ }</nav></div>
   }
   <main id="contenido" class="admin-page">
-    @if (auth.isAdmin()) {
-      <p class="eyebrow">PANEL DE ADMINISTRACIÓN</p>
+    @if (canManage()) {
+      <p class="eyebrow">{{ leaderMode ? 'ADMINISTRACIÓN · MI SEMILLERO' : 'PANEL DE ADMINISTRACIÓN' }}</p>
       <div class="title-row">
-        <h1 id="admin-screen-title" tabindex="-1">@if (activeSection() === 'communications') {Comunicados y <span>cronograma</span>} @else if (activeSection() === 'projects') {Proyectos de investigación} @else if (activeSection() === 'users') {Gestión de <span>usuarios</span>} @else if (activeSection() === 'members') {Gestión de <span>integrantes</span>} @else if (activeSection() === 'events') {Eventos} @else if (activeSection() === 'reviews') {Reseñas de <span>semilleros</span>} @else {Solicitudes de ingreso}</h1>
+        <h1 id="admin-screen-title" tabindex="-1">@if (activeSection() === 'seedbed') {Mi semillero} @else if (activeSection() === 'activities') {Actividades} @else if (activeSection() === 'calendar') {Cronograma} @else if (activeSection() === 'communications') {Comunicados y <span>cronograma</span>} @else if (activeSection() === 'projects') {Proyectos de investigación} @else if (activeSection() === 'users') {Gestión de <span>usuarios</span>} @else if (activeSection() === 'members') {Gestión de <span>integrantes</span>} @else if (activeSection() === 'events') {Eventos} @else if (activeSection() === 'reviews') {Reseñas de <span>semilleros</span>} @else {Solicitudes de ingreso}</h1>
 
       </div>
-      <p class="intro">{{ activeSection() === 'communications' ? 'Organiza los comunicados del grupo, las reuniones y los próximos hitos.' : activeSection() === 'projects' ? 'Consulta y actualiza los proyectos del grupo; cada cambio conserva su autor y fecha.' : activeSection() === 'members' ? 'Consulta los integrantes de cada semillero y su historial de participación.' : activeSection() === 'users' ? 'Busca una cuenta, asigna un rol y activa o desactiva su acceso.' : activeSection() === 'reviews' ? 'Revisa la retroalimentación de los semilleros y decide cuáles reseñas publicar.' : activeSection() === 'events' ? 'Publica, actualiza, oculta o cancela los eventos del grupo.' : 'Consulta las solicitudes y revisa su historial antes de tomar una decisión.' }}</p>
-      @if (activeSection() === 'communications') {
+      @if (leaderMode) {
+        @if (scopedSeedbeds().length > 1) {<label class="role-option" for="leader-seedbed">Semillero que diriges<select id="leader-seedbed" [value]="scopeId()" (change)="scopeId.set($any($event.target).value)">@for (item of scopedSeedbeds(); track item.id) {<option [value]="item.id">{{ item.name }}</option>}</select></label>}
+        <p class="search-status">Semillero: <strong>{{ scopedSeedbed()?.name }}</strong></p>
+      }
+      <p class="intro">{{ leaderMode ? 'Gestiona únicamente el semillero indicado. La administración general de cuentas permanece a cargo del administrador.' : activeSection() === 'communications' ? 'Organiza los comunicados del grupo, las reuniones y los próximos hitos.' : activeSection() === 'projects' ? 'Consulta y actualiza los proyectos del grupo; cada cambio conserva su autor y fecha.' : activeSection() === 'members' ? 'Consulta los integrantes de cada semillero y su historial de participación.' : activeSection() === 'users' ? 'Busca una cuenta, asigna un rol y activa o desactiva su acceso.' : activeSection() === 'reviews' ? 'Revisa la retroalimentación de los semilleros y decide cuáles reseñas publicar.' : activeSection() === 'events' ? 'Publica, actualiza, oculta o cancela los eventos del grupo.' : 'Consulta las solicitudes y revisa su historial antes de tomar una decisión.' }}</p>
+      @if (leaderMode && activeSection() === 'projects') {<p class="search-status" role="status">Pendiente para el líder: el backend debe restringir el listado a los semilleros que dirige. Esta pantalla no carga la lista general de proyectos.</p>}
+      @else if (leaderMode && activeSection() === 'reviews') {<p class="search-status" role="status">La moderación de reseñas está reservada al administrador general. Para habilitarla al líder hace falta limitar el servicio a su semillero.</p>}
+      @else if (leaderMode && activeSection() === 'calendar') {<p class="search-status" role="status">Pendiente para el líder: los servicios del cronograma interno aún no están implementados en el backend disponible.</p>}
+      @else if (leaderMode && (activeSection() === 'seedbed' || activeSection() === 'members' || activeSection() === 'activities')) {
+        @for (seedbed of scopedSeedbed() ? [scopedSeedbed()!] : []; track seedbed.id) {<app-leader-tools [seedbed]="seedbed" [section]="activeSection()" />}
+      }
+      @else if (activeSection() === 'communications') {
         <app-comunicados-admin />
       } @else if (activeSection() === 'projects') {
         <app-projects-page [embedded]="true" [management]="true" (signIn)="header.continueWithGoogle()" />
@@ -29,9 +43,9 @@
       } @else if (activeSection() === 'reviews') {
         <app-reviews-admin />
       } @else if (activeSection() === 'requests') {
-        <app-registration-requests />
+        @if (leaderMode) {@for (seedbed of scopedSeedbed() ? [scopedSeedbed()!] : []; track seedbed.id) {<app-registration-requests [seedbedId]="seedbed.id" [scopedSeedbedName]="seedbed.name" />}} @else {<app-registration-requests />}
       } @else if (activeSection() === 'events') {
-        <app-events-admin />
+        @if (!leaderMode) {<app-events-admin />}
       } @else {
       <div class="management-layout">
         <div>
@@ -48,12 +62,15 @@
               <p class="save-feedback" role="status">{{ feedback() }}</p>
               @if (error()) {<p class="save-error" role="alert">{{ error() }}</p>}
             </form>
+            <app-seedbed-assignments [person]="person" />
           </aside>
         }
       </div>
       }
+      @if (leaderMode) {@for (seedbed of scopedSeedbed() ? [scopedSeedbed()!] : []; track seedbed.id) {<app-events-admin [seedbedId]="seedbed.id" [style.display]="activeSection() === 'events' ? null : 'none'" />}}
     } @else {
-      <p role="status">Comprobando acceso administrativo…</p>
+      @if (leaderMode && !scopeLoading()) {<p class="save-error" role="alert">{{ scopeError() }}</p><button class="cancel" type="button" (click)="loadScope()">Reintentar</button>}
+      @else {<p role="status">Comprobando acceso administrativo…</p>}
     }
   </main>
 </div>

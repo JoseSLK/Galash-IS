@@ -47,22 +47,23 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | PUT | `/users/{userId}/roles` | asigna rol (id = Firebase UID) | M11 | [x] |
 | GET | `/seedbeds` | lista | M2 | [x] |
 | POST | `/seedbeds` | crea | M2 | [ ] |
-| GET | `/seedbeds/{id}` | detalle | M2 | [ ] |
+| GET | `/seedbeds/{id}` | detalle | M2 | [x] |
 | GET | `/seedbeds/{id}/space` | vista compuesta | M2 | [x] |
-| PATCH | `/seedbeds/{id}` | edita | M2 | [ ] |
-| PATCH | `/seedbeds/{id}/visibility` | estado | M2 | [ ] |
+| PATCH | `/seedbeds/{id}` | edita | M2 | [x] |
+| PATCH | `/seedbeds/{id}/visibility` | estado | M2 | [x] |
 | GET | `/seedbeds/{id}/members` | integrantes | M2 | [x] |
-| POST | `/seedbeds/{id}/members` | vincula | M2 | [ ] |
-| DELETE | `/seedbeds/{id}/members/{userId}` | retiro | M2 | [ ] |
+| POST | `/seedbeds/{id}/members` | vincula | M2 | [x] |
+| DELETE | `/seedbeds/{id}/members/{userId}` | retiro | M2 | [x] |
+| PUT | `/seedbeds/{id}/delegates` | asigna de 0 a 2 delegados activos (`userIds`); solo director o Admin | M2 | [x] |
 | POST | `/registration-requests` | radica solicitud de la cuenta en sesión | M3 | [x] |
 | GET | `/registration-requests/{id}/status` | consulta propia con token/sesión | M3 | [x] |
 | GET | `/admin/registration-requests` | lista administrativa | M3 | [x] |
 | GET | `/admin/registration-requests/{id}` | detalle e historial administrativo | M3 | [x] |
 | PATCH | `/admin/registration-requests/{id}/status` | actualiza estado y auditoría | M3 | [x] |
-| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [ ] |
-| POST | `/seedbeds/{seedbedId}/activities` | registra actividad | M4 | [ ] |
-| GET | `/activities/{id}` | detalle de actividad | M4 | [ ] |
-| PATCH | `/activities/{id}` | modifica actividad | M4 | [ ] |
+| GET | `/seedbeds/{seedbedId}/activities` | lista actividades | M4 | [x] |
+| POST | `/seedbeds/{seedbedId}/activities` | registra actividad | M4 | [x] |
+| GET | `/activities/{id}` | detalle de actividad | M4 | [x] |
+| PATCH | `/activities/{id}` | modifica actividad | M4 | [x] |
 | GET | `/projects` | lista proyectos | M4 | [x] |
 | POST | `/projects` | registra proyecto | M4 | [x] |
 | GET | `/projects/{id}` | detalle de proyecto | M4 | [x] |
@@ -130,3 +131,5 @@ enlaces: 4 | M11 roles: 6 (roles, permissions, GET users/{userId}/roles,
 users/me/dashboard) | M12: audit-logs | M13 files: 2
 
 M3: `tituloMaximoNivelEstudio` es opcional en `POST /registration-requests`: puede omitirse o enviarse vacío.
+
+Panel del líder: solicitudes usan seedbedId; eventos nuevos incluyen seedbedId fijo y solo se gestionan los creados durante la visita. No se consume el listado global de eventos/proyectos para el líder. Semillero, integrantes, delegados y actividades usan los servicios existentes con el id del semillero verificado.

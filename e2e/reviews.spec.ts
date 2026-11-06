@@ -19,15 +19,15 @@ async function prepare(page: Page, authenticated: boolean, role = 'admin'): Prom
   await expect(page.locator('app-seedbed-reviews')).toBeVisible();
 }
 async function openHeader(page: Page): Promise<void> {
-  const toggle = page.locator('.menu-toggle');
+  const toggle = page.locator('app-dashboard .menu-toggle');
   if (await toggle.isVisible() && await toggle.getAttribute('aria-expanded') === 'false') await toggle.click();
 }
 async function goAdmin(page: Page): Promise<void> {
   await openHeader(page);
   await page.locator('#header-auth-button').click();
   await page.getByRole('link', { name: 'Administración', exact: false }).click();
-  await page.getByLabel('Mostrar secciones de administración').click();
-  await page.locator('.sections-dropdown button').filter({ hasText: 'Reseñas' }).click();
+  if (await page.getByRole('button', { name: 'Mostrar menú', exact: true }).isVisible()) await page.getByRole('button', { name: 'Mostrar menú', exact: true }).click();
+  await page.locator('.admin-sidebar button').filter({ hasText: 'Reseñas' }).click();
   await expect(page.locator('app-reviews-admin')).toBeVisible();
 }
 async function goSeedbed(page: Page): Promise<void> {
@@ -65,9 +65,9 @@ test('local submissions update admin notification, approval and moderation acros
   await expect(page.locator('.review-grid')).not.toContainText(text);
   await goAdmin(page);
   await expect(page.getByText('2 reseñas pendientes de revisión')).toBeVisible();
-  await page.getByLabel('Mostrar secciones de administración').click();
+  if (await page.getByRole('button', { name: 'Mostrar menú', exact: true }).isVisible()) await page.getByRole('button', { name: 'Mostrar menú', exact: true }).click();
   await expect(page.locator('.review-count')).toHaveText('2');
-  await page.getByLabel('Mostrar secciones de administración').click();
+  if (await page.getByRole('button', { name: 'Mostrar menú', exact: true }).isVisible()) await page.getByRole('button', { name: 'Mostrar menú', exact: true }).click();
   const card = page.locator('.moderation-grid .review-card').filter({ hasText: text });
   await card.getByRole('button', { name: 'Aceptar y publicar' }).click();
   await expect(page.getByText('1 reseña pendiente de revisión')).toBeVisible();
@@ -77,7 +77,7 @@ test('local submissions update admin notification, approval and moderation acros
   await page.locator('app-reviews-admin').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `docs/testing/evidence/R20261101-SEM08/admin-${info.project.name}.png` });
   await goSeedbed(page);
   await expect(page.locator('.review-grid')).toContainText(text);
-  await page.getByRole('button', { name: /02 · Ciberseguridad/ }).click();
+  await page.getByRole('button', { name: 'Ciberseguridad', exact: true }).click();
   await expect(page.locator('.review-grid')).not.toContainText(text);
   await goAdmin(page);
   await card.getByRole('button', { name: 'Ocultar', exact: true }).click();
