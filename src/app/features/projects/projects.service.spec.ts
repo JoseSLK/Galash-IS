@@ -20,6 +20,10 @@ describe('Projects API integration',()=>{
  it('loads backend records and resolves the selected member and seedbed names',async()=>{
   const {store,api}=setup();const projects=await firstValueFrom(store.list());expect(api.get).toHaveBeenCalledWith('/projects');expect(projects[0].seedbed).toBe('Semillero');expect(projects[0].responsible).toEqual(['Ana Docente']);expect(projects[0].members).toEqual([{userId:'student',name:'Luis Estudiante'}]);expect(projects[0].endDate).toBe('');
  });
+ it('uses the names sent by the backend for people missing from the public directory',async()=>{
+  const {store,api,record}=setup();api.get.mockResolvedValueOnce({projects:[{...record,responsibleIds:['hidden-teacher'],memberIds:['hidden-student'],responsibles:[{id:'hidden-teacher',name:'Docente Oculto'}],members:[{id:'hidden-student',name:'Estudiante Oculto'}]}]});
+  const projects=await firstValueFrom(store.list());expect(projects[0].responsible).toEqual(['Docente Oculto']);expect(projects[0].members).toEqual([{userId:'hidden-student',name:'Estudiante Oculto'}]);expect(projects[0].director).toBe('Docente Oculto');
+ });
  it('posts IDs and UTC dates, deduplicates directors and permits an absent end date',async()=>{
   const {store,api}=setup();await store.create(input);expect(api.post).toHaveBeenCalledWith('/projects',{...input,title:'Proyecto',summary:'Resumen',responsibleIds:['teacher'],startDate:'2026-11-01T00:00:00Z',endDate:null});
  });
