@@ -95,7 +95,12 @@ La cresta medida es `#1B3152` (HSL 216°/51%/21%; antes `#4B566B`, 18% de
 saturación). Su intensidad (`WAVE_GAIN`) está limitada para que el texto muted
 `#8FA1AD` conserve 4.5:1 o más sobre la parte más brillante de la cinta (4.90:1
 medido a 320px). Los colores salen de los tokens con `cssColor()` como constantes
-GLSL. Con `prefers-reduced-motion: reduce` se dibuja un solo frame estático.
+GLSL. Excepción del 2026-11-06 por petición explícita: el fondo del inicio mantiene
+el movimiento automático incluso con `prefers-reduced-motion: reduce`. Se pausa
+fuera de pantalla o con la pestaña oculta y conserva el límite de 30 fps.
+Para reducir tirones de entrada, el buffer interno se limita a 1280×720 píxeles
+(con pixel ratio máximo 1), el shader se prepara antes del bucle y las
+imágenes apilables cargan sus librerías solo al acercarse al viewport.
 
 ## Exploraciones descartadas
 

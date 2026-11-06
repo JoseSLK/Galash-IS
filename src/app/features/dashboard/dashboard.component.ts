@@ -33,6 +33,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly seedbeds = signal<Seedbed[]>([]);
   readonly memberCount = signal('—');
   readonly seedbedCount = signal('—');
+  readonly projectCount = signal('—');
   activeSeedbed = 0;
   menuOpen = false;
   authMenuOpen = false;
@@ -74,6 +75,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     // Every page embeds this component as its header; only the home page shows this content.
     if (this.headerOnly) return;
     this.seedbedsService.list().then(items => { this.seedbeds.set(items); this.seedbedCount.set(String(items.length).padStart(2, '0')); }, () => undefined);
+    this.api.get<{ projects: unknown[] | null }>('/projects').then(
+      ({ projects }) => this.projectCount.set(String(projects?.length ?? 0).padStart(2, '0')),
+      () => undefined
+    );
     // GET /members has no total; it returns at most MEMBER_COUNT_LIMIT public profiles.
     this.api.get<{ members: unknown[] | null }>(`/members?limit=${MEMBER_COUNT_LIMIT}`).then(
       ({ members }) => {
@@ -99,6 +104,22 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   selectSeedbed(index: number): void { this.activeSeedbed = index; }
+  navigateSeedbeds(event: KeyboardEvent, index: number): void {
+    const count = this.seedbeds().length;
+    if (!count) return;
+    let next: number;
+    switch (event.key) {
+      case 'ArrowRight': next = (index + 1) % count; break;
+      case 'ArrowLeft': next = (index - 1 + count) % count; break;
+      case 'Home': next = 0; break;
+      case 'End': next = count - 1; break;
+      default: return;
+    }
+    event.preventDefault();
+    this.selectSeedbed(next);
+    (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+  }
+
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
     document.body.style.overflow = this.menuOpen ? 'hidden' : '';
