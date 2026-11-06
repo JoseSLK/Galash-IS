@@ -12,28 +12,30 @@
       </div>
     </section>
     } @else {
+    <div class="seedbed-selector">
+      <nav class="seedbed-tabs" aria-label="Seleccionar semillero" [style.--line-progress]="seedbeds().length > 1 ? selectedIndex() / (seedbeds().length - 1) : 0">
+        @for (seedbed of seedbeds(); track seedbed.id; let index = $index) {
+          <button type="button" [class.is-active]="selected()?.id === seedbed.id" [class.is-reached]="index <= selectedIndex()" [attr.aria-pressed]="selected()?.id === seedbed.id" (click)="selectSeedbed(seedbed)" (keydown)="navigateSeedbeds($event, index)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ seedbed.name }}</span></button>
+        }
+      </nav>
+    </div>
     <section class="seedbed-overview" aria-labelledby="seedbed-title">
       <div class="overview-copy">
-        <nav class="point-switcher" aria-label="Seleccionar semillero">
-          @for (seedbed of seedbeds(); track seedbed.id; let index = $index) {
-            <button type="button" [class.active]="selected()?.id === seedbed.id" [attr.aria-pressed]="selected()?.id === seedbed.id" (click)="selectSeedbed(seedbed)"><span class="point" aria-hidden="true"></span><span class="point-label">0{{ index + 1 }} · {{ seedbed.name }}</span></button>
-          }
-        </nav>
-        <p class="switcher-hint">Toca un punto para viajar a otro semillero</p>
+
         <h1 id="seedbed-title">Semillero de <span>{{ selected()?.name }}</span></h1>
         <p class="overview-description">{{ selected()?.description }}</p>
-        <div class="overview-actions"><a class="join-action" routerLink="/unete" [queryParams]="{ id: selected()?.id }">Quiero unirme</a><a class="members-action" [attr.href]="teamLink" (click)="scrollToTeam($event)">Conocer integrantes</a></div>
+        <div class="overview-actions"><a class="join-action" routerLink="/unete" [queryParams]="{ id: selected()?.id }">Quiero unirme</a></div>
       </div>
       @if (knowledgeGraph(); as graph) { <app-knowledge-graph [data]="graph" /> }
     </section>
     <section id="equipo" class="team-section" aria-labelledby="members-title">
-      <div class="team-heading"><h2 id="members-title">Equipo del semillero</h2><a [attr.href]="teamLink" (click)="scrollToTeam($event)">Ver todos →</a></div>
+      <div class="team-heading"><h2 id="members-title">Equipo del semillero</h2><a routerLink="/integrantes" [queryParams]="{ sem: directorySeedbed }">Ver todos →</a></div>
       <div class="team-grid">
-        <article class="team-coordinator"><div class="coordinator-avatar" aria-hidden="true">CO</div><div><p class="team-eyebrow">Coordinación</p><h3>{{ coordinator }}</h3><p class="coordinator-focus">{{ selected()?.researchLine }}</p><span class="coordinator-profile">Perfil CvLAC pendiente</span></div></article>
+        <article class="team-coordinator"><div class="coordinator-avatar" aria-hidden="true">CO</div><div><p class="team-eyebrow">Coordinación</p><h3>{{ coordinator }}</h3><p class="coordinator-focus">{{ selected()?.researchLine }}</p><a class="coordinator-profile" href="https://scienti.minciencias.gov.co/cvlac/Login/pre_s_login.do" target="_blank" rel="noopener noreferrer" aria-label="Ver CvLAC: abrir el portal general en una nueva pestaña" title="Portal general de CvLAC">Ver CvLAC ↗</a></div></article>
                 <div class="team-carousel" aria-label="Integrantes del semillero">
-          <button class="team-arrow" type="button" aria-label="Ver integrantes anteriores" [disabled]="members().length <= 4" (click)="moveMembers(-1)">‹</button>
+          <button class="team-arrow" type="button" aria-label="Ver integrantes anteriores" [disabled]="members().length <= 1" (click)="moveMembers(-1)">‹</button>
           <div class="team-members" aria-live="polite" aria-atomic="true">@for (member of visibleMembers; track member.userId) {<article class="team-member"><div class="member-avatar" aria-hidden="true">{{ memberInitials(member) }}</div><h3>{{ memberName(member) }}</h3><p class="member-role" [class.professor]="memberRole(member) === 'Profesor'">{{ memberRole(member) }}</p></article>} @empty {<p>Aún no hay integrantes registrados.</p>}</div>
-          <button class="team-arrow" type="button" aria-label="Ver siguientes integrantes" [disabled]="members().length <= 4" (click)="moveMembers(1)">›</button>
+          <button class="team-arrow" type="button" aria-label="Ver siguientes integrantes" [disabled]="members().length <= 1" (click)="moveMembers(1)">›</button>
         </div>
       </div>
     </section>

@@ -1,0 +1,22 @@
+<app-dashboard #header [headerOnly]="true" activePage="integrantes" />
+<div [inert]="header.registrationOpen">
+  <main id="contenido" class="integrantes-page">
+    <header class="directory-heading"><div><p class="eyebrow">COMUNIDAD GALASH / DIRECTORIO</p><h1>El conocimiento<br>tiene <span>rostro.</span></h1></div><div class="intro"><p>Integrantes</p><p>Docentes y estudiantes que construyen nuestra comunidad de investigación.</p></div></header>
+    <section aria-label="Directorio de integrantes" (click)="guardarScroll()">
+      <app-integrantes-toolbar [filtros]="filtros()" [personas]="personas()" [total]="filtrados().length" (busqueda)="buscar($event)" (cambio)="actualizar($event)" (limpiar)="limpiar()" />
+      @switch (state()) {
+        @case ('loading') {<div role="status" aria-busy="true"><p class="eyebrow">Cargando integrantes…</p><div class="portrait-grid">@for (item of skeletons; track item) {<div class="skeleton"><div></div><p></p><p></p></div>}</div></div>}
+        @case ('error') {<div class="state-panel"><p class="eyebrow">NO SE PUDO CARGAR EL DIRECTORIO</p><h2>Intentémoslo de nuevo</h2><p role="alert">No pudimos cargar los integrantes. Vuelve a intentarlo.</p><button class="primary" type="button" (click)="cargar()">Reintentar</button></div>}
+        @case ('ready') {
+          @if (!filtrados().length) {<div class="state-panel" role="status"><h2>Sin resultados</h2><p>No encontramos a nadie con «{{ filtros().q || 'los filtros seleccionados' }}». Revisa la ortografía o quita algún filtro.</p><button class="primary" type="button" (click)="limpiar()">Limpiar búsqueda y filtros</button></div>}
+          @else {
+            @if (filtros().vista === 'retratos') {<div class="portrait-grid">@for (persona of visibles(); track persona.id; let index = $index) {<app-retrato-card [persona]="persona" [params]="params()" [style.animation-delay.ms]="index * 60" />}</div>}
+            @else {<app-integrantes-tabla [personas]="visibles()" [params]="params()" [offset]="offset()" [orden]="orden()" [direccion]="direccion()" (ordenar)="ordenar($event)" />}
+            <app-paginador [page]="page()" [size]="size()" [total]="filtrados().length" (cambio)="actualizar({page:$event})" />
+          }
+        }
+      }
+    </section>
+  </main>
+  <app-site-footer />
+</div>

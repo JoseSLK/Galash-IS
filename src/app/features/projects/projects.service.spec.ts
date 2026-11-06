@@ -1,10 +1,35 @@
 import '@angular/compiler';
-import {Injector,runInInjectionContext,signal} from '@angular/core';
-import {describe,it,expect} from 'vitest';import {firstValueFrom} from 'rxjs';
-import {AuthService} from '../../core/services/auth.service';import {ProjectsService} from './projects.service';import {ProjectEdit} from './project.model';
-function setup(){const role=signal('admin');const auth={hasRole:(name:string)=>role()===name,backendUser:()=>({id:'admin-1'}),profileName:()=> 'Admin de ejemplo'};return {role,store:runInInjectionContext(Injector.create({providers:[{provide:AuthService,useValue:auth}]}),()=>new ProjectsService())};}
-describe('Project updates',()=>{
- it('registers accepted projects with author and creation date, without a proposal flow',async()=>{const {store}=setup();const original=(await firstValueFrom(store.list()))[0];const data:ProjectEdit={...original,problem:'Problema',objectives:'Objetivos',methodology:'Método',director:'Director de ejemplo',responsibleIds:original.responsibleIds??[],members:original.members??[]};const created=store.create(data);expect(created.history![0].action).toBe('Proyecto aceptado registrado');expect(created.history![0].authorId).toBe('admin-1');expect(created.director).toBe('Director de ejemplo');expect((await firstValueFrom(store.list())).some(project=>project.id===created.id)).toBe(true);});
- it('accepts both progress boundaries and preserves date and author for each update',async()=>{const {store}=setup();const original=(await firstValueFrom(store.list()))[0];const data:ProjectEdit={...original,responsibleIds:original.responsibleIds??[],members:original.members??[]};expect(()=>store.update(original.id,{...data,progress:-1})).toThrow(/0 y 100/);expect(()=>store.update(original.id,{...data,progress:101})).toThrow(/0 y 100/);expect(store.update(original.id,{...data,progress:0}).progress).toBe(0);const updated=store.update(original.id,{...data,title:'Título actualizado',progress:100,status:'Finalizado'});expect(updated.history).toHaveLength(2);expect(updated.history![0].authorId).toBe('admin-1');expect(updated.history![1].author).toBe('Admin de ejemplo');expect(Number.isFinite(Date.parse(updated.history![1].at))).toBe(true);expect(updated.members).toEqual(original.members);});
- it('blocks unauthorized edits and invalid status or dates',async()=>{const {store,role}=setup();const original=(await firstValueFrom(store.list()))[0];const data:ProjectEdit={...original,responsibleIds:[],members:[]};role.set('estudiante');expect(()=>store.update(original.id,data)).toThrow(/autorización/);role.set('admin');expect(()=>store.update(original.id,{...data,endDate:'2025-01-01'})).toThrow(/fechas/);expect(()=>store.update(original.id,{...data,status:'Otro' as never})).toThrow(/Radicado/);});
+import {Injector,runInInjectionContext} from '@angular/core';
+import {describe,it,expect,vi} from 'vitest';
+import {firstValueFrom,of} from 'rxjs';
+import {AuthService} from '../../core/services/auth.service';
+import {ApiService} from '../../core/services/api.service';
+import {SeedbedsService} from '../seedbeds/seedbeds.service';
+import {IntegrantesService} from '../integrantes/integrantes.service';
+import {ProjectsService} from './projects.service';
+import {ProjectApi,ProjectEdit} from './project.model';
+const input:ProjectEdit={title:' Proyecto ',summary:' Resumen ',seedbedId:'s1',researchLine:'Seguridad',responsibleIds:['teacher','teacher'],memberIds:['student'],startDate:'2026-11-01',endDate:'',status:'Activo',progress:25};
+function setup(){
+ const record:ProjectApi={...input,id:'p1',title:'Proyecto',summary:'Resumen',responsibleIds:['teacher'],startDate:'2026-11-01T00:00:00Z',endDate:null,updatedAt:'2026-11-06T12:00:00Z'};
+ const api={get:vi.fn(async()=>({projects:[record]})),post:vi.fn(async(_path:string,body:object)=>({...record,...body})),patch:vi.fn(async(_path:string,body:object)=>({...record,...body}))};
+ const auth={backendUser:()=>({id:'admin'}),profileName:()=> 'Admin de prueba'};
+ const store=runInInjectionContext(Injector.create({providers:[{provide:AuthService,useValue:auth},{provide:ApiService,useValue:api},{provide:SeedbedsService,useValue:{list:async()=>[{id:'s1',name:'Semillero'}]}},{provide:IntegrantesService,useValue:{listar:()=>of([{id:'teacher',nombre:'Ana Docente'},{id:'student',nombre:'Luis Estudiante'}])}}]}),()=>new ProjectsService());
+ return {store,api,record};
+}
+describe('Projects API integration',()=>{
+ it('loads backend records and resolves the selected member and seedbed names',async()=>{
+  const {store,api}=setup();const projects=await firstValueFrom(store.list());expect(api.get).toHaveBeenCalledWith('/projects');expect(projects[0].seedbed).toBe('Semillero');expect(projects[0].responsible).toEqual(['Ana Docente']);expect(projects[0].members).toEqual([{userId:'student',name:'Luis Estudiante'}]);expect(projects[0].endDate).toBe('');
+ });
+ it('posts IDs and UTC dates, deduplicates directors and permits an absent end date',async()=>{
+  const {store,api}=setup();await store.create(input);expect(api.post).toHaveBeenCalledWith('/projects',{...input,title:'Proyecto',summary:'Resumen',responsibleIds:['teacher'],startDate:'2026-11-01T00:00:00Z',endDate:null});
+ });
+ it('rejects invalid progress before writing and accepts both boundaries',async()=>{
+  const {store,api}=setup();for(const progress of [-1,101,0.5])await expect(store.setProgress('p1',progress)).rejects.toThrow('0 y 100');expect(api.patch).not.toHaveBeenCalled();await store.setProgress('p1',0);await store.setProgress('p1',100);expect(api.patch).toHaveBeenNthCalledWith(1,'/projects/p1/progress',{progress:0});expect(api.patch).toHaveBeenNthCalledWith(2,'/projects/p1/progress',{progress:100});
+ });
+ it('rejects invalid dates, status and missing directors before writing',async()=>{
+  const {store,api}=setup();await expect(store.update('p1',{...input,endDate:'2025-01-01'})).rejects.toThrow('fechas');await expect(store.update('p1',{...input,status:'Otro' as never})).rejects.toThrow('estado');await expect(store.update('p1',{...input,responsibleIds:[]})).rejects.toThrow('director');expect(api.patch).not.toHaveBeenCalled();
+ });
+ it('propagates a backend write failure instead of producing local success',async()=>{
+  const {store,api}=setup();api.patch.mockRejectedValueOnce(new Error('Forbidden'));await expect(store.update('p1',input)).rejects.toThrow('Forbidden');
+ });
 });

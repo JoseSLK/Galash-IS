@@ -1,0 +1,18 @@
+{
+  "status": "pass",
+  "build": "npm run build passes with existing bundle/CommonJS warnings",
+  "unit": "48 tests /14 files passed with Node24.22.1",
+  "backend": "go test ./... passes after merging origin/main",
+  "e2e": "75 distinct desktop/tablet/mobile cases passed across full runs and targeted re-runs",
+  "corrections": [
+    "API fixtures replace obsolete demo project expectations",
+    "sidebar replaces dropdown test selectors",
+    "updated emblem and seedbed labels",
+    "wait for header before responsive account-menu interaction",
+    "separate Playwright output directories avoid temporary trace collisions"
+  ],
+  "contract": "full frontend/backend contract bytes synchronized",
+  "not_run": [
+    "local Lighthouse performance suite; CI will run configured checks"
+  ]
+}

@@ -1,0 +1,14 @@
+.seedbed-tabs { position: relative; display: flex; gap: 0; margin: 32px 0 44px; }
+.seedbed-tabs::before, .seedbed-tabs::after { content: ''; position: absolute; top: 20px; left: 7px; right: 7px; height: 2px; pointer-events: none; }
+.seedbed-tabs::before { background: var(--galash-border-strong); }
+.seedbed-tabs::after { background: var(--galash-accent); transform: scaleX(var(--line-progress, 0)); transform-origin: left; transition: transform 450ms ease; }
+.seedbed-tabs button { position: relative; z-index: 1; display: flex; flex: 1 1 0; min-width: 0; min-height: 72px; flex-direction: column; align-items: center; gap: 12px; padding: 14px 0 8px; border: 0; background: transparent; color: var(--galash-muted); cursor: pointer; text-align: center; font: 600 clamp(10px, .9vw, 11px)/1.55 var(--fuente-texto); letter-spacing: .04em; text-transform: uppercase; }
+.seedbed-tabs button:first-child { align-items: flex-start; text-align: left; }
+.seedbed-tabs button:last-child { align-items: flex-end; text-align: right; }
+.seedbed-node { position: relative; display: block; flex-shrink: 0; width: 14px; height: 14px; border: 2px solid var(--galash-border-strong); border-radius: 50%; background: var(--galash-bg); transition: transform 250ms ease, border-color 250ms ease, background-color 250ms ease; }
+.seedbed-tabs .is-reached .seedbed-node { border-color: var(--galash-accent); background: var(--galash-accent); }
+.seedbed-tabs .is-active .seedbed-node { transform: scale(1.5); }
+.seedbed-tabs .is-active .seedbed-label { color: var(--galash-text-strong); }
+.seedbed-label { display: block; max-width: 100%; overflow-wrap: anywhere; transition: color 250ms ease; }
+@media (prefers-reduced-motion: reduce) { .seedbed-tabs::after, .seedbed-node, .seedbed-label { transition: none; } }
+@media (max-width: 480px) { .seedbed-tabs button { letter-spacing: .02em; } }

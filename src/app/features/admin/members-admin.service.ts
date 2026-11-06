@@ -21,9 +21,20 @@ export class MembersAdminService {
   private firebaseUids = new Map<string, string>();
   readonly people = this.state.asReadonly();
 
-  // GET /admin/members requires a name or email query.
-  async search(query: string): Promise<void> {
-    const { users: members } = await this.api.get<{ users: AdminProfile[] | null }>(`/admin/members?q=${encodeURIComponent(query.trim())}&limit=50`);
+  private requestId = 0;
+
+  clear(): void {
+    this.requestId++;
+    this.state.set([]);
+    this.firebaseUids.clear();
+  }
+
+  // An omitted q loads all accounts, as specified by M11.
+  async search(query = ''): Promise<void> {
+    const request = ++this.requestId;
+    const filter = query.trim();
+    const { users: members } = await this.api.get<{ users: AdminProfile[] | null }>(`/admin/members${filter ? '?q=' + encodeURIComponent(filter) + '&limit=50' : ''}`);
+    if (request !== this.requestId) return;
     this.firebaseUids = new Map((members ?? []).map(member => [member.id, member.firebase_uid]));
     this.state.set((members ?? []).map(member => ({
       id: member.id,
@@ -46,9 +57,13 @@ export class MembersAdminService {
       this.patchLocal(id, { role });
     }
     if (person.status !== status) {
-      await this.api.patch<unknown, { status: string }>(`/members/${encodeURIComponent(id)}/status`, { status: status === 'active' ? 'activo' : 'inactivo' });
-      this.patchLocal(id, { status });
+      await this.setStatus(id, status);
     }
+  }
+
+  async setStatus(id: string, status: AccountStatus): Promise<void> {
+    await this.api.patch<unknown, { status: string }>(`/members/${encodeURIComponent(id)}/status`, { status: status === 'active' ? 'activo' : 'inactivo' });
+    this.patchLocal(id, { status });
   }
 
   private patchLocal(id: string, change: Partial<DirectoryPerson>): void {

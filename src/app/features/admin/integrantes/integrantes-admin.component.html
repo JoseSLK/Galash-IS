@@ -1,0 +1,31 @@
+<div class="toolbar">
+  <label>Semillero<select aria-label="Semillero" #sem [value]="semilleroId()" [disabled]="guardando()" (change)="cambiar(sem.value)">@for (item of semilleros(); track item.id) {<option [value]="item.id">{{ item.name }}</option>}</select></label>
+  <label>Vinculación<select aria-label="Vinculación" #view [value]="filtro()" (change)="filtrar(view.value)"><option value="vigentes">Vigentes</option><option value="retirados">Retirados</option><option value="todos">Todo el historial</option></select></label>
+  <label>Buscar integrantes<input #query type="search" placeholder="Nombre, tipo o área" (input)="buscar(query.value)" /></label>
+</div>
+<details class="binder"><summary>Vincular integrante</summary><p>Busca una cuenta activa de Docente o Estudiante. La vinculación conserva el rol de su cuenta; puedes cambiarlo en Usuarios y roles.</p><label>Buscar usuarios existentes<input #candidate type="search" [value]="candidateQuery()" [disabled]="guardando()" placeholder="Nombre o correo" (input)="buscarCandidatos(candidate.value)" /></label><p role="status">{{ buscando() ? 'Buscando cuentas…' : searchMessage() }}</p><ul>@for (persona of candidatos(); track persona.id) {<li><span><strong>{{ persona.nombre }}</strong><small>{{ roleLabel(persona.rol) }} · {{ persona.activo ? 'Cuenta activa' : 'Cuenta inactiva' }}</small></span><button type="button" [disabled]="guardando() || estado() !== 'ready' || !puedeVincular(persona)" (click)="vincular(persona)" [attr.aria-label]="'Vincular a ' + persona.nombre">Vincular</button></li>}</ul></details>
+<p class="feedback" role="status">{{ feedback() }}</p>
+@if (accionError() && !pendiente()) {<p class="error" role="alert">{{ accionError() }}</p>}
+@if (estado() === 'loading') {<p role="status">Cargando integrantes e historial…</p>}
+@else if (estado() === 'error') {<p role="alert">No pudimos cargar los integrantes. Comprueba tu sesión e inténtalo de nuevo.</p><button type="button" (click)="cargarSemilleros()">Reintentar</button>}
+@else {
+  <p class="count" role="status">{{ filtrados().length }} integrantes · {{ semillero()?.name || 'Sin semilleros disponibles' }}</p>
+  <ng-template #acciones let-persona>
+    @if (porId().get(persona.id); as integrante) {
+      <div class="row-management"><span class="status">{{ integrante.estado === 'activo' ? 'Cuenta activa' : 'Cuenta inactiva' }} · {{ integrante.leftAt ? 'Retirado' : 'Vinculado' }}</span><span class="date">Vinculación: {{ integrante.joinedAt | date:'dd/MM/yyyy' }}</span>@if (integrante.leftAt) {<span class="date">Retiro: {{ integrante.leftAt | date:'dd/MM/yyyy' }}</span>}<div class="row-actions"><button type="button" [disabled]="guardando()" (click)="confirmar('estado', integrante)" [attr.aria-label]="(integrante.estado === 'activo' ? 'Inactivar a ' : 'Activar a ') + integrante.nombre">{{ integrante.estado === 'activo' ? 'Inactivar' : 'Activar' }}</button>@if (!integrante.leftAt) {<button type="button" class="danger" [disabled]="guardando()" (click)="confirmar('retirar', integrante)" [attr.aria-label]="'Eliminar del semillero a ' + integrante.nombre">Eliminar del semillero</button>}</div></div>
+    }
+  </ng-template>
+  @if (filtrados().length) {<app-integrantes-tabla [personas]="visibles()" [offset]="(pagina()-1)*10" [orden]="orden()" [direccion]="direccion()" (ordenar)="ordenar($event)" [acciones]="acciones" [perfilDisponible]="false" caption="Integrantes e historial del semillero" /><app-paginador [page]="pagina()" [size]="10" [total]="filtrados().length" (cambio)="page.set($event)" />}
+  @else {<p>No hay integrantes que coincidan con la búsqueda.</p>}
+}
+
+<dialog #confirmDialog aria-labelledby="member-action-title" (cancel)="cancelar($event)">
+  @if (pendiente(); as action) {
+    <h2 id="member-action-title">{{ action.tipo === 'retirar' ? 'Eliminar del semillero' : action.persona.estado === 'activo' ? 'Inactivar cuenta' : 'Activar cuenta' }}</h2>
+    <p><strong>{{ action.persona.nombre }}</strong></p>
+    @if (action.tipo === 'retirar') {<p>Se registrará su retiro de {{ semillero()?.name }}. La cuenta y el historial de participación se conservarán.</p>}
+    @else {<p>{{ action.persona.estado === 'activo' ? 'Se desactivará el acceso de esta cuenta en toda la plataforma. Sus vinculaciones e historial se conservan.' : 'Se reactivará el acceso de esta cuenta a la plataforma.' }}</p>}
+    @if (accionError()) {<p class="error" role="alert">{{ accionError() }}</p>}
+    <div class="dialog-actions"><button type="button" autofocus [disabled]="guardando()" (click)="cancelar()">Cancelar</button><button type="button" class="primary" [disabled]="guardando()" (click)="ejecutar()">{{ guardando() ? 'Guardando…' : 'Confirmar' }}</button></div>
+  }
+</dialog>

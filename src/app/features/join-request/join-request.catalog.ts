@@ -25,7 +25,7 @@ export const joinSteps: { label: string; title: string; accent: string; help: st
   ] },
   { label: 'Formación', title: 'Tu formación', accent: 'académica', help: 'Comparte tu recorrido académico y tu vinculación actual.', fields: [
     { key: 'education', label: 'Máximo nivel de estudio', type: 'select', options: options(temporaryCatalogs.education) },
-    { key: 'educationTitle', label: 'Título máximo nivel de estudio', type: 'text' },
+    { key: 'educationTitle', label: 'Título máximo nivel de estudio', type: 'text', optional: true },
     { key: 'undergraduateTitle', label: 'Título de pregrado', type: 'text' },
     { key: 'affiliation', label: 'Vinculación', type: 'select', options: options(temporaryCatalogs.affiliation) }
   ] },

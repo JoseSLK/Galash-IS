@@ -33,6 +33,7 @@ export class SeedbedsComponent {
   readonly state = signal<'loading' | 'ready' | 'empty' | 'error'>('loading');
   readonly seedbeds = signal<Seedbed[]>([]);
   readonly selected = signal<Seedbed | null>(null);
+  readonly selectedIndex = computed(() => Math.max(0, this.seedbeds().findIndex(seedbed => seedbed.id === this.selected()?.id)));
   readonly space = signal<SeedbedSpace | null>(null);
   readonly members = signal<SeedbedMember[]>([]);
   readonly events = signal<PublicEvent[]>([]);
@@ -55,17 +56,7 @@ export class SeedbedsComponent {
     const responsible = this.space()?.responsible;
     return [responsible?.name, responsible?.lastName].filter(Boolean).join(' ') || 'Coordinación no disponible';
   }
-  get teamLink(): string {
-    return this.router.createUrlTree([], { relativeTo: this.route, queryParamsHandling: 'preserve', fragment: 'equipo' }).toString();
-  }
-  scrollToTeam(event: MouseEvent): void {
-    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-    event.preventDefault();
-    document.getElementById('equipo')?.scrollIntoView({
-      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-      block: 'start'
-    });
-  }
+  get directorySeedbed(): string { return this.selected()?.name ?? ''; }
   constructor() {
     this.projectCatalog.list().pipe(takeUntilDestroyed()).subscribe(projects=>this.localProjects.set(projects));
     void this.loadEvents();
@@ -80,6 +71,21 @@ export class SeedbedsComponent {
   }
   selectSeedbed(seedbed: Seedbed): void {
     void this.router.navigate([], { relativeTo: this.route, queryParams: { id: seedbed.id }, queryParamsHandling: 'merge' });
+  }
+  navigateSeedbeds(event: KeyboardEvent, index: number): void {
+    const count = this.seedbeds().length;
+    if (!count) return;
+    let next: number;
+    switch (event.key) {
+      case 'ArrowRight': next = (index + 1) % count; break;
+      case 'ArrowLeft': next = (index - 1 + count) % count; break;
+      case 'Home': next = 0; break;
+      case 'End': next = count - 1; break;
+      default: return;
+    }
+    event.preventDefault();
+    this.selectSeedbed(this.seedbeds()[next]);
+    (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('button')[next]?.focus();
   }
   private async load(id: string | null): Promise<void> {
     const request = ++this.loadId;
@@ -147,5 +153,9 @@ export class SeedbedsComponent {
     const members = this.members();
     return Array.from({ length: Math.min(4, members.length) }, (_, index) => members[(this.memberOffset + index) % members.length]);
   }
-  moveMembers(direction: number): void { this.memberOffset = (this.memberOffset + direction + this.members().length) % this.members().length; }
+  moveMembers(direction: number): void {
+    const count = this.members().length;
+    if (count <= 1) return;
+    this.memberOffset = (this.memberOffset + direction + count) % count;
+  }
 }

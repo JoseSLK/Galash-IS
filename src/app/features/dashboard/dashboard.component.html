@@ -9,7 +9,7 @@
       <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
       <a routerLink="/proyectos" [attr.aria-current]="headerOnly && activePage === 'proyectos' ? 'page' : null" (click)="closeMenu()">Proyectos<span aria-hidden="true"></span></a>
       <a routerLink="/eventos" [attr.aria-current]="headerOnly && activePage === 'eventos' ? 'page' : null" (click)="closeMenu()">Eventos<span aria-hidden="true"></span></a>
-      <a [attr.href]="headerOnly ? '/#integrantes' : '#integrantes'" [attr.aria-current]="!headerOnly && activeSection === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
+      <a routerLink="/integrantes" [attr.aria-current]="headerOnly && activePage === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
     <div class="header-actions">
       <div #authMenu class="auth-menu">
         <button #authMenuTrigger id="header-auth-button" class="button auth-trigger" type="button"
@@ -89,7 +89,7 @@
       <dl class="home-stats">
         <div><dt>Semilleros de investigación<svg aria-hidden="true" viewBox="0 0 64 64"><path d="M32 54V30M32 39C14 40 9 29 10 16c14-1 24 5 22 23ZM32 31C31 16 40 9 54 10c1 14-6 23-22 21Z" /></svg></dt><dd>{{ seedbedCount() }}</dd></div>
         <div><dt>Integrantes de la comunidad<svg aria-hidden="true" viewBox="0 0 64 64"><circle cx="32" cy="20" r="9"/><path d="M17 54v-8a15 15 0 0 1 30 0v8M12 18a7 7 0 0 0 0 14M52 18a7 7 0 0 1 0 14M5 50v-7a10 10 0 0 1 8-10M59 50v-7a10 10 0 0 0-8-10" /></svg></dt><dd>{{ memberCount() }}</dd></div>
-        <div><dt>Grupo de investigación<svg aria-hidden="true" viewBox="0 0 64 64"><path d="M24 8h16M28 8v19L14 49a5 5 0 0 0 4 7h28a5 5 0 0 0 4-7L36 27V8M22 40h20"/><circle cx="30" cy="46" r="2"/></svg></dt><dd>01</dd></div>
+        <div><dt>Proyectos<svg aria-hidden="true" viewBox="0 0 64 64"><path d="M24 8h16M28 8v19L14 49a5 5 0 0 0 4 7h28a5 5 0 0 0 4-7L36 27V8M22 40h20"/><circle cx="30" cy="46" r="2"/></svg></dt><dd>{{ projectCount() }}</dd></div>
       </dl>
       <div class="about-story">
         <div class="about-copy"><p class="eyebrow">Conocimiento que nos conecta</p><h3>Un espacio para investigar y crecer</h3><p>Somos el grupo de investigación en Auditoría, Lógica y Arquitectura de Software y Hardware de la UPTC, seccional Sogamoso.</p><p>Unimos a estudiantes y docentes para explorar ideas y desarrollar proyectos de investigación.</p><a class="text-link" routerLink="/nosotros">Conoce más sobre nosotros →</a></div>
@@ -100,12 +100,12 @@
     @if (currentSeedbed; as current) {
     <section id="semilleros" class="seedbeds-section" aria-label="Semilleros">
       <div class="section-heading"><p class="eyebrow">Explora nuestra comunidad</p></div>
-      <div class="seedbed-tabs" role="tablist" aria-label="Semilleros disponibles">
+      <div class="seedbed-tabs" role="tablist" aria-label="Semilleros disponibles" [style.--line-progress]="seedbeds().length > 1 ? activeSeedbed / (seedbeds().length - 1) : 0">
         @for (seedbed of seedbeds(); track seedbed.id; let i = $index) {
-          <button type="button" role="tab" [attr.aria-selected]="i === activeSeedbed" [class.is-active]="i === activeSeedbed" (click)="selectSeedbed(i)"><span aria-hidden="true">✦</span>{{ seedbed.name }}</button>
+          <button type="button" role="tab" [id]="'home-seedbed-tab-' + i" aria-controls="home-seedbed-panel" [attr.aria-selected]="i === activeSeedbed" [attr.tabindex]="i === activeSeedbed ? 0 : -1" [class.is-active]="i === activeSeedbed" [class.is-reached]="i <= activeSeedbed" (click)="selectSeedbed(i)" (keydown)="navigateSeedbeds($event, i)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ seedbed.name }}</span></button>
         }
       </div>
-      <div class="seedbed-layout">
+      <div class="seedbed-layout" id="home-seedbed-panel" role="tabpanel" [attr.aria-labelledby]="'home-seedbed-tab-' + activeSeedbed">
         <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">Semillero {{ activeSeedbed + 1 }}</p><h3>{{ current.name }}</h3><p class="seedbed-phrase">{{ current.researchLine }}</p><p>{{ current.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: current.id }">Conoce el semillero →</a></article>
         <div class="seedbed-emblem" role="img" [attr.aria-label]="'Icono de ' + current.name">
           <div class="emblem-orbit" aria-hidden="true"></div>

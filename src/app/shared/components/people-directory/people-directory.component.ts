@@ -55,7 +55,7 @@ export class PeopleDirectoryComponent {
   }
   chooseFilter(value: DirectoryFilter): void { this.filter.set(value); this.page.set(1); }
   chooseSeedbed(event: Event): void { this.seedbed.set((event.target as HTMLSelectElement).value); this.page.set(1); }
-  clear(): void { this.query.set(''); this.filter.set('all'); this.seedbed.set(''); this.page.set(1); }
+  clear(): void { this.query.set(''); this.filter.set('all'); this.seedbed.set(''); this.page.set(1); this.queryChange.emit(''); }
   roleLabel(role: UserRole): string { return USER_ROLES.find(item => item.id === role)?.label || ''; }
   initials(name: string): string { return name.split(/\s+/).slice(0, 2).map(word => word[0]).join(''); }
 }

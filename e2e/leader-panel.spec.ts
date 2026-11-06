@@ -1,11 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 async function openAccountMenu(page: Page): Promise<void> {
+  await expect(page.locator('app-dashboard .site-header')).toBeVisible();
   const navigation = page.getByRole('button', { name: 'Abrir menú', exact: true });
   if (await navigation.isVisible()) await navigation.click();
   await page.locator('[aria-controls=header-auth-dropdown]').click();
 }
 async function chooseSection(page: Page, name: string): Promise<void> {
-  await page.getByLabel('Mostrar secciones de administración').click();
+  if (await page.getByRole('button', { name: 'Mostrar menú', exact: true }).isVisible()) await page.getByRole('button', { name: 'Mostrar menú', exact: true }).click();
   await page.getByRole('button', { name, exact: true }).click();
 }
 

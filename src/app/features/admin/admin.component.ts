@@ -1,7 +1,9 @@
-import {ProjectsPageComponent} from '../projects/projects-page.component';
+import { ComunicadosAdminComponent } from './comunicados/comunicados-admin.component';
+import { ProjectsPageComponent } from '../projects/projects-page.component';
+import { IntegrantesAdminComponent } from './integrantes/integrantes-admin.component';
 import { ReviewsAdminComponent } from './reviews/reviews-admin.component';
 import { SeedbedReviewsService } from '../seedbeds/reviews/seedbed-reviews.service';
-import { Component, ElementRef, HostListener, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,16 +16,16 @@ import { USER_ROLES, UserRole } from '../../core/models/role.model';
 import { AccountStatus } from '../../shared/components/people-directory/person-directory.model';
 import { RegistrationRequestsComponent } from './requests/registration-requests.component';
 import { EventsAdminComponent } from './events/events-admin.component';
+
 import { SeedbedAssignmentsComponent } from './seedbed-assignments.component';
 import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
 import { LeaderToolsComponent } from '../leader/leader-tools.component';
-
-type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar';
+type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar' | 'communications';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [LeaderToolsComponent, SeedbedAssignmentsComponent, ProjectsPageComponent,ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
+  imports: [LeaderToolsComponent, SeedbedAssignmentsComponent, ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -37,15 +39,15 @@ export class AdminComponent implements OnDestroy {
   readonly scopeError = signal('');
   readonly scopedSeedbed = computed(() => this.scopedSeedbeds().find(item => item.id === this.scopeId()) ?? null);
   readonly canManage = computed(() => this.leaderMode ? !!this.scopedSeedbed() : this.auth.isAdmin());
-  @ViewChild('sectionMenu') private sectionMenu?: ElementRef<HTMLDetailsElement>;
-  readonly upcomingSections = ['Semilleros', 'Auditoría'];
+  readonly menuOpen = signal(true);
   readonly activeSection = signal<AdminSection>(this.leaderMode ? 'requests' : 'users');
   readonly auth = inject(AuthService);
   readonly reviews = inject(SeedbedReviewsService);
   readonly users = inject(MembersAdminService);
   readonly roles = USER_ROLES;
   readonly searching = signal(false);
-  readonly searchMessage = signal('Escribe al menos 2 letras del nombre o correo para buscar cuentas.');
+  readonly searchMessage = signal('');
+  private initialLoadStarted = false;
   private searchTimer?: ReturnType<typeof setTimeout>;
   private searchId = 0;
   readonly selectedId = signal<string | null>(null);
@@ -63,6 +65,11 @@ export class AdminComponent implements OnDestroy {
     if (this.leaderMode) void this.loadScope();
     effect(() => {
       if (this.auth.sessionStatus() !== 'checking' && (this.leaderMode ? !this.auth.isAuthenticated() : !this.auth.isAdmin())) void this.router.navigateByUrl('/');
+      if (!this.leaderMode && this.auth.isAdmin() && !this.initialLoadStarted) {
+        this.initialLoadStarted = true;
+        this.users.clear();
+        void this.search('');
+      }
     });
     effect(() => {
       const person = this.selected();
@@ -83,42 +90,19 @@ export class AdminComponent implements OnDestroy {
     finally { this.scopeLoading.set(false); }
   }
 
-  closeSections(menu: HTMLDetailsElement): void {
-    menu.open = false;
-    menu.querySelector('summary')?.focus();
-  }
-
-  alignSectionMenu(menu: HTMLDetailsElement): void {
-    if (!menu.open || !menu.classList.contains('center-menu')) return;
-    const dropdown = menu.querySelector<HTMLElement>('.sections-dropdown');
-    if (!dropdown) return;
-    dropdown.style.removeProperty('--menu-shift');
-    const bounds = dropdown.getBoundingClientRect();
-    const shift = Math.max(16 - bounds.left, 0) + Math.min(window.innerWidth - 16 - bounds.right, 0);
-    dropdown.style.setProperty('--menu-shift', `${shift}px`);
-  }
-
-  showSection(section: AdminSection, menu: HTMLDetailsElement): void {
-    if (this.leaderMode && section === 'users') return;
+  showSection(section: AdminSection): void {
+    if (this.leaderMode && (section === 'users' || section === 'communications')) return;
     this.activeSection.set(section);
-    this.closeSections(menu);
   }
 
-  @HostListener('document:click', ['$event'])
-  dismissSections(event: MouseEvent): void {
-    const menu = this.sectionMenu?.nativeElement;
-    if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;
-  }
-
-  // GET /admin/members needs a query, so the directory box searches the server after a pause.
   queueSearch(query: string): void {
     if (this.leaderMode) return;
     clearTimeout(this.searchTimer);
-    if (query.trim().length < 2) {
-      this.searchId++;
-      this.searching.set(false);
-      return;
-    }
+    this.searchId++;
+    this.users.clear();
+    this.selectedId.set(null);
+    if (!query.trim()) { void this.search(''); return; }
+    this.searching.set(true);
     this.searchTimer = setTimeout(() => void this.search(query), 300);
   }
 
@@ -128,10 +112,17 @@ export class AdminComponent implements OnDestroy {
     try {
       await this.users.search(query);
       if (id !== this.searchId) return;
-      this.selectedId.set(this.users.people()[0]?.id || null);
-      this.searchMessage.set(this.users.people().length ? '' : 'No hay cuentas que coincidan con la búsqueda.');
-    } catch {
-      if (id === this.searchId) this.searchMessage.set('No se pudo buscar. Inténtalo de nuevo.');
+      const people = [...this.users.people()].sort((a, b) => a.name.localeCompare(b.name, 'es'));
+      this.selectedId.set(people[0]?.id || null);
+      this.searchMessage.set(this.users.people().length ? '' : query.trim() ? 'No hay cuentas que coincidan con la búsqueda.' : 'No hay cuentas registradas.');
+    } catch (error: unknown) {
+      if (id === this.searchId) {
+        this.users.clear();
+        this.selectedId.set(null);
+        this.searchMessage.set(error instanceof HttpErrorResponse && error.status === 400 && !query.trim()
+          ? 'El servidor aún no permite listar las cuentas sin una búsqueda. La carga inicial requiere actualizar el backend.'
+          : 'No se pudieron cargar las cuentas. Inténtalo de nuevo.');
+      }
     } finally {
       if (id === this.searchId) this.searching.set(false);
     }
@@ -143,7 +134,7 @@ export class AdminComponent implements OnDestroy {
     this.error.set('');
   }
 
-  ngOnDestroy(): void { clearTimeout(this.searchTimer); }
+  ngOnDestroy(): void { clearTimeout(this.searchTimer); this.searchId++; this.users.clear(); }
 
   initials(name: string): string { return name.split(/\s+/).slice(0, 2).map(word => word[0]).join(''); }
 

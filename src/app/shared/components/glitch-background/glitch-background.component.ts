@@ -2,6 +2,8 @@ import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inj
 import { cssColor } from '../../css-color';
 import type { Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
 
+const FRAME_INTERVAL_MS = 1000 / 30;
+const MAX_BACKGROUND_PIXELS = 1280 * 720;
 type Rgb = [number, number, number];
 const vec3 = ([r, g, b]: Rgb): string => `vec3(${r.toFixed(4)}, ${g.toFixed(4)}, ${b.toFixed(4)})`;
 
@@ -85,12 +87,14 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
   private frame = 0;
   private previousTime = 0;
   private elapsed = 12;
-  private readonly reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  private frameAccumulator = FRAME_INTERVAL_MS;
+  private ready = false;
+  private width = 0;
+  private height = 0;
 
   ngAfterViewInit(): void {
-    document.addEventListener('visibilitychange', this.onVisibility);
-    this.reducedMotion.addEventListener('change', this.onVisibility);
     this.zone.runOutsideAngular(() => {
+      document.addEventListener('visibilitychange', this.onVisibility);
       this.intersectionObserver = new IntersectionObserver(entries => {
         this.visible = entries[0]?.isIntersecting ?? false;
         this.sync();
@@ -105,7 +109,6 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
       const { WebGLRenderer, Scene, OrthographicCamera, PlaneGeometry, ShaderMaterial, Mesh, Vector2 } = await import('three');
       if (this.destroyed) return;
       this.renderer = new WebGLRenderer({ canvas: this.surface.nativeElement, antialias: false, powerPreference: 'low-power' });
-      this.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
       this.scene = new Scene();
       this.camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       this.mesh = new Mesh(new PlaneGeometry(2, 2), new ShaderMaterial({
@@ -119,6 +122,10 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
       this.resizeObserver = new ResizeObserver(() => this.resize());
       this.resizeObserver.observe(this.surface.nativeElement);
       this.resize();
+      // Prepare the shader before the first visible draw instead of compiling on that frame.
+      await this.renderer.compileAsync(this.scene, this.camera);
+      if (this.destroyed) return;
+      this.ready = true;
       this.sync();
     } catch (error: unknown) {
       if (isDevMode()) console.warn('[GALASH] No se pudo iniciar el fondo WebGL.', error);
@@ -129,10 +136,16 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private resize(): void {
     if (!this.renderer || !this.mesh) return;
-    const { width, height } = this.surface.nativeElement.getBoundingClientRect();
-    this.renderer.setSize(Math.max(1, width), Math.max(1, height), false);
-    this.mesh.material.uniforms['uResolution'].value.set(Math.max(1, width), Math.max(1, height));
-    this.draw();
+    const bounds = this.surface.nativeElement.getBoundingClientRect();
+    const width = Math.max(1, Math.round(bounds.width));
+    const height = Math.max(1, Math.round(bounds.height));
+    if (width === this.width && height === this.height) return;
+    this.width = width;
+    this.height = height;
+    // This soft background does not need retina resolution or a full 4K drawing buffer.
+    this.renderer.setPixelRatio(Math.min(1, Math.sqrt(MAX_BACKGROUND_PIXELS / (width * height))));
+    this.renderer.setSize(width, height, false);
+    this.mesh.material.uniforms['uResolution'].value.set(width, height);
   }
   private draw(): void {
     if (this.renderer && this.scene && this.camera) this.renderer.render(this.scene, this.camera);
@@ -142,21 +155,25 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
     cancelAnimationFrame(this.frame);
     this.frame = 0;
     this.previousTime = 0;
-    if (this.destroyed || !this.renderer || !this.visible || document.hidden) return;
-    // Reduced motion: one static frame, no animation loop.
-    if (this.reducedMotion.matches) { this.draw(); return; }
+    this.frameAccumulator = FRAME_INTERVAL_MS;
+    if (this.destroyed || !this.ready || !this.renderer || !this.visible || document.hidden) return;
+    // The home background animates automatically while visible, as requested.
     this.frame = requestAnimationFrame(this.animate);
   }
   private readonly animate = (time: number): void => {
     if (this.destroyed) return;
     this.frame = requestAnimationFrame(this.animate);
-    if (this.previousTime && time - this.previousTime < 1000 / 30) return;
-    if (this.previousTime) this.elapsed += Math.min((time - this.previousTime) / 1000, 0.1);
+    const delta = this.previousTime ? Math.min(time - this.previousTime, 100) : 0;
     this.previousTime = time;
+    this.elapsed += delta / 1000;
+    this.frameAccumulator += delta;
+    if (this.frameAccumulator < FRAME_INTERVAL_MS) return;
+    this.frameAccumulator %= FRAME_INTERVAL_MS;
     if (this.mesh) this.mesh.material.uniforms['uTime'].value = this.elapsed;
     this.draw();
   };
   private release(): void {
+    this.ready = false;
     cancelAnimationFrame(this.frame);
     this.resizeObserver?.disconnect();
     this.mesh?.geometry.dispose();
@@ -169,7 +186,6 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
     this.destroyed = true;
     this.intersectionObserver?.disconnect();
     document.removeEventListener('visibilitychange', this.onVisibility);
-    this.reducedMotion.removeEventListener('change', this.onVisibility);
     this.release();
   }
 }

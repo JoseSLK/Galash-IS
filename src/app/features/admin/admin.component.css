@@ -5,18 +5,6 @@ h1 { margin: 8px 0 12px; font: 600 clamp(32px, 4vw, 48px)/1.1 var(--fuente-titul
 h1 span { color: var(--galash-accent); }
 .title-row { display: flex; align-items: center; gap: 12px; margin: 8px 0 12px; }
 .title-row h1 { margin: 0; }
-.section-menu { position: relative; flex-shrink: 0; }
-.section-menu summary { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; list-style: none; }
-.section-menu summary::-webkit-details-marker { display: none; }
-.section-chevron { width: 10px; height: 10px; border-right: 2px solid var(--galash-muted); border-bottom: 2px solid var(--galash-muted); transform: rotate(45deg) translateY(-3px); }
-.section-menu[open] .section-chevron { transform: rotate(225deg) translate(-2px, -2px); }
-.section-menu summary:hover { background: #ffffff08; }
-.sections-dropdown { position: absolute; z-index: 5; top: calc(100% + 10px); right: 0; width: 300px; max-width: calc(100vw - 36px); padding: 6px; border: 1px solid var(--galash-border); border-radius: 12px; background: #102633; box-shadow: 0 14px 30px #0005; }
-.center-menu .sections-dropdown { box-sizing: border-box; left: 50%; right: auto; transform: translateX(calc(-50% + var(--menu-shift, 0px))); }
-.sections-dropdown button { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; min-height: 44px; padding: 12px; border: 0; border-radius: 6px; background: transparent; color: #c3ccd4; text-align: left; font: 400 12px var(--fuente-texto); }
-.sections-dropdown .current-section { border-left: 3px solid var(--galash-accent); background: #1b3542; color: #fff; cursor: pointer; font-weight: 600; }
-.sections-dropdown button:disabled { opacity: 1; color: #8fa2b2; }
-.sections-dropdown small { font-size: 9px; color: #91a5b8; }
 
 .intro { color: #99adbe; font-size: 14px; line-height: 1.6; }
 .management-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(300px, 1fr); gap: 28px; align-items: start; }
@@ -58,6 +46,33 @@ button:disabled { opacity: .45; cursor: default; }
 @media(prefers-reduced-motion: reduce) { .switch span { transition: none; } }
 .search-status { min-height: 1.6em; margin: 0 0 10px; color: #c3ccd4; font-size: 12px; }
 
-.sections-dropdown .review-count { display:inline-grid; min-width:22px; height:22px; padding-inline:4px; box-sizing:border-box; place-items:center; border-radius:20px; background:var(--galash-text-strong); color:#0a1420; font-size:11px; font-weight:600; }
-.sections-dropdown button:not(:disabled) { cursor:pointer; }
-.sections-dropdown .review-count { color: var(--galash-bg); }
+.admin-sidebar .review-count { display:inline-grid; min-width:22px; height:22px; padding-inline:4px; box-sizing:border-box; place-items:center; border-radius:20px; background:var(--galash-text-strong); color:#0a1420; font-size:11px; font-weight:600; }
+.admin-sidebar button:not(:disabled) { cursor:pointer; }
+.admin-sidebar .review-count { color: var(--galash-bg); }
+
+
+
+.admin-shell{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;padding:112px 24px 60px;align-items:start}
+.admin-shell:has(.admin-navigation){grid-template-columns:20px minmax(0,1fr);transition:grid-template-columns 220ms ease}
+.admin-shell.with-sidebar{grid-template-columns:240px minmax(0,1fr)}
+.admin-page{width:100%;box-sizing:border-box;padding:0;min-width:0}
+.admin-navigation{position:sticky;top:88px;min-width:0}
+.menu-toggle{position:absolute;z-index:1;right:-18px;top:18px;display:grid;place-items:center;width:44px;height:44px;padding:10px;border:1px solid var(--galash-border-strong);border-radius:0 16px 16px 0;background:var(--galash-surface);color:var(--galash-accent);cursor:pointer}
+.menu-toggle:hover{background:var(--galash-deep);border-color:var(--galash-accent)}
+.menu-toggle svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.admin-sidebar{box-sizing:border-box;width:240px;overflow:visible;padding:20px 12px 12px;border:1px solid var(--galash-border);border-radius:16px;background:var(--galash-surface);display:flex;flex-direction:column;gap:5px;transition:transform 220ms ease,visibility 220ms}
+.collapsed .admin-sidebar{transform:translateX(calc(-100% - 24px));visibility:hidden}
+.collapsed .menu-toggle{left:-24px;right:auto;border-radius:0 16px 16px 0}
+.navigation-label{font:500 10px var(--galash-mono);letter-spacing:.12em;color:var(--galash-muted);margin:8px 20px 18px 12px}
+.admin-sidebar button{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;flex-shrink:0;width:100%;padding:12px 30px 20px;border:0;border-radius:10px;background:transparent;text-align:center;color:var(--galash-text);font:400 13px/1.5 var(--fuente-texto)}
+.admin-sidebar button:hover{background:var(--galash-deep)}
+.admin-sidebar .current-section{color:var(--galash-text-strong);font-weight:600}
+.admin-sidebar .current-section::after{content:'';position:absolute;bottom:6px;left:50%;width:32px;height:3px;border-radius:2px;background:var(--galash-accent);transform:translateX(-50%)}
+.title-row h1{overflow-wrap:anywhere}
+@media(max-width:900px){.admin-shell.with-sidebar{grid-template-columns:200px minmax(0,1fr)}.admin-sidebar{width:200px}.admin-shell{gap:20px;padding-inline:16px}.collapsed .admin-sidebar{transform:translateX(calc(-100% - 16px))}.collapsed .menu-toggle{left:-16px}}
+@media(max-width:650px){.admin-shell,.admin-shell:has(.admin-navigation),.admin-shell.with-sidebar{grid-template-columns:minmax(0,1fr);padding:96px 16px 40px}.admin-navigation{position:relative}.admin-navigation.collapsed{height:44px}.admin-sidebar{width:100%}.menu-toggle{right:8px;top:8px}.collapsed .menu-toggle{top:0}.title-row h1{font-size:28px}.intro{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.admin-shell,.admin-sidebar{transition:none}}
+
+.admin-sidebar .review-count{position:absolute;right:4px;top:12px}.navigation-label{text-align:center;margin-inline:0}
+
+.admin-page{text-align:center}.admin-page>.title-row{justify-content:center}.admin-page>.intro{max-width:760px;margin:16px auto 28px}.person-heading,.editor-actions{justify-content:center}.person-heading{flex-wrap:wrap}.role-option{text-align:left}

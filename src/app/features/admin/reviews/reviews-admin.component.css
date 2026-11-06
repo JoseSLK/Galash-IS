@@ -11,3 +11,5 @@
 .review-status { display: inline-flex; align-items: center; gap: 6px; }
 .review-status.pending { border-style: dashed; }
 .status-icon { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.moderation-heading{flex-direction:column;justify-content:center}.moderation-heading>span{max-width:680px}.review-filters,.moderation-actions,.review-top{justify-content:center}.review-top{flex-wrap:wrap}.moderation-grid{display:flex;justify-content:center;flex-wrap:wrap}.review-card{box-sizing:border-box;flex:0 1 calc(50% - 9px);min-width:0}.empty-state{width:100%}@media(max-width:650px){.review-card{flex-basis:100%}}

@@ -1,32 +1,23 @@
 import {expect,test} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-test.beforeEach(async({page})=>{await page.route('**/api/**',route=>route.fulfill({status:401}));});
-test('projects navigation, combined filters and selected details work',async({page},info)=>{
- await page.goto('/');const toggle=page.locator('.menu-toggle');if(await toggle.isVisible())await toggle.click();
- await page.locator('#site-navigation').getByRole('link',{name:'Proyectos',exact:true}).click();
- await expect(page).toHaveURL(/\/proyectos$/);await expect(page.getByRole('heading',{name:'Proyectos',exact:true})).toBeVisible();
- await expect(page.locator('.project-item')).toHaveCount(9);
- await expect(page.locator('#project-detail')).toContainText('Detección de intrusos en redes universitarias');
+import {projectApi} from './project-api.fixture';
+
+test('projects API catalog combines state and seedbed filters',async({page})=>{
+ await projectApi(page);await page.goto('/proyectos');
+ await expect(page.locator('.project-item')).toHaveCount(3);
+ await expect(page.locator('#project-title')).toHaveText('Proyecto activo de prueba');
  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','62');
- await expect(page.locator('#project-detail').getByRole('button',{name:'Iniciar sesión',exact:true})).toBeVisible();
- const states=page.getByRole('group',{name:'Filtrar por estado'});const seedbeds=page.getByRole('group',{name:'Filtrar por semillero'});
- await states.getByRole('button',{name:'Radicados (2)',exact:true}).click();await expect(page.locator('.project-item')).toHaveCount(2);
- await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','8');
- await seedbeds.getByRole('button',{name:'WASI',exact:true}).click();await expect(page.getByRole('heading',{name:'No hay proyectos con estos filtros'})).toBeVisible();
- await page.getByRole('button',{name:'Limpiar filtros',exact:true}).click();await expect(page.locator('.project-item')).toHaveCount(9);
- const finished=page.locator('.project-item').filter({hasText:'Gestor de contraseñas seguras'});await finished.click();
- await expect(finished).toHaveAttribute('aria-pressed','true');await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
- await seedbeds.getByRole('button',{name:'IA',exact:true}).click();await expect(page.locator('.project-item')).toHaveCount(3);
- await states.getByRole('button',{name:'Finalizados (1)',exact:true}).click();await expect(page.locator('.project-item')).toHaveCount(1);
- await expect(page.locator('#project-title')).toHaveText('Clasificación de residuos con visión por computador');
+ const states=page.getByRole('group',{name:'Filtrar por estado'}),seedbeds=page.getByRole('group',{name:'Filtrar por semillero'});
+ await states.getByRole('button',{name:'Radicados (1)',exact:true}).click();await expect(page.locator('.project-item')).toHaveCount(1);
+ await seedbeds.getByRole('button',{name:'Ciberseguridad',exact:true}).click();await expect(page.getByRole('heading',{name:'No hay proyectos con estos filtros'})).toBeVisible();
+ await page.getByRole('button',{name:'Limpiar filtros',exact:true}).click();await expect(page.locator('.project-item')).toHaveCount(3);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- await page.screenshot({path:`docs/testing/evidence/R20261102-projects/projects-${info.project.name}.png`,fullPage:true});
 });
-test('projects keyboard selection and public accessibility',async({page},info)=>{
- await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/proyectos');await expect(page.locator('.project-item')).toHaveCount(9);
+
+test('public API projects support keyboard selection and accessibility without protected requests',async({page})=>{
+ const state=await projectApi(page);await page.goto('/proyectos');await expect(page.locator('.project-item')).toHaveCount(3);
  const second=page.locator('.project-item').nth(1);await second.focus();await page.keyboard.press('Enter');
- await expect(page.locator('#project-title')).toHaveText('Modelo de predicción de deserción estudiantil');
- const audit=await new AxeBuilder({page}).include('main#contenido').withTags(['wcag2a','wcag2aa']).analyze();
- expect(audit.violations.map(v=>v.id+': '+v.nodes.map(node=>node.target).join(', '))).toEqual([]);
- await page.locator('h1').scrollIntoViewIfNeeded();await page.screenshot({path:`docs/testing/evidence/R20261102-projects/layout-${info.project.name}.png`,fullPage:true});
+ await expect(page.locator('#project-title')).toHaveText('Proyecto radicado de prueba');
+ const audit=await new AxeBuilder({page}).include('main#contenido').withTags(['wcag2a','wcag2aa']).analyze();expect(audit.violations.map(v=>v.id)).toEqual([]);
+ expect(state.calls.some(call=>call.endsWith('/history')||call.endsWith('/projects/progress'))).toBe(false);
 });

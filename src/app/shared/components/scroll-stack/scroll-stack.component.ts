@@ -14,15 +14,30 @@ export class ScrollStackComponent implements OnDestroy {
   private root?: Root;
   private destroyed = false;
   private mounting = false;
+  private nearViewport = false;
+  private observer?: IntersectionObserver;
 
   constructor() {
     afterEveryRender(() => {
-      const mount = this.host.nativeElement.querySelector<HTMLDivElement>('.galash-scroll-stack');
-      // Angular's template refresh can remove the DOM owned by React during HMR.
-      if (mount && !mount.childElementCount && !this.mounting && !this.destroyed) {
-        void this.mountReact(mount);
+      if (!this.observer) {
+        this.zone.runOutsideAngular(() => {
+          this.observer = new IntersectionObserver(entries => {
+            this.nearViewport = entries[0]?.isIntersecting ?? false;
+            this.mountIfVisible();
+          }, { rootMargin: '200px' });
+          this.observer.observe(this.host.nativeElement);
+        });
       }
+      this.mountIfVisible();
     });
+  }
+
+  private mountIfVisible(): void {
+    const mount = this.host.nativeElement.querySelector<HTMLDivElement>('.galash-scroll-stack');
+    // Also recover React-owned DOM after Angular's development template refresh.
+    if (this.nearViewport && mount && !mount.childElementCount && !this.mounting && !this.destroyed) {
+      void this.mountReact(mount);
+    }
   }
 
   private async mountReact(mount: HTMLDivElement): Promise<void> {
@@ -50,5 +65,5 @@ export class ScrollStackComponent implements OnDestroy {
     }
   }
 
-  ngOnDestroy(): void { this.destroyed = true; this.root?.unmount(); }
+  ngOnDestroy(): void { this.destroyed = true; this.observer?.disconnect(); this.root?.unmount(); }
 }

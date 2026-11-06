@@ -38,11 +38,11 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | GET | `/users/me` | perfil y roles | M1 | [x] |
 | GET | `/members` | dir. publico | M5 | [x] |
 | POST | `/members` | crea perfil | M5 | [ ] |
-| GET | `/members/{id}` | detalle público/privado autorizado | M5 | [ ] |
+| GET | `/members/{id}` | detalle público/privado autorizado | M5 | [x] |
 | PATCH | `/members/{id}` | edita perfil | M5 | [ ] |
 | PATCH | `/members/{id}/status` | activa o desactiva perfil | M5 | [x] |
-| GET | `/members/{id}/publications` | publicaciones visibles | M5 | [ ] |
-| GET | `/admin/members` | busq. admin (requiere `q`) | M11 | [x] |
+| GET | `/members/{id}/publications` | publicaciones visibles | M5 | [x] |
+| GET | `/admin/members` | listado admin completo; filtro `q` opcional | M11 | [x] |
 | PUT | `/users/roles` | alias rol | - | [ ] |
 | PUT | `/users/{userId}/roles` | asigna rol (id = Firebase UID) | M11 | [x] |
 | GET | `/seedbeds` | lista | M2 | [x] |
@@ -65,12 +65,12 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | GET | `/activities/{id}` | detalle de actividad | M4 | [x] |
 | PATCH | `/activities/{id}` | modifica actividad | M4 | [x] |
 | GET | `/projects` | lista proyectos | M4 | [x] |
-| POST | `/projects` | registra proyecto | M4 | [ ] |
-| GET | `/projects/{id}` | detalle de proyecto | M4 | [ ] |
-| PATCH | `/projects/{id}` | modifica proyecto | M4 | [ ] |
-| PATCH | `/projects/{id}/progress` | actualiza avance | M4 | [ ] |
-| GET | `/projects/progress` | resumen de avance | M4 | [ ] |
-| GET | `/projects/{id}/history` | historial de proyecto | M4 | [ ] |
+| POST | `/projects` | registra proyecto | M4 | [x] |
+| GET | `/projects/{id}` | detalle de proyecto | M4 | [x] |
+| PATCH | `/projects/{id}` | modifica proyecto | M4 | [x] |
+| PATCH | `/projects/{id}/progress` | actualiza avance | M4 | [x] |
+| GET | `/projects/progress` | resumen de avance | M4 | [x] |
+| GET | `/projects/{id}/history` | historial de proyecto | M4 | [x] |
 | GET | `/research-proposals` | lista propuestas | M4 | [ ] |
 | POST | `/research-proposals` | registra propuesta | M4 | [ ] |
 | GET | `/research-proposals/{id}` | detalle de propuesta | M4 | [ ] |
@@ -100,7 +100,7 @@ calcula (`próxima`, `en curso`, `finalizada`).
 
 M2: los semilleros incluyen `topics` (máx. 4 `{title, phrase}`); en `PATCH
 /seedbeds/{id}` omitirlo conserva los temas. `GET /admin/members` responde
-`{"users": [...]}`, exige `q` e incluye cuentas inactivas.
+`{"users": [...]}`, lista todas las cuentas sin `q` e incluye inactivas; `q` filtra opcionalmente por nombre o correo.
 
 M6 usa `title`, `description`, `type`, `startAt`, `endAt`, `venue`, `meetingUrl`,
 `imageUrl` y `registrationUrl`. Las fechas son RFC3339; los estados son
@@ -110,7 +110,7 @@ la fecha de inicio. La escritura requiere sesión de `Docente` o `Admin`; el
 docente solo administra sus propios eventos.
 
 Fuera de contrato: `- /health` infraestructura · `- /users/roles` alias de
-`PUT /users/{userId}/roles`. `GET /admin/members` responde `400` sin `q`.
+`PUT /users/{userId}/roles`. `GET /admin/members` sin `q` devuelve la lista completa, sin el límite de resultados de una búsqueda filtrada. Requiere sesión Admin (`401` sin sesión, `403` para otros roles).
 
 ## PostgreSQL (Docker, host `5433`)
 
@@ -130,5 +130,6 @@ eventos: 7 | M7 contenidos: 6 | M8 comunicados: 7 | M9 cronograma: 5 | M10
 enlaces: 4 | M11 roles: 6 (roles, permissions, GET users/{userId}/roles,
 users/me/dashboard) | M12: audit-logs | M13 files: 2
 
+M3: `tituloMaximoNivelEstudio` es opcional en `POST /registration-requests`: puede omitirse o enviarse vacío.
 
 Panel del líder: solicitudes usan seedbedId; eventos nuevos incluyen seedbedId fijo y solo se gestionan los creados durante la visita. No se consume el listado global de eventos/proyectos para el líder. Semillero, integrantes, delegados y actividades usan los servicios existentes con el id del semillero verificado.
