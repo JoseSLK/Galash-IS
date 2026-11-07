@@ -1,6 +1,5 @@
 <section class="reviews-section" aria-labelledby="reviews-title">
   <div class="reviews-heading"><p class="eyebrow">VOCES DE NUESTRA COMUNIDAD</p><h2 id="reviews-title">Ideas que nos ayudan a <span>crecer</span></h2><p>Experiencias y sugerencias de quienes construyen este semillero.</p></div>
-  <p class="demo-note">Demostración con datos de ejemplo. Los envíos y decisiones solo duran mientras esta página siga abierta; al recargar se restablecen.</p>
   @if (published().length) {
     <div class="review-window" tabindex="0" role="region" aria-label="Reseñas en tres columnas; desplázate horizontalmente en pantallas pequeñas">
       <div class="review-grid">
@@ -21,12 +20,12 @@
         }
       </div>
     </div>
-  } @else { <div class="review-grid"><p>Aún no hay reseñas publicadas para este semillero.</p></div> }
+  } @else { <div class="review-grid"><p>{{ loadError() ? 'No pudimos cargar las reseñas publicadas.' : 'Aún no hay reseñas publicadas para este semillero.' }}</p></div> }
   <form class="review-composer" (ngSubmit)="submit()">
     <label for="review-text">Tu voz también cuenta</label><p id="review-help">Comparte una reseña o sugerencia con respeto. Se revisará antes de publicarse. Máximo 2000 caracteres.</p>
     @if (auth.isAuthenticated()) {
       <textarea id="review-text" name="review" [(ngModel)]="text" required maxlength="2000" rows="3" aria-describedby="review-help review-length" placeholder="¿Qué destacarías o qué podríamos mejorar?"></textarea>
-      <div class="composer-actions"><small id="review-length">{{ text.length }}/2000</small><button type="submit" [disabled]="!text.trim() || text.length > 2000">Enviar reseña <span aria-hidden="true">↗</span></button></div>
+      <div class="composer-actions"><small id="review-length">{{ text.length }}/2000</small><button type="submit" [disabled]="sending || !text.trim() || text.length > 2000">{{ sending ? 'Enviando…' : 'Enviar reseña' }} <span aria-hidden="true">↗</span></button></div>
     } @else { <p>Inicia sesión desde el menú superior para escribir tu reseña.</p> }
     <p class="feedback" role="status">{{ feedback }}</p>
   </form>

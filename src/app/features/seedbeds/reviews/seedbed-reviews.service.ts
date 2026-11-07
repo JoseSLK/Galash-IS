@@ -1,33 +1,57 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { ApiService } from '../../../core/services/api.service';
+import { SeedbedsService } from '../seedbeds.service';
 
 export type ReviewStatus = 'pendiente' | 'publicada' | 'oculta' | 'rechazada';
-// Local view model only. This is not an API payload or shared contract.
+export const REVIEW_STATUSES: ReviewStatus[] = ['pendiente', 'publicada', 'oculta', 'rechazada'];
+interface ReviewApi { id: string; seedbedId: string; authorId: string; text: string; status: ReviewStatus; createdAt: string | null; }
+// View model: the API sends ids only, names are resolved for display.
 export interface SeedbedReview {
   id: string; seedbedId: string; seedbedName: string; author: string;
   date: string; text: string; status: ReviewStatus;
 }
 @Injectable({ providedIn: 'root' })
 export class SeedbedReviewsService {
-  readonly reviews = signal<SeedbedReview[]>([
-    { id: 'demo-pending', seedbedId: 'demo', seedbedName: 'Semillero de ejemplo', author: 'Participante de ejemplo', date: '2026-09-06T14:00:00Z', text: 'Sería útil compartir las próximas sesiones con más anticipación para preparar nuestras preguntas.', status: 'pendiente' }
-  ]);
+  private readonly api = inject(ApiService);
+  private readonly seedbeds = inject(SeedbedsService);
+  readonly reviews = signal<SeedbedReview[]>([]);
   readonly pendingCount = computed(() => this.reviews().filter(review => review.status === 'pendiente').length);
 
-  prepare(seedbedId: string, seedbedName: string): void {
-    if (this.reviews().some(review => review.seedbedId === seedbedId)) return;
-    const examples = [
-      ['Ana · ejemplo', 'Un espacio para aprender en equipo. Las sesiones prácticas me ayudaron a convertir una idea en un proyecto de investigación.'],
-      ['David · ejemplo', 'Me gustó poder compartir mis preguntas y recibir orientación. Sugiero realizar más encuentros entre semilleros.'],
-      ['Camila · ejemplo', 'La colaboración entre estudiantes y docentes hace que cada encuentro sea una oportunidad para explorar algo nuevo.']
-    ];
-    this.reviews.update(reviews => [...reviews, ...examples.map(([author, text], index): SeedbedReview => ({ id: `demo-${seedbedId}-${index}`, seedbedId, seedbedName, author, text, date: '2026-09-06T14:00:00Z', status: 'publicada' }))]);
+  async published(seedbedId: string): Promise<SeedbedReview[]> {
+    const { reviews } = await this.api.get<{ reviews: { id: string; seedbedId: string; authorName: string; text: string; createdAt: string }[] | null }>(`/seedbeds/${encodeURIComponent(seedbedId)}/reviews`);
+    return (reviews ?? []).map(item => ({ id: item.id, seedbedId: item.seedbedId, seedbedName: '', author: item.authorName || 'Integrante', date: item.createdAt, text: item.text, status: 'publicada' }));
   }
-  submit(seedbedId: string, seedbedName: string, author: string, text: string): void {
+
+  async submit(seedbedId: string, text: string): Promise<void> {
     const clean = text.trim();
     if (!clean || clean.length > 2000) throw new Error('Escribe entre 1 y 2000 caracteres.');
-    this.reviews.update(reviews => [{ id: crypto.randomUUID(), seedbedId, seedbedName, author, text: clean, date: new Date().toISOString(), status: 'pendiente' }, ...reviews]);
+    await this.api.post(`/seedbeds/${encodeURIComponent(seedbedId)}/reviews`, { text: clean });
   }
-  moderate(id: string, status: Exclude<ReviewStatus, 'pendiente'>): void {
-    this.reviews.update(reviews => reviews.map(review => review.id === id ? { ...review, status } : review));
+
+  // The backend filters by one status per call (default pendiente), so all states take one call each.
+  async load(): Promise<void> {
+    const [lists, seedbeds] = await Promise.all([
+      Promise.all(REVIEW_STATUSES.map(status => this.api.get<{ reviews: ReviewApi[] | null }>(`/admin/seedbed-reviews?status=${status}`))),
+      this.seedbeds.list()
+    ]);
+    const items = lists.flatMap(list => list.reviews ?? []);
+    const names = new Map(await Promise.all([...new Set(items.map(item => item.authorId))].map(async id => [id, await this.authorName(id)] as const)));
+    const seedbedNames = new Map(seedbeds.map(seedbed => [seedbed.id, seedbed.name]));
+    this.reviews.set(items.map(item => ({
+      id: item.id, seedbedId: item.seedbedId, seedbedName: seedbedNames.get(item.seedbedId) ?? 'Semillero',
+      author: names.get(item.authorId) ?? 'Integrante', date: item.createdAt ?? '', text: item.text, status: item.status
+    })).sort((a, b) => b.date.localeCompare(a.date)));
+  }
+
+  async moderate(id: string, status: Exclude<ReviewStatus, 'pendiente'>): Promise<void> {
+    const updated = await this.api.patch<ReviewApi, { status: string; note: string }>(`/admin/seedbed-reviews/${encodeURIComponent(id)}/moderation`, { status, note: '' });
+    this.reviews.update(reviews => reviews.map(review => review.id === id ? { ...review, status: updated.status } : review));
+  }
+
+  private async authorName(id: string): Promise<string> {
+    try {
+      const profile = await this.api.get<{ name?: string; last_name?: string }>(`/members/${encodeURIComponent(id)}`);
+      return [profile.name, profile.last_name].filter(Boolean).join(' ') || 'Integrante';
+    } catch { return 'Integrante'; }
   }
 }

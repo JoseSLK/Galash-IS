@@ -69,6 +69,7 @@ export class AdminComponent implements OnDestroy {
         this.initialLoadStarted = true;
         this.users.clear();
         void this.search('');
+        void this.reviews.load().catch(() => undefined); // badge only; the reviews section shows its own errors
       }
     });
     effect(() => {
@@ -91,7 +92,7 @@ export class AdminComponent implements OnDestroy {
   }
 
   showSection(section: AdminSection): void {
-    if (this.leaderMode && (section === 'users' || section === 'communications')) return;
+    if (this.leaderMode && (section === 'users' || section === 'communications' || section === 'reviews')) return;
     this.activeSection.set(section);
   }
 

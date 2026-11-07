@@ -11,7 +11,7 @@ import { SeedbedsService } from '../seedbeds/seedbeds.service';
 import { JoinRequestReceipt, JoinRequestService } from './join-request.service';
 import { AuthService } from '../../core/services/auth.service';
 
-const NO_SEEDBED = { value: '', label: 'Solo al grupo / sin semillero específico' };
+const SEEDBED_PLACEHOLDER = { value: '', label: 'Selecciona un semillero' };
 
 function today(): string {
   const date = new Date();
@@ -41,7 +41,7 @@ export class JoinRequestComponent implements AfterViewInit {
   readonly auth = inject(AuthService);
   readonly canJoin = computed(() => this.auth.isAuthenticated() && this.auth.sessionStatus() === 'authenticated');
   private formUserId: string | null = null;
-  private readonly seedbedOptions = signal<readonly { value: string; label: string }[]>([NO_SEEDBED]);
+  private readonly seedbedOptions = signal<readonly { value: string; label: string }[]>([SEEDBED_PLACEHOLDER]);
   // M3 reads these from the account; an account without them gets a 400, so they are completed first.
   readonly profileComplete = computed(() => {
     const user = this.auth.backendUser();
@@ -99,9 +99,9 @@ export class JoinRequestComponent implements AfterViewInit {
   }
   private async preselect(id: string): Promise<void> {
     if (this.seedbedOptions().length === 1) {
-      // Without the list the request still works: it goes to the group, not to one seedbed.
+      // seedbedId is required by POST /registration-requests; if the list fails the field stays empty and blocks submit.
       const items = await this.seedbeds.list().catch(() => []);
-      this.seedbedOptions.set([NO_SEEDBED, ...items.map(item => ({ value: item.id, label: item.name }))]);
+      this.seedbedOptions.set([SEEDBED_PLACEHOLDER, ...items.map(item => ({ value: item.id, label: item.name }))]);
     }
     this.form.controls['seedbed'].setValue(this.options(this.seedbedField).some(option => option.value === id) ? id : '');
   }

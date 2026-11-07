@@ -35,7 +35,7 @@ export const joinSteps: { label: string; title: string; accent: string; help: st
     { key: 'researcherCategory', label: 'Categoría actual de investigador', type: 'select', options: options(temporaryCatalogs.researcher) },
     { key: 'call', label: 'Convocatoria MinCiencias', type: 'select', options: options(temporaryCatalogs.calls) },
     // Options come from GET /seedbeds at runtime.
-    { key: 'seedbed', label: 'Semillero de interés', type: 'select', optional: true, options: [] }
+    { key: 'seedbed', label: 'Semillero de interés', type: 'select', options: [] }
   ] },
   { label: 'Revisar y enviar', title: 'Tu solicitud, lista para', accent: 'revisar', help: 'Comprueba tus datos antes de radicar la solicitud.', fields: [] }
 ];
