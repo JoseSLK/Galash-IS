@@ -15,7 +15,7 @@
     <div class="seedbed-selector">
       <nav class="seedbed-tabs" aria-label="Seleccionar semillero" [style.--line-progress]="seedbeds().length > 1 ? selectedIndex() / (seedbeds().length - 1) : 0">
         @for (seedbed of seedbeds(); track seedbed.id; let index = $index) {
-          <button type="button" [class.is-active]="selected()?.id === seedbed.id" [class.is-reached]="index <= selectedIndex()" [attr.aria-pressed]="selected()?.id === seedbed.id" (click)="selectSeedbed(seedbed)" (keydown)="navigateSeedbeds($event, index)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ seedbed.name }}</span></button>
+          <button type="button" [class.is-active]="selected()?.id === seedbed.id" [class.is-reached]="index <= selectedIndex()" [attr.aria-pressed]="selected()?.id === seedbed.id" [attr.aria-label]="seedbed.name" [title]="seedbed.name" (click)="selectSeedbed(seedbed)" (keydown)="navigateSeedbeds($event, index)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ abbreviation(seedbed.name) }}</span></button>
         }
       </nav>
     </div>

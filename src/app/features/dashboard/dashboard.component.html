@@ -102,7 +102,7 @@
       <div class="section-heading"><p class="eyebrow">Explora nuestra comunidad</p></div>
       <div class="seedbed-tabs" role="tablist" aria-label="Semilleros disponibles" [style.--line-progress]="seedbeds().length > 1 ? activeSeedbed / (seedbeds().length - 1) : 0">
         @for (seedbed of seedbeds(); track seedbed.id; let i = $index) {
-          <button type="button" role="tab" [id]="'home-seedbed-tab-' + i" aria-controls="home-seedbed-panel" [attr.aria-selected]="i === activeSeedbed" [attr.tabindex]="i === activeSeedbed ? 0 : -1" [class.is-active]="i === activeSeedbed" [class.is-reached]="i <= activeSeedbed" (click)="selectSeedbed(i)" (keydown)="navigateSeedbeds($event, i)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ seedbed.name }}</span></button>
+          <button type="button" role="tab" [id]="'home-seedbed-tab-' + i" aria-controls="home-seedbed-panel" [attr.aria-selected]="i === activeSeedbed" [attr.tabindex]="i === activeSeedbed ? 0 : -1" [class.is-active]="i === activeSeedbed" [class.is-reached]="i <= activeSeedbed" [attr.aria-label]="seedbed.name" [title]="seedbed.name" (click)="selectSeedbed(i)" (keydown)="navigateSeedbeds($event, i)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ abbreviation(seedbed.name) }}</span></button>
         }
       </div>
       <div class="seedbed-layout" id="home-seedbed-panel" role="tabpanel" [attr.aria-labelledby]="'home-seedbed-tab-' + activeSeedbed">
