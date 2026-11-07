@@ -16,4 +16,6 @@ export const PROJECT_LABELS: Record<ProjectStatus,string> = {Activo:'Activos',Ra
 export interface ProjectApi {
  id:string;seedbedId:string;title:string;summary:string;researchLine:string;status:ProjectStatus;
  responsibleIds:string[]|null;memberIds:string[]|null;startDate:string|null;endDate:string|null;progress:number;updatedAt:string;
+ // Names resolved by the backend, also for profiles hidden from the public directory.
+ responsibles?:{id:string;name:string}[]|null;members?:{id:string;name:string}[]|null;
 }
