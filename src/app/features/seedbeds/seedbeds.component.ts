@@ -20,6 +20,7 @@ type ProjectFilter = 'Todos' | Project['status'];
   styleUrl: './seedbeds.component.css'
 })
 export class SeedbedsComponent {
+  readonly abbreviation = seedbedAbbreviation;
   private readonly service = inject(SeedbedsService);
   private readonly projectCatalog=inject(ProjectsService);
   readonly localProjects=signal<ResearchProject[]>([]);

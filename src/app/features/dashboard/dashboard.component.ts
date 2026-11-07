@@ -6,7 +6,7 @@ import { SiteFooterComponent } from '../../shared/components/site-footer/site-fo
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
 import { ApiService } from '../../core/services/api.service';
-import { Seedbed, SeedbedsService } from '../seedbeds/seedbeds.service';
+import { Seedbed, SeedbedsService, seedbedAbbreviation } from '../seedbeds/seedbeds.service';
 import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
 import { SpecularButtonDirective } from '../../shared/directives/specular-button.directive';
 import { INITIAL_HEADER_SCROLL, nextHeaderState } from './header-scroll';
@@ -22,6 +22,7 @@ const MEMBER_COUNT_LIMIT = 100;
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly abbreviation = seedbedAbbreviation;
   @Input() headerOnly = false;
   @Input() activePage = 'semilleros';
   @ViewChild('mobileNav') private mobileNav?: ElementRef<HTMLElement>;
