@@ -6,7 +6,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn } from '@angul
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
-import { JoinField, joinSteps } from './join-request.catalog';
+import { JoinField, joinSections, joinSteps } from './join-request.catalog';
 import { SeedbedsService } from '../seedbeds/seedbeds.service';
 import { JoinRequestReceipt, JoinRequestService } from './join-request.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -57,6 +57,7 @@ export class JoinRequestComponent implements AfterViewInit {
     ];
   });
   readonly steps = joinSteps;
+  readonly sections = joinSections;
   readonly form = new FormGroup<Record<string, FormControl<string>>>({});
   readonly maxDate = today();
   step = 0;
@@ -130,7 +131,7 @@ export class JoinRequestComponent implements AfterViewInit {
     this.stepTitle?.nativeElement.focus({ preventScroll: true });
     this.stepTitle?.nativeElement.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
-  edit(index: number): void { if (!this.loading) { this.step = index; this.focusTitle(); } }
+  edit(field?: JoinField): void { if (!this.loading) { this.step = 0; this.focusTitle(); if (field) document.getElementById(`request-${field.key}`)?.focus(); } }
   next(): void {
     if (this.loading) return;
     if (this.step === 0 && !this.profileComplete()) { document.getElementById('complete-profile')?.focus(); return; }
@@ -138,7 +139,7 @@ export class JoinRequestComponent implements AfterViewInit {
     fields.forEach(field => this.control(field).markAsTouched());
     const invalid = fields.find(field => this.control(field).invalid);
     if (invalid) { document.getElementById(`request-${invalid.key}`)?.focus(); return; }
-    this.step = Math.min(3, this.step + 1);
+    this.step = 1;
     this.focusTitle();
   }
   valueLabel(field: JoinField): string {
@@ -147,16 +148,12 @@ export class JoinRequestComponent implements AfterViewInit {
     if (field.type === 'date' && value) return value.split('-').reverse().join('/');
     return value || 'Sin indicar';
   }
-  invalidSections(): number[] {
-    return [0, 1, 2].filter(index => (index === 0 && !this.profileComplete()) || this.steps[index].fields.some(field => this.control(field).invalid));
-  }
   async submit(): Promise<void> {
     if (this.loading || !this.canJoin()) return;
-    if (this.step !== 3) { this.next(); return; }
+    if (this.step !== 1) { this.next(); return; }
     this.form.markAllAsTouched();
-    const invalidStep = this.invalidSections()[0];
-    if (invalidStep !== undefined) {
-      this.edit(invalidStep);
+    if (!this.profileComplete() || this.form.invalid) {
+      this.edit();
       const field = this.currentStep.fields.find(item => this.control(item).invalid);
       document.getElementById(field ? `request-${field.key}` : 'complete-profile')?.focus();
       return;

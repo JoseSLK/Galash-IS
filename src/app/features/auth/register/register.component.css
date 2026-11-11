@@ -36,3 +36,5 @@ button:disabled { cursor: wait; opacity: .55; }
 @media (prefers-reduced-motion: reduce) {
   .drawer-backdrop, .register-panel { animation-duration: .01ms; }
 }
+
+.match-picker{border:1px solid var(--galash-border-strong);border-radius:12px;padding:16px;margin:0 0 24px;min-width:0}.match-picker legend{font-weight:600;padding:0 8px}.match-picker p{font-size:13px;line-height:1.6;color:var(--galash-muted)}.match-option{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--galash-border);border-radius:10px;margin-top:8px;cursor:pointer}.match-option.chosen{border-color:var(--galash-accent)}.match-option input{width:18px;min-height:18px;flex-shrink:0;accent-color:var(--galash-accent)}.match-option span{min-width:0;overflow-wrap:anywhere}.match-option small{display:block;margin-top:6px;color:var(--galash-muted)}.match-error{margin-bottom:20px}.match-error button{margin-top:12px;min-height:44px}

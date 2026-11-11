@@ -22,7 +22,10 @@ export interface RegistrationData {
   fecha_nacimiento: string;
   telefono: string;
   codigo_estudiantil: string;
+  claim_id?: string;
 }
+
+export interface RegistrationMatch { id: string; name: string; role: 'docente' | 'estudiante'; }
 
 export interface SessionUser {
   id: string;
@@ -36,6 +39,8 @@ export interface SessionUser {
   student_code?: string;
   birth_date?: string;
   phone?: string;
+  photo_url?: string;
+  managed_seedbed_ids?: string[];
 }
 
 interface BackendUser extends SessionUser {
@@ -137,6 +142,20 @@ export class AuthService {
     }
   }
 
+  async updateOwnPhoto(photo_url: string): Promise<void> {
+    const id = this.backendUser()?.id;
+    const result = await this.api.put<{photo_url: string}, {photo_url: string}>('/users/me/photo', {photo_url: photo_url.trim()});
+    this.backendUser.update(user => user && user.id === id ? {...user, photo_url: result.photo_url} : user);
+  }
+
+  async registrationMatches(): Promise<RegistrationMatch[]> {
+    const user = firebaseAuth.currentUser;
+    if (!user) throw new RegistrationRequiredError();
+    const token = await user.getIdToken();
+    const response = await this.api.get<{ matches: RegistrationMatch[] }>('/auth/register/matches', authorizationHeader(token));
+    return response.matches;
+  }
+
   async registerGoogleUser(data: RegistrationData): Promise<void> {
     const user = firebaseAuth.currentUser;
     if (!user) throw new RegistrationRequiredError();
@@ -152,7 +171,8 @@ export class AuthService {
         email: user.email?.trim() ?? data.email.trim(),
         fecha_nacimiento: data.fecha_nacimiento,
         telefono: data.telefono.trim(),
-        codigo_estudiantil: data.codigo_estudiantil.trim()
+        codigo_estudiantil: data.codigo_estudiantil.trim(),
+        ...(data.claim_id?.trim() ? { claim_id: data.claim_id.trim() } : {})
       }, authorizationHeader(token));
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === 409) throw new RegistrationConflictError();
@@ -211,6 +231,8 @@ export class AuthService {
       student_code: user.student_code,
       birth_date: user.birth_date,
       phone: user.phone,
+      photo_url: user.photo_url,
+      managed_seedbed_ids: user.managed_seedbed_ids ?? [],
       status: user.status
     });
     this.isAuthenticated.set(true);

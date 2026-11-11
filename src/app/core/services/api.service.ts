@@ -9,8 +9,9 @@ const REQUEST_TIMEOUT_MS = 10_000;
 export class ApiService {
   private readonly http = inject(HttpClient);
 
-  get<TResponse>(path: string): Promise<TResponse> {
+  get<TResponse>(path: string, headers?: Record<string, string>): Promise<TResponse> {
     return firstValueFrom(this.http.get<TResponse>(this.endpoint(path), {
+      headers,
       withCredentials: true
     }).pipe(timeout(REQUEST_TIMEOUT_MS)));
   }
