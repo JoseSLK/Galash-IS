@@ -14,19 +14,19 @@ export class ProjectEditorComponent {
  private readonly store=inject(ProjectsService);
  private readonly seedbedsService=inject(SeedbedsService);
  private readonly directory=inject(IntegrantesService);
- private originalStatus:ResearchProject['status']='Radicado';private originalEndDate='';private projectId='';private researchLine='';private opener:HTMLElement|null=null;
+ private originalStatus:ResearchProject['status']='Activo';private originalEndDate='';private projectId='';private researchLine='';private opener:HTMLElement|null=null;
  readonly saved=output<ResearchProject>();readonly creating=signal(false);readonly semilleros=signal<Seedbed[]>([]);readonly saving=signal(false);readonly error=signal('');readonly statuses=PROJECT_STATUSES;
  readonly personas=signal<Integrante[]>([]);readonly cargando=signal(false);readonly errorPersonas=signal('');
  readonly seleccion=signal<Record<TipoSeleccion,string[]>>({directores:[],integrantes:[]});
  readonly busqueda=signal<Record<TipoSeleccion,string>>({directores:'',integrantes:''});
  readonly tipos:TipoSeleccion[]=['directores','integrantes'];
- readonly form=new FormGroup({title:text(),summary:text(),seedbedId:text(),startDate:text(),endDate:new FormControl('',{nonNullable:true}),status:new FormControl<ResearchProject['status']>('Radicado',{nonNullable:true,validators:Validators.required}),progress:new FormControl(0,{nonNullable:true,validators:[Validators.required,Validators.min(0),Validators.max(100),Validators.pattern(/^\d+$/)]})});
+ readonly form=new FormGroup({title:text(),summary:text(),seedbedId:text(),startDate:text(),endDate:new FormControl('',{nonNullable:true}),status:new FormControl<ResearchProject['status']>('Activo',{nonNullable:true,validators:Validators.required}),progress:new FormControl(0,{nonNullable:true,validators:[Validators.required,Validators.min(0),Validators.max(100),Validators.pattern(/^\d+$/)]})});
  open(project?:ResearchProject):void {
-  this.originalStatus=project?.status??'Radicado';this.originalEndDate=project?.endDate??'';this.form.controls.seedbedId.enable();this.creating.set(!project);this.projectId=project?.id??'';this.researchLine=project?.researchLine??'';
+  this.originalStatus=project?.status??'Activo';this.originalEndDate=project?.endDate??'';this.form.controls.seedbedId.enable();this.creating.set(!project);this.projectId=project?.id??'';this.researchLine=project?.researchLine??'';
   this.seleccion.set({directores:[...(project?.responsibleIds??[])],integrantes:(project?.members??[]).map(p=>p.userId)});
   this.busqueda.set({directores:'',integrantes:''});
   this.opener=document.activeElement as HTMLElement;this.error.set('');
-  this.form.reset({title:project?.title??'',summary:project?.summary??'',seedbedId:project?.seedbedId??'',startDate:project?.startDate?.slice(0,10)??'',endDate:project?.endDate?.slice(0,10)??'',status:project?.status??'Radicado',progress:project?.progress??0});
+  this.form.reset({title:project?.title??'',summary:project?.summary??'',seedbedId:project?.seedbedId??'',startDate:project?.startDate?.slice(0,10)??'',endDate:project?.endDate?.slice(0,10)??'',status:project?.status??'Activo',progress:project?.progress??0});
   this.dialog.nativeElement.showModal();void this.cargarPersonas();
  }
  async cargarPersonas():Promise<void>{

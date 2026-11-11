@@ -58,7 +58,7 @@ export interface Project {
   id: string;
   title: string;
   summary: string;
-  status: 'Radicado' | 'Activo' | 'Finalizado';
+  status: 'Activo' | 'Finalizado';
 }
 
 @Injectable({ providedIn: 'root' })

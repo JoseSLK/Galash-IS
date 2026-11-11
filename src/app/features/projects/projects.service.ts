@@ -17,7 +17,7 @@ export class ProjectsService {
   const people=new Map([...(p.responsibles??[]),...(p.members??[])].map(x=>[x.id,x.name] as const));
   const name=(id:string)=>people.get(id)??this.names.get(id)??'Perfil no disponible';
   const members=(p.memberIds??[]).map(userId=>({userId,name:name(userId)}));
-  return {...p,seedbed:this.seedbedNames.get(p.seedbedId)??'Semillero no disponible',responsible:(p.responsibleIds??[]).map(name),responsibleIds:p.responsibleIds??[],members,memberInitials:members.map(p=>p.name.split(/\s+/).slice(0,2).map(s=>s[0]).join('')),startDate:p.startDate??'',endDate:p.endDate??'',director:(p.responsibleIds??[]).map(name).join(' · '),history:[]};
+  return {...p,progress:p.progress??0,seedbed:this.seedbedNames.get(p.seedbedId)??'Semillero no disponible',responsible:(p.responsibleIds??[]).map(name),responsibleIds:p.responsibleIds??[],members,memberInitials:members.map(p=>p.name.split(/\s+/).slice(0,2).map(s=>s[0]).join('')),startDate:p.startDate??'',endDate:p.endDate??'',director:(p.responsibleIds??[]).map(name).join(' · '),history:[]};
  }
  list():Observable<ResearchProject[]> {return defer(async()=>{
   const [response,seedbeds,members]=await Promise.all([this.api.get<{projects:ProjectApi[]|null}>('/projects'),this.seedbeds.list(),firstValueFrom(this.members.listar())]);
