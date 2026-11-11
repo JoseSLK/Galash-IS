@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { ResearchProject } from './project.model';
 @Component({selector:'app-project-detail',standalone:true,changeDetection:ChangeDetectionStrategy.OnPush,imports:[DatePipe,ReactiveFormsModule],templateUrl:'./project-detail.component.html',styleUrl:'./project-detail.component.css'})
 export class ProjectDetailComponent implements OnChanges {
- @Input({required:true}) project!:ResearchProject; @Input() authenticated=false; @Input() showHistory=false; @Input() loginBusy=false;
+ @Input({required:true}) project!:ResearchProject; @Input() authenticated=false; @Input() showProgress=false; @Input() showHistory=false; @Input() loginBusy=false;
  @Input() canEdit=false;@Input() progressBusy=false;@Input() progressError='';@Input() historyState:'loading'|'ready'|'error'='ready';
  readonly progressControl=new FormControl(0,{nonNullable:true,validators:[Validators.required,Validators.min(0),Validators.max(100),Validators.pattern(/^\d+$/)]});
  readonly saveProgress=output<number>();readonly retryHistory=output<void>();

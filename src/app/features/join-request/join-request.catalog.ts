@@ -16,7 +16,7 @@ export const temporaryCatalogs = {
 } as const;
 const options = (values: readonly string[]) => values.map(value => ({ value, label: value }));
 
-export const joinSteps: { label: string; title: string; accent: string; help: string; fields: JoinField[] }[] = [
+export const joinSections: { label: string; title: string; accent: string; help: string; fields: JoinField[] }[] = [
   // Name, document, phone and birth date come from the account (GET /users/me), not from this form.
   { label: 'Datos personales', title: 'Comencemos por', accent: 'conocerte', help: 'Tomamos tus datos básicos de tu cuenta; completa el resto para iniciar tu solicitud.', fields: [
     { key: 'studentCode', label: 'COD. (código estudiantil)', type: 'text', numeric: true, optional: true },
@@ -36,6 +36,10 @@ export const joinSteps: { label: string; title: string; accent: string; help: st
     { key: 'call', label: 'Convocatoria MinCiencias', type: 'select', options: options(temporaryCatalogs.calls) },
     // Options come from GET /seedbeds at runtime.
     { key: 'seedbed', label: 'Semillero de interés', type: 'select', options: [] }
-  ] },
-  { label: 'Revisar y enviar', title: 'Tu solicitud, lista para', accent: 'revisar', help: 'Comprueba tus datos antes de radicar la solicitud.', fields: [] }
+  ] }
+];
+
+export const joinSteps = [
+  { label: 'Completar solicitud', title: 'Completa tu', accent: 'solicitud', help: 'Reúne tus datos personales, formación e información de investigación. Después podrás revisar todo antes de enviar.', fields: joinSections.flatMap(section => section.fields) },
+  { label: 'Revisar y enviar', title: 'Tu solicitud, lista para', accent: 'revisar', help: 'Comprueba tus datos antes de radicar la solicitud.', fields: [] as JoinField[] }
 ];

@@ -45,11 +45,11 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 |---|---|---|---|---|
 | GET | `/health` | salud y bd | - | [ ] |
 | POST | `/auth/register` | alta por token (`claim_id` opcional) | M1 | [x] |
-| GET | `/auth/register/matches` | integrantes SGI que coinciden con el correo | M1 | [ ] |
+| GET | `/auth/register/matches` | integrantes SGI que coinciden con el correo | M1 | [x] |
 | POST | `/auth/sessions` | crea sesion | M1 | [x] |
 | DELETE | `/auth/sessions/current` | cierra sesion | M1 | [x] |
 | GET | `/users/me` | perfil y roles | M1 | [x] |
-| PUT | `/users/me/photo` | guarda URL de foto de perfil | M1 | [ ] |
+| PUT | `/users/me/photo` | guarda URL de foto de perfil | M1 | [x] |
 | GET | `/members` | dir. publico | M5 | [x] |
 | POST | `/members` | crea perfil | M5 | [ ] |
 | GET | `/members/{id}` | detalle público/privado autorizado | M5 | [x] |
@@ -78,9 +78,9 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | POST | `/seedbeds/{seedbedId}/activities` | registra actividad | M4 | [x] |
 | GET | `/activities/{id}` | detalle de actividad | M4 | [x] |
 | PATCH | `/activities/{id}` | modifica actividad | M4 | [x] |
-| GET | `/projects` | lista proyectos (`seedbedId` `""` = proyecto del grupo, sin semillero; solo Admin lo modifica). Cada proyecto trae `responsibles` y `members` `[{id,name}]` para mostrar nombres sin consultar `/members` | M4 | [x] |
+| GET | `/projects` | lista proyectos (`seedbedId` `""` = proyecto del grupo, sin semillero; solo Admin lo modifica). Cada proyecto trae `responsibles` y `members` `[{id,name}]` para mostrar nombres sin consultar `/members`; `progress` se omite para Visitante o sin sesión y se incluye para Estudiante, Docente y Admin | M4 | [x] |
 | POST | `/projects` | registra proyecto | M4 | [x] |
-| GET | `/projects/{id}` | detalle de proyecto | M4 | [x] |
+| GET | `/projects/{id}` | detalle de proyecto; `progress` se omite para Visitante o sin sesión y se incluye para Estudiante, Docente y Admin | M4 | [x] |
 | PATCH | `/projects/{id}` | modifica proyecto | M4 | [x] |
 | PATCH | `/projects/{id}/progress` | actualiza avance | M4 | [x] |
 | GET | `/projects/progress` | resumen de avance | M4 | [x] |
@@ -101,31 +101,31 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | POST | `/events/{id}/publish` | publica evento | M6 | [x] |
 | POST | `/events/{id}/cancel` | cancela evento | M6 | [x] |
 | POST | `/events/{id}/hide` | oculta evento | M6 | [x] |
-| GET | `/content/pages` | páginas institucionales publicadas | M7 | [ ] |
+| GET | `/content/pages` | páginas institucionales publicadas | M7 | [x] |
 | GET | `/content/pages/{slug}` | página institucional publicada | M7 | [ ] |
-| GET | `/admin/content/pages` | páginas públicas y borradores | M7 | [ ] |
-| POST | `/admin/content/pages` | crea página en borrador | M7 | [ ] |
-| PATCH | `/admin/content/pages/{id}` | edita página y sanitiza contenido | M7 | [ ] |
-| POST | `/admin/content/pages/{id}/publish` | publica página vigente | M7 | [ ] |
+| GET | `/admin/content/pages` | páginas públicas y borradores | M7 | [x] |
+| POST | `/admin/content/pages` | crea página en borrador | M7 | [x] |
+| PATCH | `/admin/content/pages/{id}` | edita página y sanitiza contenido | M7 | [x] |
+| POST | `/admin/content/pages/{id}/publish` | publica página vigente | M7 | [x] |
 | GET | `/announcements` | comunicados publicados, borradores propios y todos los borradores para Admin; lectura propia | M8 | [x] |
 | POST | `/announcements` | crea comunicado con adjuntos permitidos | M8 | [x] |
-| GET | `/announcements/{id}` | detalle y adjuntos autorizados | M8 | [ ] |
-| PATCH | `/announcements/{id}` | edita comunicado en borrador | M8 | [ ] |
+| GET | `/announcements/{id}` | detalle y adjuntos autorizados | M8 | [x] |
+| PATCH | `/announcements/{id}` | edita comunicado en borrador | M8 | [x] |
 | POST | `/announcements/{id}/publish` | publica comunicado | M8 | [x] |
 | POST | `/announcements/{id}/read-confirmations` | confirma lectura idempotente | M8 | [x] |
 | GET | `/announcements/{id}/read-status` | trazabilidad por docente para autor/admin | M8 | [x] |
 | GET | `/internal-calendar/events` | agenda interna por rango, vista y semillero | M9 | [x] |
 | POST | `/internal-calendar/events` | crea reunión, tutoría o hito | M9 | [x] |
-| GET | `/internal-calendar/events/{id}` | detalle y participantes autorizado | M9 | [ ] |
-| PATCH | `/internal-calendar/events/{id}` | actualiza evento o participantes | M9 | [ ] |
-| DELETE | `/internal-calendar/events/{id}` | cancela lógicamente conservando trazabilidad | M9 | [ ] |
-| GET | `/links` | enlaces oficiales visibles para público; Admin activo consulta todos los estados, con filtro por categoría y orden | M10 | [ ] |
-| POST | `/links` | crea enlace oficial validando URL externa | M10 | [ ] |
-| PATCH | `/links/{id}` | actualiza enlace oficial y registra historial | M10 | [ ] |
-| PATCH | `/links/{id}/status` | activa, desactiva u oculta enlace sin borrar historial | M10 | [ ] |
+| GET | `/internal-calendar/events/{id}` | detalle y participantes autorizado | M9 | [x] |
+| PATCH | `/internal-calendar/events/{id}` | actualiza evento o participantes | M9 | [x] |
+| DELETE | `/internal-calendar/events/{id}` | cancela lógicamente conservando trazabilidad | M9 | [x] |
+| GET | `/links` | enlaces oficiales visibles para público; Admin activo consulta todos los estados, con filtro por categoría y orden | M10 | [x] |
+| POST | `/links` | crea enlace oficial validando URL externa | M10 | [x] |
+| PATCH | `/links/{id}` | actualiza enlace oficial y registra historial | M10 | [x] |
+| PATCH | `/links/{id}/status` | activa, desactiva u oculta enlace sin borrar historial | M10 | [x] |
 | GET | `/audit-logs` | consulta bitácora filtrable por actor, acción, entidad y periodo; Admin | M12 | [ ] |
-| POST | `/files` | carga multipart segura asociada a una entidad | M13 | [ ] |
-| GET | `/files/{id}` | descarga autorizada de un archivo adjunto | M13 | [ ] |
+| POST | `/files` | carga multipart segura asociada a una entidad | M13 | [x] |
+| GET | `/files/{id}` | descarga autorizada de un archivo adjunto | M13 | [x] |
 
 Payloads M4 en camelCase (`id`, `seedbedId`, `responsibleIds`, `memberIds`,
 `progress`, ...). `GET /research-proposals/{id}` incluye `history` y
@@ -193,3 +193,10 @@ users/me/dashboard) | M12: audit-logs | M13 files: 2
 M3: `tituloMaximoNivelEstudio` es opcional en `POST /registration-requests`: puede omitirse o enviarse vacío.
 
 Panel del líder: solicitudes usan seedbedId; eventos nuevos incluyen seedbedId fijo y solo se gestionan los creados durante la visita. No se consume el listado global de eventos/proyectos para el líder. Semillero, integrantes, delegados y actividades usan los servicios existentes con el id del semillero verificado.
+
+
+Proyectos M4: únicos estados admitidos `Activo` y `Finalizado`; creación y conversión de propuestas en `Activo`. `Radicado` rechazado con 400. Aplicar `database/migrations/017_project_statuses.sql` antes de desplegar el backend; conserva avance y registra conversiones de estado en historial.
+
+Archivos M13: POST /files usa multipart con file, entityType y entityId de entidad existente; 10 MiB por archivo. Responde metadatos con id/name/contentType/size. GET /files/{id} devuelve binario autorizado por sesión. Comunicados: primero se guarda borrador, se sube con entityType=announcement y se asocia cada archivo por PATCH /announcements/{id} en attachments [{name,url absoluta del GET configurado}]. Tipos PDF/DOC/DOCX/XLS/XLSX; máximo 10 adjuntos en un comunicado. Frontend usa selector múltiple y descarga Blob con credenciales, conservando enlaces externos.
+
+Gestión institucional M7/M10: el panel Admin → Contenido integra páginas (lista/alta/edición/publicación) y enlaces (lista/alta/edición/estado), con vista previa. Nosotros consume GET /content/pages y GET /links y muestra solo páginas publicadas y enlaces activos/visibles con URL válida. GET /content/pages/{slug} queda disponible sin consumo individual. Páginas publicadas se actualizan al guardar; no existe despublicación. Cuerpos y respuestas documentados en las secciones M7/M10 del contrato, sin modificar endpoints del servidor.

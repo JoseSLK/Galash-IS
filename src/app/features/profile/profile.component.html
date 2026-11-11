@@ -6,7 +6,7 @@
     } @else if (auth.isAuthenticated()) {
       <div class="profile-content">
         <section class="identity-card" aria-labelledby="profile-name">
-          <div class="profile-avatar" aria-hidden="true">{{ auth.profileInitials() }}</div>
+          <div class="profile-avatar" aria-hidden="true">@if(auth.backendUser()?.photo_url){<img [src]="auth.backendUser()?.photo_url" alt="" referrerpolicy="no-referrer">}@else{ {{ auth.profileInitials() }} }</div>
           <p class="eyebrow">Mi perfil · GALASH</p><span class="role-label">{{ auth.profileRole() }}</span>
           <div class="assignment-badges" aria-label="Funciones en semilleros">
             @for (assignment of assignments(); track assignment.id) {
@@ -49,6 +49,7 @@
             </div>
           </section>
         </div>
+        <app-profile-photo-editor />
         <section class="my-projects-section" aria-labelledby="my-projects-title"><h2 id="my-projects-title">Mi proyecto</h2><p class="my-projects-intro">Proyectos donde tu cuenta figura como integrante o responsable.</p><app-projects-page [embedded]="true" [personal]="true"/></section>
       </div>
     } @else {

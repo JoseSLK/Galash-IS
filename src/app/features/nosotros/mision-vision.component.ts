@@ -5,6 +5,8 @@ import { ContenidoInstitucional } from './institucional.models';
 @Component({ selector: 'app-nosotros-mision-vision', standalone: true, changeDetection: ChangeDetectionStrategy.OnPush, imports: [RevealDirective, InstitutionalIconComponent], templateUrl: './mision-vision.component.html', styleUrls: ['./universo.css', './mision-vision.component.css'] })
 export class NosotrosMisionVisionComponent implements AfterViewInit, OnDestroy {
   @Input({ required: true }) contenido!: ContenidoInstitucional;
+  @Input() misionHtml = '';
+  @Input() visionHtml = '';
   @ViewChild('stage', { static: true }) private stage!: ElementRef<HTMLElement>;
   readonly selected = signal(0);
   readonly labels = ['Misión', 'Visión'];
@@ -15,6 +17,7 @@ export class NosotrosMisionVisionComponent implements AfterViewInit, OnDestroy {
   private visible = false;
   private focused = false;
   get text(): string { return [this.contenido.mision, this.contenido.vision][this.selected()] || ''; }
+  get publishedHtml(): string { return this.selected() === 0 ? this.misionHtml : this.visionHtml; }
   get words(): string[] { return this.text.trim().split(/\s+/).filter(Boolean); }
   ngAfterViewInit(): void {
     this.observer = new IntersectionObserver(entries => { const entering = entries[0].isIntersecting && !this.visible; this.visible = entries[0].isIntersecting; if (entering) this.resetReveal(); this.sync(); }, { threshold: .15 });

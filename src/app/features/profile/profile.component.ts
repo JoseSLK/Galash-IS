@@ -1,3 +1,4 @@
+import {ProfilePhotoEditorComponent} from './profile-photo-editor.component';
 import {ProjectsPageComponent} from '../projects/projects-page.component';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -9,7 +10,7 @@ import { ProfileAssignment, ProfileAssignmentsService } from './profile-assignme
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [ProjectsPageComponent,DashboardComponent, SiteFooterComponent],
+  imports: [ProfilePhotoEditorComponent,ProjectsPageComponent,DashboardComponent, SiteFooterComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

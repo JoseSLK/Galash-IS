@@ -35,8 +35,8 @@ export class EventsAdminComponent implements OnInit {
   readonly feedback = signal('');
   readonly filter = signal<EventStatus | 'todos'>('todos');
   readonly filters = ['todos', 'borrador', 'publicado', 'oculto', 'cancelado'] as const;
-  readonly labels = { todos: 'Todos', borrador: 'Borradores', publicado: 'Publicados', oculto: 'Ocultos', cancelado: 'Cancelados' };
-  readonly statusLabels = { borrador: 'Borrador', publicado: 'Publicado', oculto: 'Oculto', cancelado: 'Cancelado' };
+  readonly labels = { todos: 'Todas', borrador: 'Borradores', publicado: 'Publicadas', oculto: 'Ocultas', cancelado: 'Canceladas' };
+  readonly statusLabels = { borrador: 'Borrador', publicado: 'Publicada', oculto: 'Oculta', cancelado: 'Cancelada' };
   readonly filtered = computed(() => this.events().filter(event => this.filter() === 'todos' || event.status === this.filter()));
   readonly form = new FormGroup({
     title: new FormControl('', { nonNullable: true, validators: [textRequired] }),
@@ -55,7 +55,7 @@ export class EventsAdminComponent implements OnInit {
     if (this.seedbedId()) return;
     this.loading.set(true); this.error.set('');
     try { this.events.set(await this.service.list()); }
-    catch { this.error.set('No pudimos cargar los eventos. Inténtalo de nuevo.'); }
+    catch { this.error.set('No pudimos cargar las noticias. Inténtalo de nuevo.'); }
     finally { this.loading.set(false); }
   }
   private reset(event: ManagedEvent | null): void {
@@ -66,7 +66,7 @@ export class EventsAdminComponent implements OnInit {
     if (this.busy()) return;
     this.busy.set(true); this.error.set(''); this.feedback.set('');
     try { this.reset(await this.service.detail(event.id)); }
-    catch { this.error.set('No pudimos abrir este evento. Inténtalo de nuevo.'); }
+    catch { this.error.set('No pudimos abrir esta noticia. Inténtalo de nuevo.'); }
     finally { this.busy.set(false); }
   }
   newEvent(): void {
@@ -91,7 +91,7 @@ export class EventsAdminComponent implements OnInit {
     try {
       const selected = this.selected();
       const event = selected ? await this.service.update(selected.id, data) : await this.service.create({ ...data, ...(this.seedbedId() ? { seedbedId: this.seedbedId() } : {}) });
-      this.remember(event); this.feedback.set(selected ? 'Cambios guardados.' : 'Evento creado como borrador.');
+      this.remember(event); this.feedback.set(selected ? 'Cambios guardados.' : 'Noticia creada como borrador.');
     } catch (error: unknown) { this.showError(error); }
     finally { this.busy.set(false); }
   }
@@ -99,11 +99,11 @@ export class EventsAdminComponent implements OnInit {
     const selected = this.selected();
     if (!selected || this.busy() || (!this.auth.isAdmin() && !this.seedbedId()) || this.form.dirty) return;
     this.busy.set(true); this.error.set(''); this.feedback.set('');
-    try { this.remember(await this.service.action(selected.id, action)); this.feedback.set('Estado del evento actualizado.'); }
+    try { this.remember(await this.service.action(selected.id, action)); this.feedback.set('Estado de la noticia actualizado.'); }
     catch (error: unknown) { this.showError(error); }
     finally { this.busy.set(false); }
   }
   private showError(error: unknown): void {
-    this.error.set(error instanceof HttpErrorResponse && [401, 403].includes(error.status) ? 'No tienes autorización para realizar esta acción.' : error instanceof HttpErrorResponse && [400, 409, 422].includes(error.status) ? 'El servicio rechazó el cambio. Revisa los datos y el estado del evento.' : 'No pudimos guardar el cambio. Conservamos los datos para que puedas intentarlo de nuevo.');
+    this.error.set(error instanceof HttpErrorResponse && [401, 403].includes(error.status) ? 'No tienes autorización para realizar esta acción.' : error instanceof HttpErrorResponse && [400, 409, 422].includes(error.status) ? 'El servicio rechazó el cambio. Revisa los datos y el estado de la noticia.' : 'No pudimos guardar el cambio. Conservamos los datos para que puedas intentarlo de nuevo.');
   }
 }

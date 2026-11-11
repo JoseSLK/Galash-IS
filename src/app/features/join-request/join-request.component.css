@@ -75,7 +75,7 @@
   list-style:none;
   padding:0;
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:10px;
   margin:25px 0
 }
@@ -345,7 +345,7 @@ h1:focus {
 .form-card {
   padding:26px 18px
 }
-.progress li span,.step-number {
+.step-number {
   display:none
 }
 .progress li {
@@ -387,3 +387,5 @@ h1 {
 
 }
 
+
+.application-section{margin:32px 0 0;padding-top:28px;border-top:1px solid var(--galash-border)}.application-section h2{margin:0 0 10px;font:600 26px var(--fuente-titulo);color:var(--galash-text-strong)}.application-section>p{margin:0 0 22px;color:var(--galash-muted);font:14px/1.6 var(--fuente-texto)}

@@ -9,13 +9,26 @@
       @if (datos(); as data) {
         <app-nosotros-hero [contenido]="data.contenido" />
         <div class="universe-content">
-          <app-nosotros-mision-vision [contenido]="data.contenido" />
-          <app-nosotros-objetivos [objetivos]="data.contenido.objetivos" />
+          <app-nosotros-mision-vision [contenido]="data.contenido"
+            [misionHtml]="published().get('mision')?.content ?? ''"
+            [visionHtml]="published().get('vision')?.content ?? ''" />
+          <app-nosotros-objetivos [objetivos]="data.contenido.objetivos" [publishedHtml]="published().get('objetivos')?.content ?? ''" />
+          @if (sections().length) {
+            <section aria-label="Información institucional">
+              @for (page of sections(); track page.slug) {
+                <article class="u-section" [id]="'contenido-'+page.slug" [attr.aria-labelledby]="'titulo-'+page.slug">
+                  <p class="u-label">GALASH · NOSOTROS</p>
+                  <h2 [id]="'titulo-'+page.slug">{{ page.title }}</h2>
+                  <div class="published-copy" [innerHTML]="page.content"></div>
+                </article>
+              }
+            </section>
+          }
           <app-nosotros-galeria [titulo]="data.contenido.galeriaTitulo" [fotos]="data.contenido.galeria" />
-          <app-nosotros-areas [logoUrl]="data.contenido.logoUrl" [areas]="data.contenido.areas" />
+          <app-nosotros-areas [logoUrl]="data.contenido.logoUrl" [areas]="data.contenido.areas"
+            [publishedHtml]="(published().get('areas-de-conocimiento') ?? published().get('areas'))?.content ?? ''" />
           <app-nosotros-enlaces [enlaces]="data.enlaces" [ubicacion]="data.ubicacion" />
-          <app-nosotros-colaborar />
-          <p class="editorial-meta">{{ data.autor }} · Actualización: {{ data.actualizadoEn }}</p>
+          @if(data.actualizadoEn){<p class="editorial-meta">{{ data.autor }} · Actualización: {{ data.actualizadoEn }}</p>}
         </div>
       }
     }

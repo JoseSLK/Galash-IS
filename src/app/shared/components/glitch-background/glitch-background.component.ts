@@ -2,7 +2,8 @@ import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inj
 import { cssColor } from '../../css-color';
 import type { Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, WebGLRenderer } from 'three';
 
-const FRAME_INTERVAL_MS = 1000 / 30;
+const FRAME_INTERVAL_MS = 1000 / 60;
+const ANIMATION_SPEED = 1.5;
 const MAX_BACKGROUND_PIXELS = 1280 * 720;
 type Rgb = [number, number, number];
 const vec3 = ([r, g, b]: Rgb): string => `vec3(${r.toFixed(4)}, ${g.toFixed(4)}, ${b.toFixed(4)})`;
@@ -15,56 +16,56 @@ uniform vec2 uResolution;
 const vec3 uBase = ${vec3(c.base)};
 const vec3 uWave = ${vec3(c.wave)};
 const vec3 uHighlight = ${vec3(c.highlight)};
-// Wave intensity: keeps the crest dark enough for muted text (#8FA1AD) to stay at 4.5:1 or more over it.
+// Keep decorative light restrained behind the hero text.
 const float WAVE_GAIN = 0.60;
-// Grain and scanlines tinted with the wave hue instead of neutral gray.
-const vec3 TINT = uWave / max(max(uWave.r, uWave.g), uWave.b);
 varying vec2 vUv;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
-vec3 field(vec2 uv) {
-  float aspect = uResolution.x / max(uResolution.y, 1.0);
-  vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
-  float t = uTime;
-  vec3 color = uBase;
-  float drift = sin(p.x * 2.3 + t * 0.24) * 0.045 + cos(p.x * 4.1 - t * 0.17) * 0.025;
-  float ribbon = exp(-abs(p.y + 0.30 + drift) * 24.0);
-  float broad = exp(-abs(p.y + 0.30 + drift) * 6.0);
-  float center = exp(-p.x * p.x * 1.9);
-  vec3 neon = mix(uWave, uHighlight, (sin(p.x * 2.0 + t * 0.13) * 0.5 + 0.5) * 0.15) * WAVE_GAIN;
-  color += neon * (ribbon * 0.47 + broad * 0.16) * (0.4 + center * 0.6);
-  color += uWave * WAVE_GAIN * 0.5 * exp(-length((p - vec2(0.28 * sin(t * 0.1), -0.40)) * vec2(1.1, 2.8)) * 2.3) * 0.55;
-
-  float depth = max(0.045, 0.47 - uv.y);
-  vec2 world = vec2((uv.x - 0.5) * aspect / depth, 1.0 / depth + t * 0.16);
-  vec2 cell = abs(fract(world * 1.4) - 0.5);
-  float lines = max(1.0 - smoothstep(0.0, 0.018, cell.x), 1.0 - smoothstep(0.0, 0.025, cell.y));
-  float floorMask = (1.0 - smoothstep(0.18, 0.45, uv.y)) * smoothstep(0.0, 0.10, uv.y);
-  color += uWave * WAVE_GAIN * lines * floorMask * 0.20;
-
-  vec2 stars = uv * vec2(85.0, 46.0);
-  vec2 starCell = floor(stars);
-  float star = (1.0 - smoothstep(0.015, 0.08, length(fract(stars) - 0.5))) * step(0.982, hash(starCell));
-  color += uHighlight * star * (0.35 + sin(t * 0.3 + hash(starCell) * 6.28) * 0.15);
-  return color;
+float particles(vec2 uv, float scale, float speed, float seed) {
+  vec2 moving = uv * vec2(scale, scale * 0.65);
+  // Stable cells drift upward together; only particles outside the view wrap.
+  moving.y -= uTime * speed;
+  vec2 cell = floor(moving);
+  vec2 point = fract(moving) - vec2(0.25 + hash(cell + seed) * 0.5, 0.5);
+  point.x += sin(uTime * 0.16 + hash(cell + seed) * 6.28) * 0.08;
+  float dotLight = 1.0 - smoothstep(0.012, 0.055, length(point));
+  float selected = step(0.965, hash(cell + seed + 13.0));
+  float fade = smoothstep(0.0, 0.12, uv.y) * (1.0 - smoothstep(0.85, 1.0, uv.y));
+  return dotLight * selected * fade * (0.55 + 0.15 * sin(uTime * 0.6 + hash(cell) * 6.28));
 }
 
 void main() {
   vec2 uv = vUv;
-  float tick = floor(uTime * 5.0);
-  float glitch = step(0.975, hash(vec2(tick, 7.0)));
-  float row = floor(uv.y * 45.0);
-  uv.x += (hash(vec2(row, tick)) - 0.5) * 0.065 * glitch;
-  float shift = 0.0015 + glitch * 0.006;
-  vec3 color = vec3(field(uv + vec2(shift, 0.0)).r, field(uv).g, field(uv - vec2(shift, 0.0)).b);
-  float grain = hash(gl_FragCoord.xy + floor(uTime * 12.0)) - 0.5;
-  color += TINT * grain * 0.024;
-  float scan = sin(gl_FragCoord.y * 1.7) * 0.005;
-  color += TINT * scan;
-  // Vignette fades toward the navy base, not toward black/gray.
-  color = mix(uBase, color, 0.85 + 0.15 * smoothstep(0.0, 0.45, min(vUv.x, 1.0 - vUv.x)));
-  gl_FragColor = vec4(max(color, 0.0), 1.0);
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
+  vec3 color = uBase;
+
+  // A broad horizon glow breathes slowly instead of a flickering ribbon.
+  float horizon = 0.24 + sin(uTime * 0.18) * 0.008;
+  float spread = 1.0 + sin(uTime * 0.22) * 0.07;
+  vec2 light = vec2(p.x / spread, (uv.y - horizon) * 3.8);
+  float halo = exp(-dot(light, light) * 2.2);
+  float crest = exp(-pow((uv.y - horizon) * 25.0, 2.0)) * exp(-p.x * p.x * 1.3);
+  color += uWave * WAVE_GAIN * (halo * 0.50 + crest * 0.26);
+
+  // Perspective lines remain coherent; motion has no random row offsets.
+  float distanceToHorizon = abs(uv.y - 0.49);
+  float depth = max(0.065, distanceToHorizon);
+  vec2 world = vec2(p.x / depth, 0.70 / depth - uTime * 0.12);
+  vec2 cell = abs(fract(world * 0.85 + 0.5) - 0.5);
+  vec2 edge = max(fwidth(world * 0.85), vec2(0.001));
+  vec2 lines = 1.0 - smoothstep(vec2(0.0), edge * 1.2, cell);
+  float grid = max(lines.x, lines.y);
+  float gridFade = smoothstep(0.08, 0.32, distanceToHorizon);
+  gridFade *= 0.45 + halo * 0.55;
+  color += uWave * WAVE_GAIN * grid * gridFade * 0.16;
+
+  color += uHighlight * (particles(uv, 55.0, 0.22, 3.0) * 0.50
+    + particles(uv, 33.0, 0.12, 17.0) * 0.28);
+  float sideFade = 1.0 - smoothstep(0.25, 0.65, abs(uv.x - 0.5));
+  color = mix(uBase, color, sideFade);
+  gl_FragColor = vec4(color, 1.0);
 }`;
 
 @Component({
@@ -165,7 +166,7 @@ export class GlitchBackgroundComponent implements AfterViewInit, OnDestroy {
     this.frame = requestAnimationFrame(this.animate);
     const delta = this.previousTime ? Math.min(time - this.previousTime, 100) : 0;
     this.previousTime = time;
-    this.elapsed += delta / 1000;
+    this.elapsed += delta / 1000 * ANIMATION_SPEED;
     this.frameAccumulator += delta;
     if (this.frameAccumulator < FRAME_INTERVAL_MS) return;
     this.frameAccumulator %= FRAME_INTERVAL_MS;

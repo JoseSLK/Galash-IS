@@ -1,3 +1,4 @@
+import {ContentAdminComponent} from './content/content-admin.component';
 import { ComunicadosAdminComponent } from './comunicados/comunicados-admin.component';
 import { ProjectsPageComponent } from '../projects/projects-page.component';
 import { IntegrantesAdminComponent } from './integrantes/integrantes-admin.component';
@@ -20,12 +21,12 @@ import { EventsAdminComponent } from './events/events-admin.component';
 import { SeedbedAssignmentsComponent } from './seedbed-assignments.component';
 import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
 import { LeaderToolsComponent } from '../leader/leader-tools.component';
-type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar' | 'communications';
+type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar' | 'communications' | 'content';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [LeaderToolsComponent, SeedbedAssignmentsComponent, ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
+  imports: [ContentAdminComponent,LeaderToolsComponent, SeedbedAssignmentsComponent, ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -92,7 +93,7 @@ export class AdminComponent implements OnDestroy {
   }
 
   showSection(section: AdminSection): void {
-    if (this.leaderMode && (section === 'users' || section === 'communications' || section === 'reviews')) return;
+    if (this.leaderMode && (section === 'users' || section === 'communications' || section === 'reviews' || section === 'content')) return;
     this.activeSection.set(section);
   }
 

@@ -1,14 +1,14 @@
 import {ProjectsService} from '../projects/projects.service';
 import {ResearchProject} from '../projects/project.model';
 import { SeedbedReviewsComponent } from './reviews/seedbed-reviews.component';
-import { Component, LOCALE_ID, computed, inject, signal } from '@angular/core';
-import { DatePipe, formatDate } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KnowledgeGraphComponent, KnowledgeGraphData } from '../../shared/components/knowledge-graph/knowledge-graph.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
-import { PublicEvent, Project, Seedbed, SeedbedMember, SeedbedSpace, SeedbedsService, seedbedAbbreviation } from './seedbeds.service';
+import { Project, Seedbed, SeedbedMember, SeedbedSpace, SeedbedsService, seedbedAbbreviation } from './seedbeds.service';
 
 type ProjectFilter = 'Todos' | Project['status'];
 
@@ -28,7 +28,6 @@ export class SeedbedsComponent {
   get allProjects():Project[] {const local=this.seedbedProjects();return [...local,...this.projects().filter(project=>!local.some(item=>item.id===project.id))];}
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly locale = inject(LOCALE_ID);
   private loadId = 0;
 
   readonly state = signal<'loading' | 'ready' | 'empty' | 'error'>('loading');
@@ -37,20 +36,16 @@ export class SeedbedsComponent {
   readonly selectedIndex = computed(() => Math.max(0, this.seedbeds().findIndex(seedbed => seedbed.id === this.selected()?.id)));
   readonly space = signal<SeedbedSpace | null>(null);
   readonly members = signal<SeedbedMember[]>([]);
-  readonly events = signal<PublicEvent[]>([]);
-  readonly eventsState = signal<'loading' | 'ready' | 'error'>('loading');
   readonly projects = signal<Project[]>([]);
   readonly knowledgeGraph = computed<KnowledgeGraphData | null>(() => {
     const seedbed = this.selected();
     return seedbed?.topics?.length ? { name: seedbed.name, abbreviation: seedbedAbbreviation(seedbed.name), nodes: seedbed.topics } : null;
   });
 
-  readonly statuses: ProjectFilter[] = ['Todos', 'Activo', 'Finalizado', 'Radicado'];
-  readonly filterLabels: Record<ProjectFilter, string> = { Todos: 'Todos', Activo: 'Activos', Finalizado: 'Finalizados', Radicado: 'Radicados' };
+  readonly statuses: ProjectFilter[] = ['Todos', 'Activo', 'Finalizado'];
+  readonly filterLabels: Record<ProjectFilter, string> = { Todos: 'Todos', Activo: 'Activos', Finalizado: 'Finalizados' };
   selectedStatus: ProjectFilter = 'Activo';
-  readonly eventOrders = ['Más recientes', 'Más antiguos'];
-  selectedEventOrder = 'Más recientes';
-  selectedDetail: { title: string; description: string; kind: string; metadata: string; event?: PublicEvent; project?:ResearchProject } | null = null;
+  selectedDetail: { title: string; description: string; kind: string; metadata: string; project?:ResearchProject } | null = null;
   memberOffset = 0;
 
   get coordinator(): string {
@@ -60,15 +55,7 @@ export class SeedbedsComponent {
   get directorySeedbed(): string { return this.selected()?.name ?? ''; }
   constructor() {
     this.projectCatalog.list().pipe(takeUntilDestroyed()).subscribe(projects=>this.localProjects.set(projects));
-    void this.loadEvents();
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => void this.load(params.get('id') ?? params.get('nombre')));
-  }
-  async loadEvents(): Promise<void> {
-    this.eventsState.set('loading');
-    try {
-      this.events.set(await this.service.publishedEvents());
-      this.eventsState.set('ready');
-    } catch { this.eventsState.set('error'); }
   }
   selectSeedbed(seedbed: Seedbed): void {
     void this.router.navigate([], { relativeTo: this.route, queryParams: { id: seedbed.id }, queryParamsHandling: 'merge' });
@@ -110,7 +97,6 @@ export class SeedbedsComponent {
       this.projects.set(projects);
       this.memberOffset = 0;
       this.selectedStatus = 'Activo';
-      this.selectedEventOrder = 'Más recientes';
       this.selectedDetail = null;
       this.state.set('ready');
     } catch {
@@ -120,23 +106,7 @@ export class SeedbedsComponent {
   retry(): void { void this.load(this.route.snapshot.queryParamMap.get('id') ?? this.route.snapshot.queryParamMap.get('nombre')); }
   projectCount(status: ProjectFilter): number { return this.allProjects.filter(project => status === 'Todos' || project.status === status).length; }
   get filteredProjects(): Project[] { return this.allProjects.filter(project => this.selectedStatus === 'Todos' || project.status === this.selectedStatus); }
-  get filteredEvents(): PublicEvent[] {
-    const direction = this.selectedEventOrder === 'Más recientes' ? -1 : 1;
-    return [...this.events()].sort((first, second) => direction * (Date.parse(first.startAt) - Date.parse(second.startAt)));
-  }
-  eventMetadata(event: PublicEvent): string {
-    return [formatDate(event.startAt, 'dd/MM/yyyy, HH:mm', this.locale), event.type, event.venue, event.organizerName].filter(Boolean).join(' · ');
-  }
   openProjectDetails(dialog:HTMLDialogElement,project:Project):void {this.selectedDetail={title:project.title,description:project.summary,kind:'Proyecto',metadata:this.projectStatusLabel(project.status),project:this.localProjects().find(item=>item.id===project.id)};dialog.showModal();}
-  openEventDetails(dialog: HTMLDialogElement, event: PublicEvent): void {
-    this.selectedDetail = { title: event.title, description: event.description, kind: 'Evento', metadata: this.eventMetadata(event), event };
-    dialog.showModal();
-  }
-  safeEventLink(value: string | undefined): string | null {
-    if (!value) return null;
-    try { return ['https:', 'http:'].includes(new URL(value).protocol) ? value : null; }
-    catch { return null; }
-  }
   memberName(member: SeedbedMember): string { return [member.name, member.lastName].filter(Boolean).join(' '); }
   memberInitials(member: SeedbedMember): string { return this.memberName(member).split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase(); }
   memberRole(member: SeedbedMember): string {

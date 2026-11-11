@@ -14,6 +14,17 @@
     <button class="close-button" type="button" aria-label="Cancelar registro" (click)="cancel()" [disabled]="loading">×</button>
   </header>
 
+  @if (!updating) {
+    @if (matchesLoading()) {<p role="status">Comprobando si ya tienes un perfil en GALASH…</p>}
+    @if (matchesError()) {<div class="match-error"><p class="error" role="alert">{{ matchesError() }}</p><button class="cancel-button" type="button" (click)="loadMatches()">Reintentar coincidencias</button></div>}
+    @if (matches().length) {
+      <fieldset class="match-picker" [disabled]="loading || matchesLoading()"><legend>¿Eres esta persona?</legend><p>Si reconoces tu perfil importado, selecciónalo para conservar tu rol y trayectoria.</p>
+        @for (match of matches(); track match.id) {<label class="match-option" [class.chosen]="matchChoice === match.id"><input type="radio" name="registration-match" [value]="match.id" [checked]="matchChoice === match.id" (change)="matchChoice = match.id"><span><strong>{{ match.name }}</strong><small>{{ match.role === 'docente' ? 'Docente' : 'Estudiante' }}</small></span></label>}
+        <label class="match-option" [class.chosen]="matchChoice === ''"><input type="radio" name="registration-match" value="" [checked]="matchChoice === ''" (change)="matchChoice = ''"><span>Ninguno de estos perfiles me corresponde</span></label>
+      </fieldset>
+    }
+  }
+
   <form [formGroup]="registerForm" (ngSubmit)="submit()" novalidate>
     <div class="form-grid">
       <div class="field">
@@ -96,7 +107,7 @@
     }
 
     <div class="form-actions">
-      <button class="submit-button" type="submit" [disabled]="loading">
+      <button class="submit-button" type="submit" [disabled]="loading || matchesLoading() || !!matchesError()">
         {{ loading ? 'Guardando…' : updating ? 'Guardar datos' : 'Enviar registro' }}
       </button>
       <button class="cancel-button" type="button" (click)="cancel()" [disabled]="loading">Cancelar</button>

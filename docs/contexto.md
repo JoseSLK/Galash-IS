@@ -134,3 +134,57 @@ GALASH-UPTC web system for academic management, research, and communication.
 - Menú de secciones compartido: en títulos cortos se centra bajo la flecha y corrige su desplazamiento lateral al abrir para evitar salir del viewport.
 
 - PR branch now incorporates origin/main through bc11d63, retaining scoped leader functions alongside the refreshed administration and real project API. Both complete shared-contract copies are synchronized. Build,48unit tests on Node24 and75distinct E2E cases across responsive runs/retries pass. Prior contract-drift pending notes are superseded.
+
+- Registro: consulta perfiles importados con Firebase y confirma explícitamente claim_id o descarta coincidencias antes del primer registro.
+
+- Autogestión: Mi perfil edita área, formación, ORCID, CvLAC y visibilidad; guarda URL de foto. Backend autoriza solo perfil propio, sin identidad, roles ni semilleros; Admin conserva administración. Requiere desplegar ambos cambios juntos.
+
+- Comunicados: el detalle consulta al servidor y permite editar borradores al autor o Admin, conservando todos sus adjuntos y validando el estado.
+
+- Cronograma interno: detalle desde servidor, edición autorizada de actividad/participantes y cancelación lógica confirmada; conserva semillero y fechas de varios días. Autorización de dirección/delegación obtenida de managed_seedbed_ids de sesión y validada por backend.
+
+- Corrección por solicitud del usuario: se retiró la autogestión del perfil investigador; POST/PATCH /members regresan a permisos Admin. Mi perfil conserva información de solo lectura y edición de URL de foto únicamente. Sustituye el estado de autogestión descrito anteriormente.
+
+- Solicitud de ingreso: dos pasos. Primero formulario completo con datos personales, formación e investigación; segundo revisión y envío. Los botones de edición del resumen regresan al campo correspondiente del formulario completo. Reemplaza la navegación anterior de cuatro pasos; conserva el mismo payload y campos obligatorios.
+
+- Datos locales: retirados los 4 semilleros y 12 proyectos sintéticos; permanecen 5 semilleros reales y 22 proyectos reales. Solicitud y evento manuales conservados y reasignados a Complejidad Algorítmica y Programación Competitiva. Cuentas sin eliminar.
+
+- Proyectos: solo Activo y Finalizado en interfaz, backend y CHECK de PostgreSQL. Proyectos nuevos y conversiones desde propuestas se crean Activo; migración 017 conserva datos e historial. Base local mantiene 22 proyectos reales finalizados. Se entregó servicios.md actualizado al frontend.
+
+- Comunicados: subida real de adjuntos PDF/Word/Excel desde el equipo (10 MiB por archivo, 10 adjuntos); guarda borrador antes de POST /files y persiste cada referencia con PATCH. Descarga desde detalle por GET /files/{id} mediante Blob y sesión, con estado/error. Enlaces externos previos conservados. Sin cambios de backend operativo; contrato y servicios.md sincronizados con el frontend.
+
+- Admin → Contenido: gestión de secciones institucionales y enlaces con lista/editor/vista previa. Crea/edita borradores y publica; una sección publicada se actualiza al guardar. Enlaces con nombre, descripción, URL, categoría, orden, visibilidad y activación/ocultación. Nosotros lee contenido publicado y enlaces visibles del backend, incluidos filtros al visitar como Admin; conserva hero, galería y ubicación. Sin endpoint de despublicación ni editor de ubicación/galería. Contratos M7/M10 y servicios.md sincronizados, catálogo de consumo frontend actualizado. Compilación de producción completada; sin pruebas por instrucción del usuario.
+
+- Portada (2026-11-10): fondo WebGL con partículas en dos planos, cuadrícula en perspectiva y luz suave continua, sin cortes glitch ni ruido temporal; mantiene colores GALASH y pausa fuera de vista.
+
+- Cabecera (2026-11-10): toda la barra reduce su altura de 64 a 56px al bajar y recupera su altura al subir, reutilizando el estado de scroll existente.
+
+- Redes sociales (2026-11-10): portada, pie de página y sección Dónde nos encontramos de Nosotros comparten iconos y enlaces oficiales suministrados de Instagram, Facebook y LinkedIn mediante SocialLinksComponent.
+
+- Noticias (2026-11-10): la sección antes presentada como Eventos se llama Noticias en toda la interfaz pública, semilleros y administración. Ruta /noticias con redirección desde /eventos. Conserva la integración de servicios events y datos existentes, sin cambios de contrato.
+
+- Contacto (2026-11-10): redes compartidas incluyen X y YouTube además de Instagram, Facebook y LinkedIn. Pie y Nosotros muestran galash@uptc.edu.co y Calle 4 A Sur No. 15-134, Sogamoso, Boyacá, Colombia.
+
+- Avance de proyectos (2026-11-10): visible solo para Estudiante, Docente y Admin; oculto a Visitante y sin sesión en lista y detalle. Backend omite progress para esos lectores. Contrato sincronizado con backend; permisos de edición conservados.
+
+- Catálogo de proyectos (2026-11-10): lista de escritorio con scroll independiente limitado al viewport; detalle en flujo normal para poder leerlo completo sin recorrer el listado. Selección alinea inicio del detalle.
+
+- Búsqueda de proyectos (2026-11-10): campo por título activa filtrado desde dos palabras, sin distinguir tildes o mayúsculas, combinado con estado y semillero sobre los proyectos ya cargados.
+
+- Nosotros (2026-11-10): Historia, Objetivos, Misión, Visión y Áreas de conocimiento tienen texto provisional visible cuando no existe una versión publicada. El contenido publicado desde administración tiene prioridad por slug.
+
+- Nosotros (2026-11-10): se restaura el diseño interactivo original con carrusel Misión/Visión, objetivos con iconos y logo grande entre las áreas de conocimiento. Los textos provisionales se integran en ese diseño y las versiones publicadas conservan prioridad.
+
+- Nosotros (2026-11-10): Historia se retira de la vista pública. Misión, Visión, Objetivos y Áreas de conocimiento conservan su diseño.
+
+- Cabecera compartida: actualiza la animación de compactación al desplazarse también en secciones con detección de cambios OnPush.
+
+- Las noticias generales se consultan desde Noticias; la vista pública de Semilleros ya no duplica ese listado.
+
+- Proyectos filtra por título desde una sola palabra; la portada distingue los cinco semilleros con iconos temáticos y el pie combina amarillo GALASH, carbón y tonos azul violáceo.
+
+- Búsqueda de proyectos: filtra desde dos letras del título, sin exigir dos palabras.
+
+- Pie de página: paleta de grafito y azul oscuro con amarillo limitado al botón y acentos.
+
+- Pie de página: recupera la paleta azul original y el botón con borde; se conservan los datos de contacto y los enlaces actuales.

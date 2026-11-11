@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
-import { DatosInstitucionales } from './institucional.models';
+import {InstitutionalContentService} from '../../core/services/institutional-content.service';
+import {LINK_CATEGORIES} from '../../core/models/institutional.model';
+import { Injectable, inject } from '@angular/core';
+import { Observable, defer } from 'rxjs';
+import { CategoriaEnlace, DatosInstitucionales } from './institucional.models';
 
-// Editorial examples only: replace cargar() with the agreed HTTP adapter later.
+// Existing visual assets and location; editable text and links are read from the backend below.
 export const INSTITUCIONAL_MOCK: DatosInstitucionales = {
-  ubicacion: { nombre: 'UPTC · Seccional Sogamoso', direccion: 'Calle 4 A Sur No. 15-134, Barrio Universitario', ciudad: 'Sogamoso, Boyacá, Colombia', fuenteUrl: 'https://www.uptc.edu.co/sitio/portal/sitios/localizacion/' },
+  ubicacion: { nombre: 'UPTC · Seccional Sogamoso', direccion: 'Calle 4 A Sur No. 15-134', ciudad: 'Sogamoso, Boyacá, Colombia', fuenteUrl: 'https://www.uptc.edu.co/sitio/portal/sitios/localizacion/' },
   autor: 'Contenido de demostración', actualizadoEn: '2026-11-01',
   contenido: {
     etiqueta: 'NOSOTROS · UPTC SECCIONAL SOGAMOSO', titulo: 'GALASH', logoUrl: '/assets/galash-emblema-sin-fondo.svg',
     descripcion: 'Conectamos ideas, personas y tecnología para construir conocimiento desde la ingeniería de sistemas y computación.',
     presentacion: 'GALASH es el Grupo de investigación en Auditoría, Lógica, Arquitectura de Software y Hardware de la UPTC Seccional Sogamoso. Reúne a estudiantes y docentes de ingeniería de sistemas y computación.',
     letras: [{ letra: 'G', significado: 'Grupo de investigación en' }, { letra: 'A', significado: 'Auditoría' }, { letra: 'L', significado: 'Lógica' }, { letra: 'A', significado: 'Arquitectura de' }, { letra: 'S', significado: 'Software' }, { letra: 'H', significado: 'Hardware' }],
-    mision: 'Impulsar la investigación colaborativa y la formación de estudiantes mediante el estudio de sistemas de software y hardware. Texto de ejemplo pendiente de validación institucional.',
-    vision: 'Consolidar una comunidad que conecte la investigación con las necesidades de su entorno. Texto de ejemplo pendiente de validación institucional.',
+    mision: 'Impulsar la investigación y la formación de estudiantes en auditoría, lógica y arquitectura de software y hardware en la UPTC Seccional Sogamoso. A través de los semilleros, reunimos a estudiantes y docentes para investigar problemas del entorno, desarrollar soluciones tecnológicas y compartir lo aprendido.',
+    vision: 'Consolidarnos como un grupo de investigación reconocido en la región por la formación de nuevos investigadores, la calidad de sus proyectos y sus aportes a la solución de problemas de la comunidad.',
     objetivos: ['Explorar problemas de ingeniería desde distintas áreas de conocimiento.', 'Fortalecer el aprendizaje y la colaboración entre estudiantes y docentes.', 'Compartir resultados y construir proyectos con impacto en el entorno.'],
     galeriaTitulo: 'Personas que se encuentran. Ideas que se convierten en conocimiento.',
     galeria: [
@@ -36,5 +38,14 @@ export const INSTITUCIONAL_MOCK: DatosInstitucionales = {
 };
 @Injectable({ providedIn: 'root' })
 export class InstitucionalService {
-  cargar(): Observable<DatosInstitucionales | null> { return of(structuredClone(INSTITUCIONAL_MOCK)).pipe(delay(450)); }
+  private readonly api=inject(InstitutionalContentService);
+  cargar(): Observable<DatosInstitucionales | null> { return defer(async()=>{
+    const [published,links]=await Promise.all([this.api.pages(),this.api.links(true)]);
+    const pages=published.filter(page=>page.status==='publicado');
+    const latest=[...pages].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0];
+    return {...structuredClone(INSTITUCIONAL_MOCK),pages,
+      autor:latest?.authorName||'GALASH',actualizadoEn:latest?.updatedAt.slice(0,10)||'',
+      enlaces:links.map(link=>({categoria:(LINK_CATEGORIES.find(category=>category.value===link.category)?.label??link.category) as CategoriaEnlace,nombre:link.name,descripcion:link.description,url:link.url,activo:true}))};
+  }); }
+
 }
