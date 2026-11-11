@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SocialLinksComponent } from '../social-links/social-links.component';
 
 @Component({
   selector: 'app-site-footer',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SocialLinksComponent],
   templateUrl: './site-footer.component.html',
   styleUrl: './site-footer.component.css'
 })

@@ -1,15 +1,15 @@
-<app-dashboard #header [headerOnly]="true" activePage="eventos" />
+<app-dashboard #header [headerOnly]="true" activePage="noticias" />
 <main id="contenido" [inert]="header.registrationOpen">
-  <span class="eyebrow">GALASH · EVENTOS</span><h1>Eventos</h1>
+  <span class="eyebrow">GALASH · NOTICIAS</span><h1>Noticias</h1>
   <p class="intro">Encuentros, talleres, charlas y convocatorias del grupo.</p>
-  <div class="toolbar"><nav aria-label="Filtrar eventos por fecha">@for (option of filters; track option.id) {<button type="button" [class.active]="filter() === option.id" [attr.aria-pressed]="filter() === option.id" (click)="filter.set(option.id)">{{ option.label }} ({{ count(option.id) }})</button>}</nav><span class="general">Agenda general del grupo</span></div>
-  @if (state() === 'loading') {<p role="status">Cargando eventos publicados…</p>}
-  @else if (state() === 'error') {<div class="empty"><p role="alert">No pudimos cargar los eventos.</p><button class="retry" type="button" (click)="load()">Reintentar</button></div>}
+  <div class="toolbar"><nav aria-label="Filtrar noticias por fecha">@for (option of filters; track option.id) {<button type="button" [class.active]="filter() === option.id" [attr.aria-pressed]="filter() === option.id" (click)="filter.set(option.id)">{{ option.label }} ({{ count(option.id) }})</button>}</nav><span class="general">Actualidad del grupo</span></div>
+  @if (state() === 'loading') {<p role="status">Cargando noticias publicadas…</p>}
+  @else if (state() === 'error') {<div class="empty"><p role="alert">No pudimos cargar las noticias.</p><button class="retry" type="button" (click)="load()">Reintentar</button></div>}
   @else {
-    <p class="sr-only" role="status">{{ filtered().length }} eventos encontrados.</p>
+    <p class="sr-only" role="status">{{ filtered().length }} noticias encontradas.</p>
     @if (featured(); as event) {<app-event-card [event]="event" [featured]="true" [now]="now()" (details)="showDetails($event, detailDialog)" />}
     <div class="event-grid">@for (event of cards(); track event.id) {<app-event-card [event]="event" [now]="now()" (details)="showDetails($event, detailDialog)" />}</div>
-    @if (!filtered().length) {<div class="empty"><h2>No hay eventos {{ filter() === 'next' ? 'próximos' : filter() === 'past' ? 'anteriores' : 'publicados' }}</h2><p>Consulta las otras fechas para explorar la agenda del grupo.</p></div>}
+    @if (!filtered().length) {<div class="empty"><h2>No hay noticias {{ filter() === 'next' ? 'próximas' : filter() === 'past' ? 'anteriores' : 'publicadas' }}</h2><p>Consulta las otras fechas para explorar las noticias del grupo.</p></div>}
   }
 </main>
 <app-site-footer [inert]="header.registrationOpen" />

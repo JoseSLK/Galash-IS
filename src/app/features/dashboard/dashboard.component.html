@@ -1,23 +1,21 @@
 <div class="galash-site" [class.header-only]="headerOnly" [class.menu-is-open]="menuOpen" [attr.inert]="registrationOpen ? '' : null" [attr.aria-hidden]="registrationOpen ? 'true' : null">
-  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'proyectos' ? '/proyectos' : activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'leader' ? '/gestion-semillero' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'eventos' ? '/eventos' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
+  <a class="skip-link" [routerLink]="headerOnly ? (activePage === 'proyectos' ? '/proyectos' : activePage === 'nosotros' ? '/nosotros' : activePage === 'admin' ? '/administracion' : activePage === 'leader' ? '/gestion-semillero' : activePage === 'unete' ? '/unete' : activePage === 'perfil' ? '/mi-perfil' : activePage === 'noticias' ? '/noticias' : '/semilleros') : '/'" fragment="contenido" queryParamsHandling="preserve">Saltar al contenido</a>
   <header class="site-header" [class.site-header--scrolled]="headerScrolled" [class.site-header--compact]="headerCompact">
     <a class="site-logo" routerLink="/" aria-label="GALASH, inicio" (click)="closeMenu()">
       <img class="nav-emblem" src="/assets/galash-emblema-nav-96.webp" srcset="/assets/galash-emblema-nav-96.webp 1x, /assets/galash-emblema-nav-144.webp 1.5x" alt="" width="48" height="47" decoding="async"><span>GALASH</span>
     </a>
     <nav #mobileNav id="site-navigation" class="site-nav mobile-nav" aria-label="Principal">
+      <div class="nav-links">
       <a routerLink="/nosotros" [attr.aria-current]="headerOnly && activePage === 'nosotros' ? 'page' : null" (click)="closeMenu()">Nosotros<span aria-hidden="true"></span></a>
       <a routerLink="/semilleros" [attr.aria-current]="headerOnly && activePage === 'semilleros' ? 'page' : null" (click)="closeMenu()">Semilleros<span aria-hidden="true"></span></a>
       <a routerLink="/proyectos" [attr.aria-current]="headerOnly && activePage === 'proyectos' ? 'page' : null" (click)="closeMenu()">Proyectos<span aria-hidden="true"></span></a>
-      <a routerLink="/eventos" [attr.aria-current]="headerOnly && activePage === 'eventos' ? 'page' : null" (click)="closeMenu()">Eventos<span aria-hidden="true"></span></a>
+      <a routerLink="/noticias" [attr.aria-current]="headerOnly && activePage === 'noticias' ? 'page' : null" (click)="closeMenu()">Noticias<span aria-hidden="true"></span></a>
       <a routerLink="/integrantes" [attr.aria-current]="headerOnly && activePage === 'integrantes' ? 'page' : null" (click)="closeMenu()">Integrantes<span aria-hidden="true"></span></a>
+      </div>
     <div class="header-actions">
       <div #authMenu class="auth-menu">
         <button #authMenuTrigger id="header-auth-button" class="button auth-trigger" type="button"
-          [appSpecularButton]="!authService.isAuthenticated()"
-          size="lg" [radius]="18" tint="var(--galash-text-strong)" [tintOpacity]="0.04"
-          textColor="var(--galash-text-strong)" lineColor="var(--galash-accent)" baseColor="var(--galash-surface)"
-          [intensity]="1" [idleIntensity]="0.35" [shineSize]="10" [shineFade]="34"
-          [thickness]="1.2" [glow]="1" [followMouse]="true" [proximity]="250"
+          [class.auth-trigger--glowing]="!authService.isAuthenticated()"
           [attr.aria-expanded]="authMenuOpen" aria-controls="header-auth-dropdown"
           [disabled]="authService.sessionStatus() === 'checking' || authLoading"
           (click)="toggleAuthMenu()">
@@ -25,6 +23,7 @@
             <span class="account-avatar" aria-hidden="true">{{ authService.profileInitials() }}</span>
             <span class="account-name">{{ authService.profileName() }}</span>
           } @else {
+            <span class="login-border" aria-hidden="true"><span class="login-border-light"></span></span>
             <span class="login-label">{{ authService.sessionStatus() === 'checking' ? 'Comprobando sesión…' : 'Iniciar sesión' }}</span>
           }
         </button>
@@ -77,10 +76,10 @@
   <main id="contenido">
     <section id="nosotros" class="hero-section" aria-labelledby="welcome-title">
       <div class="hero-copy">
-        <p class="eyebrow">UPTC · Sogamoso</p>
         <h1 id="welcome-title">Bienvenido a <span>GALASH</span></h1>
         <p class="hero-description">Grupo de investigación de la Universidad Pedagógica y Tecnológica de Colombia, seccional Sogamoso.</p>
         <a class="button button--primary" routerLink="/semilleros">Conoce los semilleros <span aria-hidden="true">↗</span></a>
+        <app-social-links class="hero-socials" />
       </div>
       <app-glitch-background />
     </section>
@@ -111,6 +110,10 @@
           <div class="emblem-orbit" aria-hidden="true"></div>
           <svg viewBox="0 0 160 160" aria-hidden="true">
             @switch (seedbedIcon) {
+              @case ('cloud') { <path class="emblem-main" d="M42 85a20 20 0 0 1-4-40 29 29 0 0 1 55-8 22 22 0 1 1 16 48Z"/><path class="emblem-accent" d="M56 86v23h48V86M80 86v40"/><g class="emblem-nodes"><circle cx="56" cy="109" r="5"/><circle cx="104" cy="109" r="5"/><circle cx="80" cy="126" r="5"/></g> }
+              @case ('algorithm') { <rect class="emblem-main" x="64" y="24" width="32" height="22" rx="5"/><path class="emblem-main" d="m80 60 23 19-23 19-23-19Z M80 46v14M57 79H38v32M103 79h19v32"/><rect class="emblem-accent" x="24" y="111" width="28" height="22" rx="5"/><rect class="emblem-accent" x="108" y="111" width="28" height="22" rx="5"/> }
+              @case ('innovation') { <path class="emblem-main" d="M65 111v-11c0-10-20-17-20-39a35 35 0 0 1 70 0c0 22-20 29-20 39v11ZM66 122h28M73 133h14"/><path class="emblem-accent" d="m82 45-12 22h17l-9 19M25 60h10m90 0h10M37 28l8 8m70 0 8-8"/> }
+              @case ('distributed') { <path class="emblem-accent" d="m80 80-43-39m43 39 43-39M80 80l-43 39m43-39 43 39"/><circle class="emblem-main" cx="80" cy="80" r="17"/><circle class="emblem-main" cx="31" cy="35" r="12"/><circle class="emblem-main" cx="129" cy="35" r="12"/><circle class="emblem-main" cx="31" cy="125" r="12"/><circle class="emblem-main" cx="129" cy="125" r="12"/> }
               @case ('security') { <path class="emblem-main" d="M80 22 126 40v36c0 31-25 52-46 64-21-12-46-33-46-64V40Z"/><rect class="emblem-accent" x="61" y="71" width="38" height="32" rx="6"/><path class="emblem-accent" d="M68 71V59a12 12 0 0 1 24 0v12M80 83v9"/> }
               @case ('ai') { <path class="emblem-main" d="M78 37c-16-16-38-4-35 14-18 4-23 26-11 39-12 17 0 38 17 38 8 18 29 14 29-2V37Zm4 0c16-16 38-4 35 14 18 4 23 26 11 39 12 17 0 38-17 38-8 18-29 14-29-2V37Z"/><path class="emblem-accent" d="M46 62h15v20h17M114 62H99v20H82M42 103h19v13M118 103H99v13"/><g class="emblem-nodes"><circle cx="46" cy="62" r="4"/><circle cx="114" cy="62" r="4"/><circle cx="61" cy="116" r="4"/><circle cx="99" cy="116" r="4"/></g> }
               @case ('ar') { <g class="emblem-cube"><path class="emblem-main" d="m80 37 39 23v43l-39 23-39-23V60Z"/><path class="emblem-accent" d="m41 60 39 23 39-23M80 83v43"/></g><path class="emblem-accent" d="M26 49V26h23M111 26h23v23M134 111v23h-23M49 134H26v-23"/> }

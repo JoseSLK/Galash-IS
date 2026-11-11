@@ -1,14 +1,14 @@
 import { ScrollStackComponent } from '../../shared/components/scroll-stack/scroll-stack.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, HostListener, Input, NgZone, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, Input, NgZone, OnDestroy, OnInit, ViewChild, inject, isDevMode, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SocialLinksComponent } from '../../shared/components/social-links/social-links.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
 import { ApiService } from '../../core/services/api.service';
 import { Seedbed, SeedbedsService, seedbedAbbreviation } from '../seedbeds/seedbeds.service';
 import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
-import { SpecularButtonDirective } from '../../shared/directives/specular-button.directive';
 import { INITIAL_HEADER_SCROLL, nextHeaderState } from './header-scroll';
 import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
 
@@ -17,7 +17,7 @@ const MEMBER_COUNT_LIMIT = 100;
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RegisterComponent, SiteFooterComponent, GlitchBackgroundComponent, SpecularButtonDirective, ScrollStackComponent],
+  imports: [RouterLink, RegisterComponent, SiteFooterComponent, SocialLinksComponent, GlitchBackgroundComponent, ScrollStackComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -51,13 +51,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   headerCompact = false;
   activeSection = 'nosotros';
   private readonly zone = inject(NgZone);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private headerState = INITIAL_HEADER_SCROLL;
   private scrollFrame = 0;
   private removeScrollListener?: () => void;
 
   get seedbedIcon(): string {
     const name = this.currentSeedbed?.name.toLocaleLowerCase('es') ?? '';
+    if (name.includes('big data') || name.includes('cloud')) return 'cloud';
     if (name.includes('ciber')) return 'security';
+    if (name.includes('algor')) return 'algorithm';
+    if (name.includes('innovaci')) return 'innovation';
+    if (name.includes('distribuido') || name.includes('devops')) return 'distributed';
     if (name.includes('inteligencia')) return 'ai';
     if (name.includes('realidad')) return 'ar';
     return 'research';
@@ -74,7 +79,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const section = this.activeSection;
     this.updateActiveSection();
     if (this.headerState.compact !== this.headerCompact || scrolled !== this.headerScrolled || section !== this.activeSection) {
-      this.zone.run(() => { this.headerCompact = this.headerState.compact; this.headerScrolled = scrolled; });
+      this.zone.run(() => {
+        this.headerCompact = this.headerState.compact;
+        this.headerScrolled = scrolled;
+        this.changeDetector.markForCheck();
+      });
     }
   }
 

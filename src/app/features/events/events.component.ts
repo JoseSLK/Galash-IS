@@ -17,7 +17,7 @@ export class EventsComponent {
   readonly events = signal<PublicEvent[]>([]);
   readonly now = signal(Date.now());
   readonly filter = signal<DateFilter>('next');
-  readonly filters = [{ id: 'next', label: 'Próximos' }, { id: 'past', label: 'Anteriores' }, { id: 'all', label: 'Todos' }] as const;
+  readonly filters = [{ id: 'next', label: 'Próximas' }, { id: 'past', label: 'Anteriores' }, { id: 'all', label: 'Todas' }] as const;
   readonly selected = signal<PublicEvent | null>(null);
   readonly safeUrl = eventUrl;
   readonly filtered = computed(() => this.events().filter(event => this.filter() === 'all' || (Date.parse(event.startAt) >= this.now()) === (this.filter() === 'next')).sort((a, b) => this.filter() === 'past' ? Date.parse(b.startAt) - Date.parse(a.startAt) : Date.parse(a.startAt) - Date.parse(b.startAt)));

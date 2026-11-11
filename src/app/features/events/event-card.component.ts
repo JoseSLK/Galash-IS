@@ -18,9 +18,9 @@ export function eventUrl(value?: string): string | null {
       <div class="body">
         <div class="date"><strong>{{ event.startAt | date:'d' }}</strong><span>{{ event.startAt | date:'MM/yyyy' }}</span></div>
         <div class="copy">
-          <div class="meta">@if (featured) {<span class="tag">SIGUIENTE EVENTO</span>} {{ event.type }} · {{ event.startAt | date:'HH:mm' }}</div>
+          <div class="meta">@if (featured) {<span class="tag">PRÓXIMA NOTICIA</span>} {{ event.type }} · {{ event.startAt | date:'HH:mm' }}</div>
           <h2>{{ event.title }}</h2>
-          <p>{{ event.venue || (event.meetingUrl ? 'Evento virtual' : 'Lugar por confirmar') }}</p>
+          <p>{{ event.venue || (event.meetingUrl ? 'Modalidad virtual' : 'Lugar por confirmar') }}</p>
           <div class="bottom"><span class="general">General</span><span class="phase">{{ phase }}</span></div>
           <button type="button" (click)="details.emit(event)" [attr.aria-label]="'Ver detalles de ' + event.title">Ver detalles ↗</button>
         </div>
@@ -40,7 +40,7 @@ export class EventCardComponent {
     if (start >= this.now) {
       if (new Date(start).toDateString() === new Date(this.now).toDateString()) return 'Hoy';
       const days = Math.ceil((start - this.now) / 86_400_000);
-      return this.featured ? (days === 1 ? 'Falta 1 día' : `Faltan ${days} días`) : 'Próximo';
+      return this.featured ? (days === 1 ? 'Falta 1 día' : `Faltan ${days} días`) : 'Próxima';
     }
     return this.event.endAt && Date.parse(this.event.endAt) >= this.now ? 'En curso' : 'Anterior';
   }
