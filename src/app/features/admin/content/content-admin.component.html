@@ -1,0 +1,53 @@
+<section class="content-manager" aria-label="Administración de contenido institucional">
+  <div class="manager-top"><p>Lo que publiques aquí se mostrará en la página <strong>Nosotros</strong>.</p><div class="publication-summary" aria-label="Resumen de publicación"><span><i class="dot published"></i>{{ publishedCount() }} de {{ pages().length }} secciones publicadas</span><span><i class="dot published"></i>{{ visibleLinks() }} de {{ links().length }} enlaces visibles</span>@if(missingUrls()){<span class="warning">{{ missingUrls() }} enlaces sin URL válida: no se muestran al público</span>}</div></div>
+  <div class="content-tabs" role="tablist" aria-label="Administrar contenido o enlaces">
+    <button id="content-pages-tab" type="button" role="tab" [attr.aria-selected]="tab()==='pages'" aria-controls="content-pages-panel" [class.active]="tab()==='pages'" [disabled]="saving()" (click)="changeTab('pages')">Contenido <span>{{ pages().length }}</span></button>
+    <button id="content-links-tab" type="button" role="tab" [attr.aria-selected]="tab()==='links'" aria-controls="content-links-panel" [class.active]="tab()==='links'" [disabled]="saving()" (click)="changeTab('links')">Enlaces <span>{{ links().length }}</span></button>
+  </div>
+  @if(tab()==='pages'){
+    <div id="content-pages-panel" role="tabpanel" aria-labelledby="content-pages-tab" class="workspace">
+      <aside class="entry-list" aria-label="Secciones institucionales"><div class="list-title"><h2>Secciones</h2><button type="button" class="add-entry" [disabled]="saving()||pagesLoading()||!!pagesError()" aria-label="Agregar sección" title="Agregar sección" (click)="openPage()">+</button></div>
+        @if(pagesLoading()){<p role="status">Cargando secciones…</p>}
+        @else if(pagesError()){<p class="error" role="alert">{{ pagesError() }}</p><button type="button" (click)="loadPages()">Reintentar</button>}
+        @else{<div class="entries">@for(page of pages();track page.id){<button class="entry" type="button" [class.selected]="page.id===pageId()" [attr.aria-current]="page.id===pageId()?'true':null" [disabled]="saving()" (click)="openPage(page)"><i class="dot" [class.published]="page.status==='publicado'"></i><span>{{ page.title }}</span><small [class.published-text]="page.status==='publicado'">{{ page.status==='publicado'?'Publicado':'Borrador' }}</small></button>}@empty{<p>No hay secciones. Usa + para crear la primera.</p>}</div>}
+      </aside>
+      @if(pageOpen()){
+        <form class="editor" [formGroup]="pageForm" (ngSubmit)="savePage()"><h2>{{ selectedPage()?.title||'Nueva sección' }}</h2>
+          <fieldset [disabled]="saving()">
+            <label>Título<input formControlName="title" (input)="updateSlug($any($event.target).value)" required></label>
+            <label>Dirección de la sección<input formControlName="slug" placeholder="quienes-somos" required aria-describedby="page-address-help"></label><small id="page-address-help">Palabras en minúsculas separadas por guiones. Identifica la sección dentro de Nosotros.</small>
+            @if(pageForm.controls.slug.touched&&pageForm.controls.slug.invalid){<p class="error">Usa letras minúsculas sin tildes, números y guiones entre palabras.</p>}
+            <label>Contenido<textarea formControlName="content" rows="12" required></textarea></label><small>{{ pageForm.controls.content.value.length }} caracteres</small>
+          </fieldset>
+          <div class="editor-actions"><button class="primary" type="submit" [disabled]="saving()">{{ saving()?'Guardando…':'Guardar cambios' }}</button>@if(selectedPage()?.status!=='publicado'){<button type="button" [disabled]="saving()" (click)="savePage(true)">Publicar sección</button>}</div>
+          <p class="editor-note">{{ selectedPage()?.status==='publicado'?'Los cambios en esta sección publicada serán visibles al guardar.':'El borrador no es visible al público hasta que lo publiques.' }}</p>
+          @if(selectedPage();as page){<p class="editor-meta">Actualizado: {{ page.updatedAt | date:'dd/MM/yyyy, HH:mm' }}@if(page.authorName){<br>Autor: {{ page.authorName }}}</p>}
+        </form>
+        <aside class="preview" aria-labelledby="page-preview-title"><p class="eyebrow">ASÍ SE VERÁ EN NOSOTROS</p><article><h2 id="page-preview-title">{{ pageForm.controls.title.value||'Título de la sección' }}</h2><div class="rendered-content" [innerHTML]="pageForm.controls.content.value"></div><p class="preview-state"><i class="dot" [class.published]="selectedPage()?.status==='publicado'"></i>{{ selectedPage()?.status==='publicado'?'Publicado':'Borrador' }}@if(pageForm.dirty){ · Cambios sin guardar}</p></article><p class="preview-note">Vista previa del contenido que estás editando.</p></aside>
+      }@else if(!pagesLoading()&&!pagesError()){<div class="editor-empty"><h2>Tu contenido empieza aquí</h2><p>Crea una sección para presentar al grupo, su misión, visión o historia.</p><button type="button" class="primary" (click)="openPage()">Crear primera sección</button></div>}
+    </div>
+  }@else{
+    <div id="content-links-panel" role="tabpanel" aria-labelledby="content-links-tab" class="workspace">
+      <aside class="entry-list" aria-label="Enlaces oficiales"><div class="list-title"><h2>Enlaces</h2><button type="button" class="add-entry" [disabled]="saving()||linksLoading()||!!linksError()" aria-label="Agregar enlace" title="Agregar enlace" (click)="openLink()">+</button></div>
+        @if(linksLoading()){<p role="status">Cargando enlaces…</p>}
+        @else if(linksError()){<p class="error" role="alert">{{ linksError() }}</p><button type="button" (click)="loadLinks()">Reintentar</button>}
+        @else{<div class="entries">@for(link of links();track link.id){<button class="entry" type="button" [class.selected]="link.id===linkId()" [disabled]="saving()" [attr.aria-current]="link.id===linkId()?'true':null" (click)="openLink(link)"><i class="dot" [class.published]="linkLabel(link)==='Visible'"></i><span>{{ link.name }}</span><small [class.published-text]="linkLabel(link)==='Visible'">{{ linkLabel(link) }}</small></button>}@empty{<p>No hay enlaces. Usa + para agregar uno.</p>}</div>}
+      </aside>
+      @if(linkOpen()){
+        <form class="editor" [formGroup]="linkForm" (ngSubmit)="saveLink()"><h2>{{ selectedLink()?.name||'Nuevo enlace' }}</h2>
+          <fieldset [disabled]="saving()">
+            <label>Nombre<input formControlName="name" required></label><label>Descripción<textarea formControlName="description" rows="3" required></textarea></label>
+            <label>Dirección del enlace<input formControlName="url" type="url" placeholder="https://" required></label>@if(linkForm.controls.url.touched&&linkForm.controls.url.invalid){<p class="error">Escribe una URL completa con http:// o https://.</p>}
+            <label>Categoría<select formControlName="category">@for(category of categories;track category.value){<option [value]="category.value">{{ category.label }}</option>}</select></label>
+            <label>Orden de aparición<input formControlName="order" type="number" min="0" step="1" required></label><label class="check"><input type="checkbox" formControlName="visible"> Mostrar al público cuando esté activo</label>
+          </fieldset>
+          <div class="editor-actions"><button class="primary" type="submit" [disabled]="saving()">{{ saving()?'Guardando…':'Guardar cambios' }}</button></div>
+          @if(selectedLink();as link){<div class="status-actions" aria-label="Cambiar estado del enlace">@if(link.status!=='activo'){<button type="button" [disabled]="saving()" (click)="setLinkStatus('activo')">Activar enlace</button>}@if(link.status!=='inactivo'){<button type="button" [disabled]="saving()" (click)="setLinkStatus('inactivo')">Desactivar</button>}@if(link.status!=='oculto'){<button type="button" [disabled]="saving()" (click)="setLinkStatus('oculto')">Ocultar</button>}</div><p class="editor-meta">Estado: {{ link.status }} · Actualizado: {{ link.updatedAt | date:'dd/MM/yyyy, HH:mm' }}</p>}
+          <p class="editor-note">Solo se muestran al público los enlaces activos, visibles y con una URL válida.</p>
+        </form>
+        <aside class="preview" aria-labelledby="link-preview-title"><p class="eyebrow">ASÍ SE VERÁ EN NOSOTROS</p><article><p class="preview-category">{{ categoryLabel(linkForm.controls.category.value) }}</p><h2 id="link-preview-title">{{ linkForm.controls.name.value||'Nombre del enlace' }}</h2><p>{{ linkForm.controls.description.value }}</p>@if(safeUrl(linkForm.controls.url.value);as url){<a class="preview-link" [href]="url" target="_blank" rel="noopener noreferrer">Visitar enlace <span aria-hidden="true">↗</span></a>}@else{<p class="warning">Agrega una URL válida para que el enlace pueda mostrarse.</p>}<p class="preview-state"><i class="dot" [class.published]="linkForm.controls.visible.value&&selectedLink()?.status!=='inactivo'&&selectedLink()?.status!=='oculto'&&!!safeUrl(linkForm.controls.url.value)"></i>{{ linkForm.controls.visible.value&&selectedLink()?.status!=='inactivo'&&selectedLink()?.status!=='oculto'&&safeUrl(linkForm.controls.url.value)?'Visible al guardar':'No visible al público' }}@if(linkForm.dirty){ · Cambios sin guardar}</p></article></aside>
+      }@else if(!linksLoading()&&!linksError()){<div class="editor-empty"><h2>Conecta al grupo</h2><p>Agrega sus redes, perfiles de investigación y recursos oficiales.</p><button type="button" class="primary" (click)="openLink()">Crear primer enlace</button></div>}
+    </div>
+  }
+  @if(error()){<p class="error feedback" role="alert">{{ error() }}</p>}@if(feedback()){<p class="success feedback" role="status">{{ feedback() }}</p>}
+</section>
