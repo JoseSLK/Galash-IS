@@ -1,0 +1,26 @@
+@if (aplica()) {
+  <div class="bell">
+    <button type="button" class="bell-trigger" [class.bell-trigger--alert]="total() > 0" aria-controls="notification-panel" [attr.aria-expanded]="abierto()"
+      [attr.aria-label]="total() ? 'Notificaciones: ' + total() + ' pendientes' : 'Notificaciones: sin pendientes'" (click)="alternar()">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 15.4A1 1 0 0 0 5.2 17h13.6a1 1 0 0 0 .9-1.6L18 12.6V9a6 6 0 0 0-6-6Zm-2.4 15.5a2.5 2.5 0 0 0 4.8 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      @if (total()) {<span class="bell-count" aria-hidden="true">{{ total() > 99 ? '99+' : total() }}</span>}
+    </button>
+    <p class="visually-hidden" role="status" aria-live="polite">{{ anuncio() }}</p>
+    @if (abierto()) {
+      <div id="notification-panel" class="bell-panel" role="region" aria-label="Notificaciones">
+        <p class="bell-caption">Pendientes</p>
+        @for (aviso of avisos(); track aviso.id) {
+          <a class="bell-item" [routerLink]="aviso.ruta" [queryParams]="aviso.query ?? null">
+            <span class="bell-item-count">{{ aviso.cantidad }}</span>
+            <span class="bell-item-copy"><strong>{{ aviso.texto }}</strong>
+              @for (titulo of aviso.detalle ?? []; track $index) {<small>{{ titulo }}</small>}
+            </span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        } @empty {
+          <p class="bell-empty">No tienes pendientes por ahora.</p>
+        }
+      </div>
+    }
+  </div>
+}

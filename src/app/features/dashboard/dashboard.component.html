@@ -66,6 +66,7 @@
       </div>
     </div>
     </nav>
+    <app-notification-bell class="header-bell" />
     <button #menuToggle class="menu-toggle" type="button" [attr.aria-expanded]="menuOpen" aria-controls="site-navigation" [attr.aria-label]="menuOpen ? 'Cerrar menú' : 'Abrir menú'" (click)="toggleMenu()">
       <span></span><span></span><span></span>
     </button>
@@ -76,40 +77,69 @@
   <main id="contenido">
     <section id="nosotros" class="hero-section" aria-labelledby="welcome-title">
       <div class="hero-copy">
-        <h1 id="welcome-title">Bienvenido a <span>GALASH</span></h1>
-        <p class="hero-description">Grupo de investigación de la Universidad Pedagógica y Tecnológica de Colombia, seccional Sogamoso.</p>
-        <a class="button button--primary" routerLink="/semilleros">Conoce los semilleros <span aria-hidden="true">↗</span></a>
-        <app-social-links class="hero-socials" />
+        <div class="hero-text">
+          <p class="hero-badge"><span class="hero-pulse" aria-hidden="true"></span>UPTC · Seccional Sogamoso</p>
+          <h1 id="welcome-title">Bienvenido a <span>GALASH</span></h1>
+          <p class="hero-description">Grupo de investigación de la Universidad Pedagógica y Tecnológica de Colombia, seccional Sogamoso.</p>
+          <a class="button button--primary" routerLink="/semilleros">Conoce los semilleros <span aria-hidden="true">↗</span></a>
+          <app-social-links class="hero-socials" />
+        </div>
+        <figure class="hero-demo" role="img" [attr.aria-label]="'Terminal: GALASH es el grupo de investigación en Auditoría, Lógica y Arquitectura de Software y Hardware. ' + seedbedCount() + ' semilleros, ' + memberCount() + ' integrantes, ' + projectCount() + ' proyectos.'">
+          <div class="hero-term-bar" aria-hidden="true"><i></i><i></i><i></i><span>galash@uptc: ~/sogamoso</span></div>
+          <div class="hero-term" aria-hidden="true">
+            <p style="--step: 0"><b>$</b> galash --acronimo</p>
+            <p style="--step: 1"><em>G</em> grupo de investigación</p>
+            <p style="--step: 2"><em>A</em> auditoría</p>
+            <p style="--step: 3"><em>L</em> lógica</p>
+            <p style="--step: 4"><em>A</em> arquitectura</p>
+            <p style="--step: 5"><em>S</em> software</p>
+            <p style="--step: 6"><em>H</em> hardware</p>
+            <p style="--step: 7"><b>$</b> galash status</p>
+            <p style="--step: 8"><strong>✓</strong> {{ seedbedCount() }} semilleros</p>
+            <p style="--step: 9"><strong>✓</strong> {{ memberCount() }} integrantes</p>
+            <p style="--step: 10"><strong>✓</strong> {{ projectCount() }} proyectos</p>
+            <p style="--step: 11"><b>$</b> <span class="hero-caret"></span></p>
+          </div>
+          <div class="hero-term-status" aria-hidden="true"><span>NORMAL</span><span>main</span><span>es-CO</span><span>utf-8</span></div>
+        </figure>
       </div>
       <app-glitch-background />
     </section>
 
+    <div class="home-ticker" aria-hidden="true">
+      <div class="ticker-track">
+        @for (copy of [0, 1]; track copy) {
+          <span>auditoría</span><span>lógica</span><span>arquitectura</span><span>software</span><span>hardware</span>
+          @for (seedbed of seedbeds(); track seedbed.id) { <span>{{ seedbed.name }}</span> }
+        }
+      </div>
+    </div>
+
     <section class="home-about" aria-label="Conoce GALASH">
-      <dl class="home-stats">
-        <div><dt>Semilleros de investigación<svg aria-hidden="true" viewBox="0 0 64 64"><path d="M32 54V30M32 39C14 40 9 29 10 16c14-1 24 5 22 23ZM32 31C31 16 40 9 54 10c1 14-6 23-22 21Z" /></svg></dt><dd>{{ seedbedCount() }}</dd></div>
-        <div><dt>Integrantes de la comunidad<svg aria-hidden="true" viewBox="0 0 64 64"><circle cx="32" cy="20" r="9"/><path d="M17 54v-8a15 15 0 0 1 30 0v8M12 18a7 7 0 0 0 0 14M52 18a7 7 0 0 1 0 14M5 50v-7a10 10 0 0 1 8-10M59 50v-7a10 10 0 0 0-8-10" /></svg></dt><dd>{{ memberCount() }}</dd></div>
-        <div><dt>Proyectos<svg aria-hidden="true" viewBox="0 0 64 64"><path d="M24 8h16M28 8v19L14 49a5 5 0 0 0 4 7h28a5 5 0 0 0 4-7L36 27V8M22 40h20"/><circle cx="30" cy="46" r="2"/></svg></dt><dd>{{ projectCount() }}</dd></div>
-      </dl>
       <div class="about-story">
-        <div class="about-copy"><p class="eyebrow">Conocimiento que nos conecta</p><h3>Un espacio para investigar y crecer</h3><p>Somos el grupo de investigación en Auditoría, Lógica y Arquitectura de Software y Hardware de la UPTC, seccional Sogamoso.</p><p>Unimos a estudiantes y docentes para explorar ideas y desarrollar proyectos de investigación.</p><a class="text-link" routerLink="/nosotros">Conoce más sobre nosotros →</a></div>
+        <div class="about-copy"><p class="eyebrow">Conocimiento que nos conecta</p><h3>Un espacio para investigar y crecer</h3><p>Somos el grupo de investigación en Auditoría, Lógica y Arquitectura de Software y Hardware de la UPTC, seccional Sogamoso.</p><p>Unimos a estudiantes y docentes para explorar ideas y desarrollar proyectos de investigación.</p><dl class="about-meta"><div><dt>sede</dt><dd>UPTC · Sogamoso, Boyacá</dd></div><div><dt>áreas</dt><dd>auditoría · lógica · arquitectura</dd></div><div><dt>abierto a</dt><dd>estudiantes y docentes</dd></div></dl><a class="text-link" routerLink="/nosotros">Conoce más sobre nosotros →</a></div>
         <app-scroll-stack />
       </div>
     </section>
 
-    @if (currentSeedbed; as current) {
-    <section id="semilleros" class="seedbeds-section" aria-label="Semilleros">
-      <div class="section-heading"><p class="eyebrow">Explora nuestra comunidad</p></div>
-      <div class="seedbed-tabs" role="tablist" aria-label="Semilleros disponibles" [style.--line-progress]="seedbeds().length > 1 ? activeSeedbed / (seedbeds().length - 1) : 0">
-        @for (seedbed of seedbeds(); track seedbed.id; let i = $index) {
-          <button type="button" role="tab" [id]="'home-seedbed-tab-' + i" aria-controls="home-seedbed-panel" [attr.aria-selected]="i === activeSeedbed" [attr.tabindex]="i === activeSeedbed ? 0 : -1" [class.is-active]="i === activeSeedbed" [class.is-reached]="i <= activeSeedbed" [attr.aria-label]="seedbed.name" [title]="seedbed.name" (click)="selectSeedbed(i)" (keydown)="navigateSeedbeds($event, i)"><span class="seedbed-node" aria-hidden="true"></span><span class="seedbed-label">{{ abbreviation(seedbed.name) }}</span></button>
-        }
-      </div>
-      <div class="seedbed-layout" id="home-seedbed-panel" role="tabpanel" [attr.aria-labelledby]="'home-seedbed-tab-' + activeSeedbed">
-        <article class="seedbed-copy" aria-live="polite"><p class="eyebrow">Semillero {{ activeSeedbed + 1 }}</p><h3>{{ current.name }}</h3><p class="seedbed-phrase">{{ current.researchLine }}</p><p>{{ current.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: current.id }">Conoce el semillero →</a></article>
-        <div class="seedbed-emblem" role="img" [attr.aria-label]="'Icono de ' + current.name">
-          <div class="emblem-orbit" aria-hidden="true"></div>
-          <svg viewBox="0 0 160 160" aria-hidden="true">
-            @switch (seedbedIcon) {
+    @if (seedbeds().length) {
+    <section id="semilleros" class="seedbeds-section" aria-labelledby="home-seedbeds-title">
+      <div class="section-heading"><div><p class="eyebrow">Explora nuestra comunidad</p><h2 id="home-seedbeds-title">Semilleros de investigación</h2></div><a class="text-link" routerLink="/semilleros">Ver todos →</a></div>
+      <div class="seedbed-scroll">
+        <nav class="seedbed-rail" aria-label="Semilleros" [style.--line-progress]="seedbeds().length > 1 ? activeSeedbed / (seedbeds().length - 1) : 0">
+          @for (seedbed of seedbeds(); track seedbed.id; let i = $index) {
+            <button type="button" [class.is-active]="i === activeSeedbed" [class.is-reached]="i <= activeSeedbed" [attr.aria-current]="i === activeSeedbed ? 'true' : null" [attr.aria-label]="seedbed.name" (click)="selectSeedbed(i)"><span class="seedbed-node" aria-hidden="true"></span><span class="rail-index" aria-hidden="true">0{{ i + 1 }}</span>{{ abbreviation(seedbed.name) }}</button>
+          }
+        </nav>
+        <div class="seedbed-blocks" #seedbedBlocks>
+          @for (seedbed of seedbeds(); track seedbed.id; let i = $index) {
+          <article class="seedbed-block">
+            <div class="seedbed-layout">
+              <div class="seedbed-copy"><p class="eyebrow">Semillero 0{{ i + 1 }} / 0{{ seedbeds().length }}</p><h3>{{ seedbed.name }}</h3><p class="seedbed-phrase">{{ seedbed.researchLine }}</p><p>{{ seedbed.description }}</p><a class="text-link" routerLink="/semilleros" [queryParams]="{ id: seedbed.id }">Conoce el semillero →</a></div>
+              <div class="seedbed-emblem" role="img" [attr.aria-label]="'Icono de ' + seedbed.name">
+                <div class="emblem-orbit" aria-hidden="true"></div>
+                <svg viewBox="0 0 160 160" aria-hidden="true">
+            @switch (iconFor(seedbed)) {
               @case ('cloud') { <path class="emblem-main" d="M42 85a20 20 0 0 1-4-40 29 29 0 0 1 55-8 22 22 0 1 1 16 48Z"/><path class="emblem-accent" d="M56 86v23h48V86M80 86v40"/><g class="emblem-nodes"><circle cx="56" cy="109" r="5"/><circle cx="104" cy="109" r="5"/><circle cx="80" cy="126" r="5"/></g> }
               @case ('algorithm') { <rect class="emblem-main" x="64" y="24" width="32" height="22" rx="5"/><path class="emblem-main" d="m80 60 23 19-23 19-23-19Z M80 46v14M57 79H38v32M103 79h19v32"/><rect class="emblem-accent" x="24" y="111" width="28" height="22" rx="5"/><rect class="emblem-accent" x="108" y="111" width="28" height="22" rx="5"/> }
               @case ('innovation') { <path class="emblem-main" d="M65 111v-11c0-10-20-17-20-39a35 35 0 0 1 70 0c0 22-20 29-20 39v11ZM66 122h28M73 133h14"/><path class="emblem-accent" d="m82 45-12 22h17l-9 19M25 60h10m90 0h10M37 28l8 8m70 0 8-8"/> }
@@ -119,9 +149,13 @@
               @case ('ar') { <g class="emblem-cube"><path class="emblem-main" d="m80 37 39 23v43l-39 23-39-23V60Z"/><path class="emblem-accent" d="m41 60 39 23 39-23M80 83v43"/></g><path class="emblem-accent" d="M26 49V26h23M111 26h23v23M134 111v23h-23M49 134H26v-23"/> }
               @default { <path class="emblem-main" d="M65 28h30M72 28v36l-29 51a12 12 0 0 0 10 18h54a12 12 0 0 0 10-18L88 64V28M59 99h42"/> }
             }
-          </svg>
+                </svg>
+              </div>
+              <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h4>Preguntas que abren caminos</h4>@if (seedbed.topics?.length) {<ul>@for (topic of seedbed.topics; track topic.title) {<li><span aria-hidden="true">✓</span>{{ topic.title }}</li>}</ul>} @else {<p>{{ seedbed.objective }}</p>}</aside>
+            </div>
+          </article>
+          }
         </div>
-        <aside class="seedbed-topics"><p class="eyebrow">Investiga con nosotros</p><h3>Preguntas que abren caminos</h3>@if (current.topics?.length) {<ul>@for (topic of current.topics; track topic.title) {<li><span aria-hidden="true">✓</span>{{ topic.title }}</li>}</ul>} @else {<p>{{ current.objective }}</p>}</aside>
       </div>
     </section>
     }

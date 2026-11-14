@@ -22,3 +22,10 @@ export function nextHeaderState(state: HeaderScrollState, y: number): HeaderScro
   else if (compact && anchorY - y >= HEADER_SCROLL.up) compact = false;
   return { compact, anchorY, lastY: y, direction };
 }
+
+/** Índice del último bloque cuyo borde superior ya cruzó `line` (px desde el borde superior de la ventana); 0 si ninguno. */
+export function lastIndexAbove(tops: number[], line: number): number {
+  let index = 0;
+  tops.forEach((top, i) => { if (top <= line) index = i; });
+  return index;
+}

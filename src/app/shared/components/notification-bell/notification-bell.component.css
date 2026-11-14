@@ -1,0 +1,20 @@
+:host { display: block; flex-shrink: 0; }
+:host(.bell-empty-host) { display: none; }
+.bell { position: relative; }
+.bell-trigger { position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--galash-text-strong); cursor: pointer; }
+.bell-trigger:hover, .bell-trigger[aria-expanded='true'] { background: color-mix(in srgb, var(--galash-text-strong) 6%, transparent); }
+.bell-trigger--alert svg { color: var(--galash-accent); }
+.bell-count { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--galash-accent); color: var(--galash-accent-fg); font: 600 11px/18px var(--fuente-texto); text-align: center; }
+.bell-panel { position: absolute; z-index: 40; top: calc(100% + 8px); right: 0; display: grid; gap: 10px; width: min(320px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--galash-border); border-radius: 16px; background: var(--galash-surface); box-shadow: 0 20px 45px #0005; }
+.bell-caption { margin: 0; color: var(--galash-muted); font: 600 11px var(--galash-mono); letter-spacing: .08em; text-transform: uppercase; }
+.bell-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; min-height: 44px; padding: 10px 12px; border: 1px solid var(--galash-border-strong); border-radius: 12px; color: var(--galash-text-strong); text-decoration: none; }
+.bell-item:hover { background: color-mix(in srgb, var(--galash-text-strong) 6%, transparent); }
+.bell-item-count { min-width: 28px; color: var(--galash-accent); font: 600 18px var(--fuente-titulo); text-align: center; }
+.bell-item-copy { display: grid; gap: 3px; min-width: 0; }
+.bell-item-copy strong { font: 600 14px var(--fuente-texto); }
+.bell-item-copy small { overflow: hidden; color: var(--galash-text); font: 12px var(--fuente-texto); text-overflow: ellipsis; white-space: nowrap; }
+.bell-empty { margin: 0; color: var(--galash-text); font: 14px var(--fuente-texto); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 900px) { .bell-panel { position: fixed; top: 68px; right: 16px; max-height: calc(100dvh - 84px); overflow-y: auto; } }
+@media (prefers-reduced-motion: no-preference) { .bell-trigger--alert svg { animation: bell-ring 1.2s ease-in-out 2; transform-origin: 50% 10%; } }
+@keyframes bell-ring { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(14deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(6deg); } 80% { transform: rotate(-3deg); } }
