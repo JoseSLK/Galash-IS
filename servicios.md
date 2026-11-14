@@ -50,6 +50,7 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | DELETE | `/auth/sessions/current` | cierra sesion | M1 | [x] |
 | GET | `/users/me` | perfil y roles | M1 | [x] |
 | PUT | `/users/me/photo` | guarda URL de foto de perfil | M1 | [x] |
+| PUT | `/users/{userId}/photo` | Admin reemplaza o quita (`""`) la URL de foto de otra cuenta | M1 | [x] |
 | GET | `/members` | dir. publico | M5 | [x] |
 | POST | `/members` | crea perfil | M5 | [ ] |
 | GET | `/members/{id}` | detalle público/privado autorizado | M5 | [x] |
@@ -60,7 +61,7 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | PUT | `/users/roles` | alias rol | - | [ ] |
 | PUT | `/users/{userId}/roles` | asigna rol (id = Firebase UID) | M11 | [x] |
 | GET | `/seedbeds` | lista | M2 | [x] |
-| POST | `/seedbeds` | crea | M2 | [ ] |
+| POST | `/seedbeds` | crea | M2 | [x] |
 | GET | `/seedbeds/{id}` | detalle | M2 | [x] |
 | GET | `/seedbeds/{id}/space` | vista compuesta | M2 | [x] |
 | PATCH | `/seedbeds/{id}` | edita | M2 | [x] |
@@ -123,7 +124,7 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | POST | `/links` | crea enlace oficial validando URL externa | M10 | [x] |
 | PATCH | `/links/{id}` | actualiza enlace oficial y registra historial | M10 | [x] |
 | PATCH | `/links/{id}/status` | activa, desactiva u oculta enlace sin borrar historial | M10 | [x] |
-| GET | `/audit-logs` | consulta bitácora filtrable por actor, acción, entidad y periodo; Admin | M12 | [ ] |
+| GET | `/audit-logs` | consulta bitácora filtrable por actor, acción, entidad y periodo; Admin | M12 | [x] |
 | POST | `/files` | carga multipart segura asociada a una entidad | M13 | [x] |
 | GET | `/files/{id}` | descarga autorizada de un archivo adjunto | M13 | [x] |
 
@@ -146,12 +147,15 @@ lista inválida, `403` si no es director/Admin). `GET /seedbeds/{id}/members`
 marca `delegate: true`. Director y delegados gestionan solicitudes (M3),
 actividades (M4), eventos de su semillero (M6) y cronograma (M9, sin
 implementar). Aprobar una solicitud inscribe al solicitante como integrante
-activo del semillero. Una solicitud la decide el primero que la procese; si otro ya
+activo del semillero; un `visitante` pasa a `estudiante` y otros roles se conservan
+(Admin asigna `docente` a mano). Una solicitud la decide el primero que la procese; si otro ya
 cambió el estado responde `400`. Sin permiso: `403`.
 
 M2: los semilleros incluyen `topics` (máx. 4 `{title, phrase}`); en `PATCH
 /seedbeds/{id}` omitirlo conserva los temas. `GET /admin/members` responde
 `{"users": [...]}`, lista todas las cuentas sin `q` e incluye inactivas; `q` filtra opcionalmente por nombre o correo.
+
+M5: `GET /members` y `GET /members/{id}` incluyen `photo_url` (enlace de `PUT /users/me/photo`; `""` si no hay), dato público mostrado en el directorio y en el detalle del integrante.
 
 M6 usa `title`, `description`, `type`, `startAt`, `endAt`, `venue`, `meetingUrl`,
 `imageUrl` y `registrationUrl`. Las fechas son RFC3339; los estados son

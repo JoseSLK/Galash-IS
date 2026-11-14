@@ -36,6 +36,7 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 | `DELETE` | `/auth/sessions/current` | Invalida la sesión actual. | Must / Estudiante, Docente o Admin | HU-AUTH-02 |
 | `GET` | `/users/me` | Devuelve el perfil mínimo (incluidos los datos básicos del alta) y los roles y permisos efectivos del usuario autenticado. | Must / Estudiante, Docente o Admin | HU-AUTH-01, HU-TR-02 |
 | `PUT` | `/users/me/photo` | Guarda el enlace (URL) de la imagen de perfil del usuario autenticado; reemplaza el anterior. | Must / Estudiante, Docente o Admin | — |
+| `PUT` | `/users/{userId}/photo` | Reemplaza o quita el enlace (URL) de la imagen de perfil de otra cuenta; solo se almacena el enlace. | Must / Admin | — |
 | `POST` | `/auth/password-recovery-requests` | Solicita recuperación por correo; la respuesta no revela si el correo está registrado. | Should / Visitante | HU-AUTH-03 |
 | `POST` | `/auth/password-resets` | Cambia la contraseña con un token vigente, de un solo uso. | Should / Visitante con token | HU-AUTH-03 |
 
@@ -46,6 +47,8 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 **Perfil en `GET /users/me`:** además de `id`, `name`, `last_name`, `email`, `role` y `status`, devuelve `document_type`, `document_number`, `student_code`, `birth_date` (`AAAA-MM-DD`) y `phone`; un dato no registrado llega como cadena vacía. También devuelve `managed_seedbed_ids`: lista (posiblemente vacía) de ids de semilleros de los que el usuario es director o delegado activo; no incluye el acceso global de `Admin`. Incluye `photo_url`: enlace de la imagen de perfil (cadena vacía si no hay).
 
 **Foto de perfil en `PUT /users/me/photo`:** requiere sesión activa y cuerpo JSON `{"photo_url":"<url>"}`; la URL debe ser absoluta `http` o `https` con host y de máximo 2048 caracteres. El enlace queda asociado al usuario de la sesión (nunca a un id enviado por el cliente) y reemplaza el anterior. Responde `200` con `{"photo_url":"<url>"}`. Errores: `400` para JSON inválido o URL inválida, `401` sin sesión o con sesión inválida/expirada y `500` si falla el guardado; formato de error `{"error":"<mensaje>"}`.
+
+**Foto de una cuenta por Admin en `PUT /users/{userId}/photo`:** `userId` es el `id` de la cuenta (el mismo de `GET /members`). Requiere sesión `Admin` y cuerpo JSON `{"photo_url":"<url>"}`, con las mismas reglas de URL que `PUT /users/me/photo`; `""` quita la foto. Solo se guarda el enlace. Responde `200` con `{"photo_url":"<url>"}`. Errores: `400` para JSON inválido, `photo_url` ausente o URL inválida, `401` sin sesión o con sesión inválida/expirada, `403` si no es `Admin`, `404` si la cuenta no existe y `500` si falla el guardado; formato de error `{"error":"<mensaje>"}`.
 
 **Reglas clave:** las contraseñas se almacenan con hash seguro; las sesiones expiran y se revocan al cerrar sesión. Solo `Admin` puede asignar o retirar los cuatro roles permitidos.
 
@@ -84,7 +87,7 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 
 **Datos de la solicitud:** `POST /registration-requests` requiere sesión; sin sesión válida responde `401`. Los datos personales (`nombre`, `cc`, `telefono`, `fechaNacimiento`) no se envían: se toman de la cuenta referenciada por `userId` y no se copian en la solicitud. `cod` es opcional: vacío se ignora y con valor actualiza el `codigo_estudiantil` de la cuenta (`409` si pertenece a otra cuenta). Obligatorios: `lugarNacimiento`, `direccionResidencia`, `linkCvLAC`, `linkORCID`, `maximoNivelEstudio`, `tituloPregrado`, `vinculacion`, `categoriaActualInvestigador` y `convocatoriaMinCiencias`; si falta alguno, o la cuenta no tiene documento, teléfono o fecha de nacimiento, responde `400`. Las respuestas de consulta siguen devolviendo `nombre`, `cc`, `cod`, `telefono` y `fechaNacimiento`, leídos de la cuenta. `tituloMaximoNivelEstudio` es opcional: puede omitirse o enviarse vacío; no bloquea la creación de la solicitud.
 
-**Estados mínimos:** `Radicada`, `En revisión`, `Aprobada`, `Rechazada` y `Pendiente de información`. Las transiciones permitidas son `Radicada` → `En revisión` o `Pendiente de información`, `Pendiente de información` → `En revisión` y `En revisión` → `Aprobada` o `Rechazada`. Basta una sola decisión: la atiende el primer gestor (director o delegado) o `Admin` que la procese; si otro ya cambió el estado, la transición se rechaza con `400`. Sin permiso sobre la solicitud responde `403`. Las solicitudes antiguas sin semillero solo las gestiona `Admin`. La pantalla administrativa puede actualizarse mediante consulta periódica; si se requiere actualización push, se puede añadir SSE/WebSocket sin cambiar el modelo de solicitudes.
+**Estados mínimos:** `Radicada`, `En revisión`, `Aprobada`, `Rechazada` y `Pendiente de información`. Las transiciones permitidas son `Radicada` → `En revisión` o `Pendiente de información`, `Pendiente de información` → `En revisión` y `En revisión` → `Aprobada` o `Rechazada`. Basta una sola decisión: la atiende el primer gestor (director o delegado) o `Admin` que la procese; si otro ya cambió el estado, la transición se rechaza con `400`. Sin permiso sobre la solicitud responde `403`. Las solicitudes antiguas sin semillero solo las gestiona `Admin`. Al aprobarse, el solicitante queda como integrante activo del semillero y, si su rol era `Visitante`, pasa a `Estudiante`; los demás roles se conservan. Si el solicitante es docente, `Admin` le asigna el rol `Docente` manualmente con `PUT /users/{userId}/roles`. La pantalla administrativa puede actualizarse mediante consulta periódica; si se requiere actualización push, se puede añadir SSE/WebSocket sin cambiar el modelo de solicitudes.
 
 ### Módulo 4. Actividades, proyectos y propuestas de investigación
 
@@ -150,6 +153,8 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 | `PATCH` | `/members/{id}` | Edita datos, asociación a semilleros, visibilidad y enlace CvLAC. | Must / Admin | HU-INT-01, HU-INT-03 |
 | `PATCH` | `/members/{id}/status` | Activa o desactiva perfil sin borrar historial relacionado. | Must / Admin | HU-INT-01 |
 | `GET` | `/members/{id}/publications` | Consulta artículos y publicaciones asociados al perfil cuando existan. | Must / Visitante según visibilidad | HU-INT-02 |
+
+**Foto en perfiles de integrantes:** `GET /members` y `GET /members/{id}` incluyen `photo_url` en cada perfil: el enlace guardado con `PUT /users/me/photo` (cadena vacía si no hay). Es un dato público del perfil y se muestra también en el directorio.
 
 ### Módulo 6. Eventos, talleres y convocatorias
 

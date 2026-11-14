@@ -188,3 +188,9 @@ GALASH-UPTC web system for academic management, research, and communication.
 - Pie de página: paleta de grafito y azul oscuro con amarillo limitado al botón y acentos.
 
 - Pie de página: recupera la paleta azul original y el botón con borde; se conservan los datos de contacto y los enlaces actuales.
+- Administración → Auditoría (solo Admin, oculta en modo líder) consume GET /audit-logs solo tras doble confirmación, con periodo obligatorio (máx. 31 días) y actor; módulo, operación, resultado y texto se filtran localmente con paginación de 25.
+- Administración → Semilleros (solo Admin) crea semilleros con POST /seedbeds en estado Borrador, eligiendo un docente activo como responsable y hasta 4 temas; el responsable lo publica desde Administrar mi semillero.
+- /gestion-semillero admite director y delegados: el delegado gestiona solicitudes, actividades, noticias y cronograma; Integrantes y delegados, Mi semillero y Proyectos son solo del director. Semilleros delegados no publicados no aparecen (backend responde 404).
+- Comunicados para docentes: Mi perfil muestra la sección Comunicados (rol docente) para leer, descargar adjuntos y confirmar lectura; Nueva reunión solo para Admin o docentes que gestionan semillero.
+- Campana de notificaciones en el encabezado: Admin (postulaciones abiertas, reseñas pendientes), líder/delegado (postulaciones de sus semilleros) y docente (comunicados sin leer); sondeo de 60 s.
+- Fotos de integrantes: el Admin las edita con un lápiz sobre el retrato en /integrantes/:id mediante PUT /users/{userId}/photo (solo se guarda el enlace; "" la quita).
