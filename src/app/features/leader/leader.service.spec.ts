@@ -8,13 +8,20 @@ describe('LeaderService', () => {
   let service: LeaderService; let http: HttpTestingController;
   beforeEach(() => { TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] }); service = TestBed.inject(LeaderService); http = TestBed.inject(HttpTestingController); });
   afterEach(() => http.verify());
-  it('only exposes semilleros actually directed by the authenticated user', async () => {
+  it('exposes directed and delegated semilleros, marking only the directed one as director', async () => {
     const load = service.owned();
     http.expectOne('/api/users/me').flush({ id: 'leader', managed_seedbed_ids: ['own','delegated'] });
     await Promise.resolve();
     http.expectOne('/api/seedbeds/own').flush({ id: 'own', responsibleTeacherId: 'leader' });
     http.expectOne('/api/seedbeds/delegated').flush({ id: 'delegated', responsibleTeacherId: 'other' });
-    await expect(load).resolves.toEqual([{ id: 'own', responsibleTeacherId: 'leader' }]);
+    await expect(load).resolves.toEqual([{ id: 'own', responsibleTeacherId: 'leader', director: true }, { id: 'delegated', responsibleTeacherId: 'other', director: false }]);
+  });
+  it('skips an unpublished delegated semillero (404) without reporting a failure', async () => {
+    const load = service.owned();
+    http.expectOne('/api/users/me').flush({ id: 'delegate', managed_seedbed_ids: ['draft'] });
+    await Promise.resolve();
+    http.expectOne('/api/seedbeds/draft').flush({}, { status: 404, statusText: 'Not Found' });
+    await expect(load).resolves.toEqual([]);
   });
   it('never queries the directory when the search term is too short', async () => { await expect(service.candidates('a')).resolves.toEqual([]); });
   it('reports a lookup failure instead of claiming the user has no semilleros', async () => {

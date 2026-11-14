@@ -14,8 +14,7 @@ for (const role of ['admin', 'docente', 'estudiante']) {
   test(`account menu keeps global administration for admin and hides leadership from a non-leader ${role}`, async ({ page }) => {
     await page.route('**/api/**', route => {
       const path = new URL(route.request().url()).pathname;
-      if (path === '/api/users/me') return route.fulfill({ json: { id:'user',name:'Usuario',role,status:'activo',managed_seedbed_ids:['delegated'] } });
-      if (path === '/api/seedbeds/delegated') return route.fulfill({json:{id:'delegated',name:'Otro semillero',responsibleTeacherId:'other'}});
+      if (path === '/api/users/me') return route.fulfill({ json: { id:'user',name:'Usuario',role,status:'activo',managed_seedbed_ids:[] } });
       return route.fulfill({json:{projects:[],seedbeds:[],reviews:[]}});
     });
     await page.goto('/mi-perfil');
@@ -28,7 +27,7 @@ for (const role of ['admin', 'docente', 'estudiante']) {
       await menu.getByRole('link',{name:'Administración',exact:true}).click();
       await expect(page.locator('app-admin')).toBeVisible();
       await expect(page.locator('#admin-screen-title')).toHaveText('Gestión de usuarios');
-      await chooseSection(page, 'Eventos');
+      await chooseSection(page, 'Noticias');
       await expect(page.locator('app-events-admin')).toBeVisible();
       await expect(page.getByText(/Pendiente para el líder: el backend aún no ofrece/)).toHaveCount(0);
     }
@@ -68,8 +67,34 @@ test('leader enters own panel from profile and only loads scoped requests', asyn
   await chooseSection(page, 'Proyectos');
   await expect(page.getByText(/Pendiente para el líder: el backend debe restringir/)).toBeVisible();
   expect(calls.some(path => path.startsWith('/api/admin/members'))).toBe(false);
-  await page.goto('/gestion-semillero?seedbedId=delegated');
-  await expect(page.getByText('No tienes acceso como líder a este semillero.')).toBeVisible();
+  await page.goto('/gestion-semillero?seedbedId=ajeno');
+  await expect(page.getByText('No diriges este semillero ni eres su delegado.')).toBeVisible();
+});
+
+test('delegate manages requests, activities and events but not members or seedbed data', async ({ page }) => {
+  const calls: string[] = [];
+  await page.route('**/api/**', route => {
+    const url = new URL(route.request().url()); calls.push(route.request().method() + ' ' + url.pathname + url.search);
+    if (url.pathname === '/api/users/me') return route.fulfill({ json: { id: 'delegate', name: 'Delegada', role: 'estudiante', status: 'activo', managed_seedbed_ids: ['delegated'] } });
+    if (url.pathname === '/api/seedbeds/delegated') return route.fulfill({ json: { id: 'delegated', name: 'Semillero delegado', responsibleTeacherId: 'director' } });
+    if (url.pathname === '/api/admin/registration-requests') return route.fulfill({ json: { requests: [{ id: 'r1', seedbedId: 'delegated', nombre: 'Solicitud delegada', estado: 'Radicada', fechaRadicacion: '2026-11-01', fechaActualizacion: '2026-11-01' }] } });
+    if (url.pathname === '/api/seedbeds/delegated/activities') return route.fulfill({ json: { activities: [] } });
+    return route.fulfill({ json: { projects: [], seedbeds: [], reviews: [], events: [], members: [] } });
+  });
+  await page.goto('/mi-perfil');
+  await openAccountMenu(page);
+  await page.locator('#header-auth-dropdown').getByRole('link', { name: 'Administrar mi semillero' }).click();
+  await expect(page.locator('#admin-screen-title')).toHaveText('Solicitudes de ingreso');
+  await expect(page.getByText('Solicitud delegada', { exact: true })).toBeVisible();
+  await expect(page.locator('.search-status').filter({ hasText: 'Delegado' })).toBeVisible();
+  for (const hidden of ['Integrantes y delegados', 'Mi semillero', 'Proyectos']) await expect(page.getByRole('button', { name: hidden, exact: true })).toHaveCount(0);
+  await chooseSection(page, 'Actividades');
+  await expect(page.getByRole('button', { name: 'Guardar actividad' })).toBeVisible();
+  await chooseSection(page, 'Noticias');
+  await expect(page.locator('app-events-admin')).toBeVisible();
+  await chooseSection(page, 'Cronograma');
+  await expect(page.locator('app-comunicados-admin')).toBeVisible();
+  expect(calls.some(c => c.startsWith('PUT /api/seedbeds/delegated/delegates') || c.startsWith('GET /api/seedbeds/delegated/members'))).toBe(false);
 });
 
 test('leader manages own semillero, members, activities and creates and publishes a scoped event', async ({ page }, info) => {
@@ -103,10 +128,10 @@ test('leader manages own semillero, members, activities and creates and publishe
   await page.getByRole('button',{name:'Retirar a Eva'}).click();await expect(page.getByRole('button',{name:'Retirar a Eva'})).toHaveCount(0);
   await chooseSection(page, 'Actividades');await page.getByLabel('Título',{exact:true}).fill('Taller propio');await page.getByRole('button',{name:'Guardar actividad'}).click();await expect(page.getByRole('button',{name:'Editar Taller propio'})).toBeVisible();
   await page.getByRole('button',{name:'Editar Taller propio'}).click();await page.getByLabel('Estado',{exact:true}).selectOption('finalizada');await page.getByRole('button',{name:'Guardar actividad'}).click();await expect(page.getByText('finalizada · Sin fecha')).toBeVisible();
-  await chooseSection(page, 'Eventos');await expect(page.getByText(/Pendiente para el líder: el backend aún no ofrece/)).toBeVisible();
-  await page.getByLabel('Título',{exact:false}).fill('Encuentro propio');await page.getByLabel('Descripción',{exact:false}).fill('Encuentro del semillero');await page.getByLabel('Tipo',{exact:false}).fill('Taller');await page.getByLabel('Fecha y hora de inicio',{exact:false}).fill('2027-01-15T10:00');await page.getByLabel('Lugar',{exact:true}).fill('Aula');await page.getByRole('button',{name:'Crear borrador'}).click();await expect(page.getByText('Evento creado como borrador.')).toBeVisible();
-  await page.getByRole('button',{name:'Publicar',exact:true}).click();await expect(page.getByText('Estado del evento actualizado.')).toBeVisible();expect(event.status).toBe('publicado');
-  await chooseSection(page, 'Solicitudes de ingreso');await chooseSection(page, 'Eventos');await expect(page.getByText('Encuentro propio',{exact:true})).toBeVisible();
+  await chooseSection(page, 'Noticias');await expect(page.getByText(/Pendiente para el líder: el backend aún no ofrece/)).toBeVisible();
+  await page.getByLabel('Título',{exact:false}).fill('Encuentro propio');await page.getByLabel('Descripción',{exact:false}).fill('Encuentro del semillero');await page.getByLabel('Tipo',{exact:false}).fill('Taller');await page.getByLabel('Fecha y hora de inicio',{exact:false}).fill('2027-01-15T10:00');await page.getByLabel('Lugar',{exact:true}).fill('Aula');await page.getByRole('button',{name:'Crear borrador'}).click();await expect(page.getByText('Noticia creada como borrador.')).toBeVisible();
+  await page.getByRole('button',{name:'Publicar',exact:true}).click();await expect(page.getByText('Estado de la noticia actualizado.')).toBeVisible();expect(event.status).toBe('publicado');
+  await chooseSection(page, 'Solicitudes de ingreso');await chooseSection(page, 'Noticias');await expect(page.getByText('Encuentro propio',{exact:true})).toBeVisible();
   expect(calls.some(c=>c==='GET /api/events'||c.startsWith('GET /api/projects')||c.startsWith('GET /api/admin/members'))).toBe(false);
   await page.locator('main').screenshot({style:'app-dashboard {visibility:hidden !important}',path:`docs/testing/evidence/R20261104-leader/${info.project.name}.png`});
 });

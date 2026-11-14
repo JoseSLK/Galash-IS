@@ -25,6 +25,8 @@ export class ComunicadosAdminComponent implements OnInit {
  readonly filtro=signal<'todo'|'reunion'|'comunicado'>('todo');readonly tipo=signal<ComunicadoAgenda['tipo']>('reunion');readonly elegido=signal<string|null>(null);readonly error=signal('');readonly feedback=signal('');
  readonly cargando=signal(false);readonly guardando=signal(false);readonly errorCarga=signal('');readonly errorDetalle=signal('');
  readonly semilleros=signal<Seedbed[]>([]);readonly integrantes=signal<SeedbedMember[]>([]);readonly participantes=signal<string[]>([]);readonly lecturas=signal<Lectura[]|null>(null);
+ // Meetings are created by Admin or the seedbed's director/delegate; other docentes only read.
+ readonly semillerosEditables=computed(()=>this.auth.isAdmin()||this.seedbedId?this.semilleros():this.semilleros().filter(s=>(this.auth.backendUser()?.managed_seedbed_ids??[]).includes(s.id)));
  readonly seleccionado=computed(()=>this.store.items().find(p=>p.id===this.elegido()));
  readonly agendaActiva=computed(()=>this.store.items().filter(item=>item.status!=='cancelado'));
  readonly listado=computed(()=>this.agendaActiva().filter(p=>(!this.seedbedId||p.seedbedId===this.seedbedId)&&p.fecha.startsWith(fechaLocal(this.mes()).slice(0,7))&&(!this.filtrarDia()||p.fecha===this.fecha())&&(this.filtro()==='todo'||p.tipo===this.filtro())).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.inicio.localeCompare(b.inicio)));
