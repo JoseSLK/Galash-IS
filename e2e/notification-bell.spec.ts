@@ -46,7 +46,8 @@ test('docente bell lists unread announcements, announces new ones and clears aft
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Notificaciones: 1 pendientes' })).toBeVisible();
   notices.push({ ...notices[0], id: 'a2', title: 'Reunión general', publishedAt: '2026-11-02T10:00:00Z', readConfirmed: false });
-  await page.clock.runFor(61_000);
+  // fastForward fires the 60 s poll once; runFor would replay every animation frame and take ~25 s of real time (D007).
+  await page.clock.fastForward(61_000);
   await expect(page.getByRole('status').filter({ hasText: 'Nuevo comunicado: Reunión general' })).toBeAttached();
   const bell = page.getByRole('button', { name: 'Notificaciones: 2 pendientes' });
   await bell.click();
