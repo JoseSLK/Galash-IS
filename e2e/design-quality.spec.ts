@@ -18,15 +18,18 @@ const empty = { seedbeds: [], members: [], projects: [], events: [], pages: [], 
 
 type Mode = 'ok' | 'slow' | 'error';
 async function api(page: Page, initial: Mode = 'ok') {
+  // 'slow' holds responses until the mode changes, so the loading state is observable even on a loaded machine.
+  let release = () => {};
+  const gate = new Promise<void>(r => { release = r; });
   const state = { mode: initial };
   await page.route('**/api/**', async route => {
     if (new URL(route.request().url()).pathname === '/api/users/me') return route.fulfill({ status: 401, json: { error: 'sesión requerida' } });
     const mode = state.mode;
-    if (mode === 'slow') await new Promise(r => setTimeout(r, 2500));
+    if (mode === 'slow') await gate;
     // A slow response may arrive after the page moved on; ignore that late fulfil.
     await (mode === 'error' ? route.fulfill({ status: 500, json: { error: 'falla simulada' } }) : route.fulfill({ json: empty })).catch(() => undefined);
   });
-  return (mode: Mode) => { state.mode = mode; };
+  return (mode: Mode) => { state.mode = mode; release(); };
 }
 
 function save(name: string, data: unknown) {
@@ -56,7 +59,8 @@ for (const s of screens.filter(s => ['/semilleros', '/proyectos', '/noticias', '
     const setMode = await api(page, 'slow');
     await page.goto(s.path);
     const busy = page.locator('[aria-busy="true"], [role="status"], [role="progressbar"], [aria-live]').filter({ hasText: /\S/ }).first();
-    states.cargando = await busy.isVisible().catch(() => false) ? (await busy.innerText()).trim() || '(indicador sin texto)' : '';
+    // Responses are held, so the page must reach a visible loading state; wait for it instead of sampling once.
+    states.cargando = await busy.waitFor({ state: 'visible', timeout: 10_000 }).then(async () => (await busy.innerText()).trim() || '(indicador sin texto)', () => '');
     setMode('ok');
     await page.goto(s.path);
     await page.waitForLoadState('networkidle');
@@ -65,7 +69,7 @@ for (const s of screens.filter(s => ['/semilleros', '/proyectos', '/noticias', '
     await page.goto(s.path);
     await page.waitForLoadState('networkidle');
     const alert = page.locator('[role="alert"], [aria-live]').filter({ hasText: /\S/ }).first();
-    states.error = await alert.isVisible().catch(() => false) ? (await alert.innerText()).trim() : '';
+    states.error = await alert.waitFor({ state: 'visible', timeout: 10_000 }).then(async () => (await alert.innerText()).trim(), () => '');
     await page.screenshot({ path: `${dir}/estado-error${s.path.replace('/', '-')}-${info.project.name}.png` });
     save(`estados${s.path.replace('/', '-')}-${info.project.name}`, states);
     expect.soft(states.cargando, 'loading indicator while the API is slow').not.toBe('');
