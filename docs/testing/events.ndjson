@@ -654,3 +654,8 @@
 {"v": 1, "id": "X2026111602", "t": "result", "run": "R2026111601", "test": "T024", "s": "pass", "ev": ["docs/testing/evidence/R2026111601/cors-y-404.txt"], "note": "Access-Control-Allow-Credentials: true y Allow-Origin explícito en OPTIONS y GET"}
 {"v": 1, "defect": "D001", "t": "defect", "test": "T019", "run": "R2026111601", "s": "closed", "note": "Rutas de sesión y perfil presentes en la API actual"}
 {"v": 1, "defect": "D002", "t": "defect", "test": "T024", "run": "R2026111601", "s": "closed", "note": "Header Access-Control-Allow-Credentials presente"}
+{"v": 1, "id": "T2026111601", "t": "test", "area": "members", "p": "must", "name": "Perfil docente muestra 'Ver CvLAC' con href exacto, target _blank y rel noopener.", "matrix": "PT-INT-03"}
+{"v": 1, "id": "T2026111602", "t": "test", "area": "members", "p": "must", "name": "Sin enlace o con javascript: no hay enlace y se muestra '[Enlace CvLAC pendiente]'.", "matrix": "PT-INT-03"}
+{"v": 1, "id": "R2026111602", "t": "run", "at": "2026-11-16T16:55:00Z", "area": "members", "mode": "automated", "by": "agent", "cmd": "npx playwright test e2e/cvlac-profile.spec.ts --workers=3 (desktop, tablet, mobile)"}
+{"v": 1, "id": "X2026111603", "t": "result", "run": "R2026111602", "test": "T2026111601", "s": "pass", "ev": ["docs/testing/evidence/R2026111602-cvlac/"]}
+{"v": 1, "id": "X2026111604", "t": "result", "run": "R2026111602", "test": "T2026111602", "s": "pass", "ev": ["docs/testing/evidence/R2026111602-cvlac/playwright.txt"]}
