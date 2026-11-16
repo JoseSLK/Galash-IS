@@ -123,8 +123,7 @@ test('public screens pass axe WCAG A/AA and keep a visible focus ring', async ({
   }
   save('axe-teclado', report);
   for (const [path, r] of Object.entries(report)) {
-    // Known: D009 (.brand visible text includes the decorative "G"). Update this list when D009 is fixed.
-    expect.soft(r.violations, `${path} axe violations`).toEqual(['label-content-name-mismatch (serious, 1)']);
+    expect.soft(r.violations, `${path} axe violations`).toEqual([]);
     expect.soft(r.focusWithoutRing, `${path} focused elements without a visible ring`).toEqual([]);
   }
 });
