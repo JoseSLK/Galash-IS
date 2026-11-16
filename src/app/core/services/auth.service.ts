@@ -1,13 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import {
-  GoogleAuthProvider,
-  User,
-  onAuthStateChanged,
-  signInWithPopup,
-  signOut
-} from 'firebase/auth';
-import { firebaseAuth } from '../config/firebase.config';
+import type { User } from 'firebase/auth';
 import { ApiService } from './api.service';
 import { parseUserRole, USER_ROLES, UserRole } from '../models/role.model';
 
@@ -59,6 +52,8 @@ interface RegistrationResponse {
   firebase_uid: string;
 }
 
+type FirebaseKit = typeof import('firebase/auth') & { auth: import('firebase/auth').Auth };
+
 export class RegistrationRequiredError extends Error {}
 export class RegistrationSaveError extends Error {}
 export class RegistrationConflictError extends Error {}
@@ -72,6 +67,7 @@ export class AuthService {
   private readonly authInitialized = new Promise<void>(resolve => {
     this.resolveAuthInitialized = resolve;
   });
+  private firebaseKit?: Promise<FirebaseKit>;
 
   readonly currentUser = signal<User | null>(null);
   readonly backendUser = signal<SessionUser | null>(null);
@@ -97,11 +93,26 @@ export class AuthService {
   });
 
   constructor() {
-    onAuthStateChanged(firebaseAuth, (user: User | null) => {
-      this.currentUser.set(user);
-      this.resolveAuthInitialized();
-      void this.restoreBackendSession();
+    // The backend session lives in a cookie, so it is restored without Firebase. Firebase Auth (~90 KiB)
+    // loads when the browser is idle or on first use, keeping it out of the first paint (D008).
+    void this.restoreBackendSession();
+    const idle = (globalThis as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1));
+    idle(() => void this.firebase());
+  }
+
+  private firebase(): Promise<FirebaseKit> {
+    this.firebaseKit ??= Promise.all([import('firebase/auth'), import('../config/firebase.config')]).then(([sdk, config]) => {
+      let first = true;
+      sdk.onAuthStateChanged(config.firebaseAuth, (user: User | null) => {
+        this.currentUser.set(user);
+        this.resolveAuthInitialized();
+        // The startup restore already ran; repeat it only when Firebase reports a user (expired vs anonymous) or a later change.
+        if (!first || user) void this.restoreBackendSession();
+        first = false;
+      });
+      return { ...sdk, auth: config.firebaseAuth };
     });
+    return this.firebaseKit;
   }
 
   waitForAuthInitialization(): Promise<void> {
@@ -109,7 +120,8 @@ export class AuthService {
   }
 
   async loginWithGoogle(): Promise<void> {
-    const credential = await signInWithPopup(firebaseAuth, new GoogleAuthProvider());
+    const { signInWithPopup, GoogleAuthProvider, auth } = await this.firebase();
+    const credential = await signInWithPopup(auth, new GoogleAuthProvider());
     this.currentUser.set(credential.user);
     try {
       await this.createBackendSession(credential.user);
@@ -136,7 +148,8 @@ export class AuthService {
     }
 
     try {
-      await signOut(firebaseAuth);
+      const { signOut, auth } = await this.firebase();
+      await signOut(auth);
     } finally {
       this.clearBackendSession('anonymous');
     }
@@ -149,7 +162,7 @@ export class AuthService {
   }
 
   async registrationMatches(): Promise<RegistrationMatch[]> {
-    const user = firebaseAuth.currentUser;
+    const user = (await this.firebase()).auth.currentUser;
     if (!user) throw new RegistrationRequiredError();
     const token = await user.getIdToken();
     const response = await this.api.get<{ matches: RegistrationMatch[] }>('/auth/register/matches', authorizationHeader(token));
@@ -157,7 +170,7 @@ export class AuthService {
   }
 
   async registerGoogleUser(data: RegistrationData): Promise<void> {
-    const user = firebaseAuth.currentUser;
+    const user = (await this.firebase()).auth.currentUser;
     if (!user) throw new RegistrationRequiredError();
 
     const token = await user.getIdToken();
@@ -240,7 +253,7 @@ export class AuthService {
   }
 
   private async discardFirebaseSession(): Promise<void> {
-    await signOut(firebaseAuth).catch(() => undefined);
+    await this.firebase().then(({ signOut, auth }) => signOut(auth)).catch(() => undefined);
     this.clearBackendSession('anonymous');
   }
 
