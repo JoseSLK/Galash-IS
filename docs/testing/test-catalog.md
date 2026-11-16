@@ -59,6 +59,12 @@ spec name.
 |T2026111604|roles|`<rol>: direct URL access to guarded routes`|Acceso directo: /administracion solo admin (adminGuard), /mi-perfil y /gestion-semillero redirigen a / sin sesión (profileGuard); sin semillero asignado no se muestra el panel.|`e2e/role-access.spec.ts`|PT-TR-02|
 |T2026111605|visual|`main screens use one display font, one body font and the brand accent`|Captura 8 pantallas públicas y sus estilos computados; una fuente de títulos, una de texto y acento #F7C500 en todas.|`e2e/visual-identity.spec.ts`|PT-NF-01, TD-T05|
 |T2026111607|forms|`<formulario>: validation errors are next to their fields`|Tras enviar vacío, cada campo inválido tiene mensaje visible, enlazado por aria-describedby y a ≤100 px. Cubre consulta de solicitud, Únete, crear semillero, noticia y proyecto; los marcados con D005 usan test.fail().|`e2e/form-errors.spec.ts`|PT-NF-03, TD-T06|
+|T2026111610|navigation|`main navigation reaches each section with its heading`|Cada entrada del menú principal lleva a su ruta y muestra un h1.|`e2e/design-quality.spec.ts`|TD-T03|
+|T2026111611|states|`<ruta>: loading, empty and error states are communicated`|Con API lenta, vacía y con error 500, Semilleros, Proyectos, Noticias e Integrantes muestran carga y error en una región alert/aria-live.|`e2e/design-quality.spec.ts`|TD-T07, TU-T08|
+|T2026111612|responsive|`responsive <vista>: no horizontal scroll on public screens`|Sin desbordamiento horizontal a 320 px, móvil horizontal (915×412) y tableta horizontal (1138×712) en 7 pantallas públicas.|`e2e/design-quality.spec.ts`|TD-T09, TU-T11|
+|T2026111613|accessibility|`public screens pass axe WCAG A/AA and keep a visible focus ring`|axe WCAG 2.1 A/AA en 7 pantallas (solo se acepta D009) y anillo o cambio visible de foco en los primeros 15 Tab.|`e2e/design-quality.spec.ts`|TD-T10, TU-T10|
+|T2026111614|accessibility|`200% zoom keeps public screens usable`|Con zoom 200 % (640 px de ancho) no hay desbordamiento horizontal y el h1 es visible.|`e2e/design-quality.spec.ts`|TU-T10|
+|T2026111615|visual|`<ruta> matches the approved screenshot`|Regresión visual con toHaveScreenshot de 5 pantallas contra la línea base aprobada (desktop; omitida en CI).|`e2e/visual-regression.spec.ts`|TD-T14|
 
 ## Build tests
 
