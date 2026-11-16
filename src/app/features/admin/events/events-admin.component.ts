@@ -90,7 +90,7 @@ export class EventsAdminComponent implements OnInit {
     this.busy.set(true);
     try {
       const selected = this.selected();
-      const event = selected ? await this.service.update(selected.id, data) : await this.service.create({ ...data, ...(this.seedbedId() ? { seedbedId: this.seedbedId() } : {}) });
+      const event = selected ? await this.service.update(selected.id, data, selected.updatedAt) : await this.service.create({ ...data, ...(this.seedbedId() ? { seedbedId: this.seedbedId() } : {}) });
       this.remember(event); this.feedback.set(selected ? 'Cambios guardados.' : 'Noticia creada como borrador.');
     } catch (error: unknown) { this.showError(error); }
     finally { this.busy.set(false); }
@@ -104,6 +104,8 @@ export class EventsAdminComponent implements OnInit {
     finally { this.busy.set(false); }
   }
   private showError(error: unknown): void {
+    // 409 covers both a venue/time clash and a stale edit (D039); the API message tells which one.
+    if (error instanceof HttpErrorResponse && error.status === 409 && typeof error.error?.error === 'string') { this.error.set(`${error.error.error}.`); return; }
     this.error.set(error instanceof HttpErrorResponse && [401, 403].includes(error.status) ? 'No tienes autorización para realizar esta acción.' : error instanceof HttpErrorResponse && [400, 409, 422].includes(error.status) ? 'El servicio rechazó el cambio. Revisa los datos y el estado de la noticia.' : 'No pudimos guardar el cambio. Conservamos los datos para que puedas intentarlo de nuevo.');
   }
 }

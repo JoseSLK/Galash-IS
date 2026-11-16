@@ -33,7 +33,8 @@ export class ProjectsService {
   if(!data.startDate||!Number.isFinite(Date.parse(data.startDate))||(data.endDate&&(!Number.isFinite(Date.parse(data.endDate))||data.endDate<data.startDate)))throw new Error('Revisa las fechas de inicio y fin.');
   return {title:data.title.trim(),summary:data.summary.trim(),seedbedId:data.seedbedId,researchLine:data.researchLine,responsibleIds:[...new Set(data.responsibleIds)],memberIds:[...new Set(data.memberIds)],startDate:data.startDate+'T00:00:00Z',endDate:data.endDate?data.endDate+'T00:00:00Z':null,status:data.status,progress:data.progress};
  }
- async update(id:string,data:ProjectEdit):Promise<ResearchProject>{return this.map(await this.api.patch<ProjectApi,ReturnType<ProjectsService['payload']>>(`/projects/${encodeURIComponent(id)}`,this.payload(data)));}
+ // updatedAt is the version the editor loaded; the API answers 409 if the project changed since (D039).
+ async update(id:string,data:ProjectEdit,updatedAt?:string):Promise<ResearchProject>{return this.map(await this.api.patch<ProjectApi,ReturnType<ProjectsService['payload']>&{updatedAt?:string}>(`/projects/${encodeURIComponent(id)}`,updatedAt?{...this.payload(data),updatedAt}:this.payload(data)));}
  async create(data:ProjectEdit):Promise<ResearchProject>{return this.map(await this.api.post<ProjectApi,ReturnType<ProjectsService['payload']>>('/projects',this.payload(data)));}
  async setProgress(id:string,progress:number):Promise<ResearchProject>{
   if(!Number.isInteger(progress)||progress<0||progress>100)throw new Error('El avance debe ser un número entero entre 0 y 100.');

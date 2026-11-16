@@ -14,7 +14,7 @@ export class ProjectEditorComponent {
  private readonly store=inject(ProjectsService);
  private readonly seedbedsService=inject(SeedbedsService);
  private readonly directory=inject(IntegrantesService);
- private originalStatus:ResearchProject['status']='Activo';private originalEndDate='';private projectId='';private researchLine='';private opener:HTMLElement|null=null;
+ private originalStatus:ResearchProject['status']='Activo';private loadedUpdatedAt='';private originalEndDate='';private projectId='';private researchLine='';private opener:HTMLElement|null=null;
  readonly saved=output<ResearchProject>();readonly creating=signal(false);readonly semilleros=signal<Seedbed[]>([]);readonly saving=signal(false);readonly error=signal('');readonly statuses=PROJECT_STATUSES;
  readonly personas=signal<Integrante[]>([]);readonly cargando=signal(false);readonly errorPersonas=signal('');
  readonly seleccion=signal<Record<TipoSeleccion,string[]>>({directores:[],integrantes:[]});
@@ -22,7 +22,7 @@ export class ProjectEditorComponent {
  readonly tipos:TipoSeleccion[]=['directores','integrantes'];
  readonly form=new FormGroup({title:text(),summary:text(),seedbedId:text(),startDate:text(),endDate:new FormControl('',{nonNullable:true}),status:new FormControl<ResearchProject['status']>('Activo',{nonNullable:true,validators:Validators.required}),progress:new FormControl(0,{nonNullable:true,validators:[Validators.required,Validators.min(0),Validators.max(100),Validators.pattern(/^\d+$/)]})});
  open(project?:ResearchProject):void {
-  this.originalStatus=project?.status??'Activo';this.originalEndDate=project?.endDate??'';this.form.controls.seedbedId.enable();this.creating.set(!project);this.projectId=project?.id??'';this.researchLine=project?.researchLine??'';
+  this.originalStatus=project?.status??'Activo';this.loadedUpdatedAt=project?.updatedAt??'';this.originalEndDate=project?.endDate??'';this.form.controls.seedbedId.enable();this.creating.set(!project);this.projectId=project?.id??'';this.researchLine=project?.researchLine??'';
   this.seleccion.set({directores:[...(project?.responsibleIds??[])],integrantes:(project?.members??[]).map(p=>p.userId)});
   this.busqueda.set({directores:'',integrantes:''});
   this.opener=document.activeElement as HTMLElement;this.error.set('');
@@ -62,9 +62,9 @@ export class ProjectEditorComponent {
   this.saving.set(true);this.error.set('');
   try{
    const record={...data,researchLine:this.creating()?semillero.researchLine:this.researchLine,responsibleIds:directores.map(p=>p.id),memberIds:integrantes.map(p=>p.id)};
-   const project=this.creating()?await this.store.create(record):await this.store.update(this.projectId,record);
+   const project=this.creating()?await this.store.create(record):await this.store.update(this.projectId,record,this.loadedUpdatedAt||undefined);
    this.saved.emit(project);this.dialog.nativeElement.close();this.opener?.focus();
-  }catch(error){this.error.set(error instanceof HttpErrorResponse ? ({400:'Revisa los datos del proyecto.',401:'Tu sesión venció. Vuelve a iniciar sesión.',403:'No tienes permiso para guardar este proyecto.',404:'El proyecto o semillero ya no está disponible.'}[error.status]??'No se pudo guardar el proyecto. Inténtalo nuevamente.') : error instanceof Error?error.message:'No se pudo guardar el proyecto.');}
+  }catch(error){this.error.set(error instanceof HttpErrorResponse ? ({400:'Revisa los datos del proyecto.',401:'Tu sesión venció. Vuelve a iniciar sesión.',403:'No tienes permiso para guardar este proyecto.',404:'El proyecto o semillero ya no está disponible.',409:'Otra persona modificó este proyecto mientras lo editabas. Cierra y vuelve a abrirlo para ver la versión actual.'}[error.status]??'No se pudo guardar el proyecto. Inténtalo nuevamente.') : error instanceof Error?error.message:'No se pudo guardar el proyecto.');}
   finally{this.saving.set(false);}
  }
 }
