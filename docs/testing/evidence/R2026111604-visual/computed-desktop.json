@@ -1,0 +1,106 @@
+{
+  "/": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/semilleros": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/integrantes": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/proyectos": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/noticias": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/nosotros": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/unete": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  },
+  "/mi-solicitud": {
+    "h1Font": "Sora, system-ui, sans-serif",
+    "bodyFont": "\"IBM Plex Sans\", system-ui, sans-serif",
+    "bodyBackground": "rgb(10, 20, 32)",
+    "accentToken": "#F7C500",
+    "secondaryToken": "#7785AC",
+    "bgToken": "#0A1420",
+    "loadedFonts": [
+      "IBM Plex Mono",
+      "IBM Plex Sans",
+      "Sora"
+    ]
+  }
+}

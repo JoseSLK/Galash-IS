@@ -664,3 +664,9 @@
 {"v": 1, "id": "R2026111603", "t": "run", "at": "2026-11-16T17:30:00Z", "area": "roles", "mode": "automated", "by": "agent", "cmd": "npx playwright test e2e/role-access.spec.ts --workers=4"}
 {"v": 1, "id": "X2026111605", "t": "result", "run": "R2026111603", "test": "T2026111603", "s": "pass", "ev": ["docs/testing/evidence/R2026111603-roles/"]}
 {"v": 1, "id": "X2026111606", "t": "result", "run": "R2026111603", "test": "T2026111604", "s": "pass", "ev": ["docs/testing/evidence/R2026111603-roles/playwright.txt"]}
+{"v": 1, "id": "T2026111605", "t": "test", "area": "visual", "p": "should", "name": "Captura 8 pantallas públicas y sus estilos computados; una fuente de títulos, una de texto y acento #F7C500 en todas.", "matrix": "PT-NF-01"}
+{"v": 1, "id": "T2026111606", "t": "test", "area": "visual", "p": "should", "name": "Conformidad de paleta y tipografía con §11.4.2 del informe (revisión sobre estilos computados y capturas)", "matrix": "PT-NF-01, TD-T05"}
+{"v": 1, "id": "R2026111604", "t": "run", "at": "2026-11-16T17:50:00Z", "area": "visual", "mode": "automated", "by": "agent", "cmd": "npx playwright test e2e/visual-identity.spec.ts --workers=3"}
+{"v": 1, "id": "X2026111607", "t": "result", "run": "R2026111604", "test": "T2026111605", "s": "pass", "ev": ["docs/testing/evidence/R2026111604-visual/"]}
+{"v": 1, "id": "X2026111608", "t": "result", "run": "R2026111604", "test": "T2026111606", "s": "fail", "ev": ["docs/testing/evidence/R2026111604-visual/conformidad-11.4.2.md"]}
+{"v": 1, "id": "D004", "t": "defect", "test": "T2026111606", "run": "R2026111604", "sev": "low", "s": "open", "area": "visual", "name": "La UI usa Sora/IBM Plex Sans y fondo #0A1420; §11.4.2 aprueba Signika/Open Sans y #1E1A17 (solo Jonquil y Glaucous coinciden)", "note": "Decisión del equipo: actualizar el manual (§11.4.2) o la interfaz."}
