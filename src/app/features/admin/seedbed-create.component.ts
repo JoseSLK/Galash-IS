@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FieldErrorDirective } from '../../shared/field-error.directive';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NewSeedbed, SeedbedAssignmentsService, TeacherOption } from './seedbed-assignments.service';
 
@@ -8,7 +9,7 @@ const text = (validators = [Validators.required]) => new FormControl('', { nonNu
 const topic = () => new FormGroup({ title: text([Validators.required, Validators.maxLength(60)]), phrase: text([Validators.maxLength(160)]) });
 
 @Component({
-  selector: 'app-seedbed-create', standalone: true, imports: [ReactiveFormsModule],
+  selector: 'app-seedbed-create', standalone: true, imports: [ReactiveFormsModule, FieldErrorDirective],
   templateUrl: './seedbed-create.component.html',
   styleUrl: './seedbed-create.component.css'
 })

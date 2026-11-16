@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, Page } from '@playwright/test';
 
@@ -46,7 +47,7 @@ test('anonymous visitors see demo reviews below projects without a submission fi
   expect(reviews!.y).toBeGreaterThanOrEqual(projects!.y + projects!.height);
   const audit = await new AxeBuilder({ page }).include('app-seedbed-reviews').withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(audit.violations).toEqual([]);
-  await page.locator('app-seedbed-reviews').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `docs/testing/evidence/R20261101-SEM08-motion/public-${info.project.name}.png` });
+  await page.locator('app-seedbed-reviews').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `${evidenceRoot}/SEM08-motion/public-${info.project.name}.png` });
 });
 
 test('local submissions update admin notification, approval and moderation across navigation', async ({ page }, info) => {
@@ -74,7 +75,7 @@ test('local submissions update admin notification, approval and moderation acros
   await expect(card).toContainText('Publicada');
   const audit = await new AxeBuilder({ page }).include('app-reviews-admin').withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(audit.violations).toEqual([]);
-  await page.locator('app-reviews-admin').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `docs/testing/evidence/R20261101-SEM08/admin-${info.project.name}.png` });
+  await page.locator('app-reviews-admin').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `${evidenceRoot}/SEM08/admin-${info.project.name}.png` });
   await goSeedbed(page);
   await expect(page.locator('.review-grid')).toContainText(text);
   await page.getByRole('button', { name: 'Ciberseguridad', exact: true }).click();

@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, Page, test } from '@playwright/test';
 
 // PT-INT-03: the CvLAC link of a teacher profile appears when registered, only with a safe URL, and disappears when removed.
@@ -22,7 +23,7 @@ test('teacher profile shows a valid CvLAC link that opens safely in a new tab', 
   await expect(link).toHaveAttribute('href', cvlac);
   await expect(link).toHaveAttribute('target', '_blank');
   await expect(link).toHaveAttribute('rel', /noopener/);
-  await page.screenshot({ path: `docs/testing/evidence/R2026111602-cvlac/${info.project.name}.png` });
+  await page.screenshot({ path: `${evidenceRoot}/cvlac/${info.project.name}.png` });
 });
 
 for (const [name, link] of [['removed', ''], ['unsafe', 'javascript:alert(1)']]) {

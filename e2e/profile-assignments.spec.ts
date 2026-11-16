@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, test } from '@playwright/test';
 
 test('profile displays leader and delegate functions and refreshes changed assignments', async ({ page }, info) => {
@@ -14,7 +15,7 @@ test('profile displays leader and delegate functions and refreshes changed assig
   await expect(badges.getByText('Líder de semillero · Inteligencia artificial')).toBeVisible();
   await expect(badges.getByText('Delegado · Desarrollo web')).toBeVisible();
   await expect(page.locator('.identity-card > .role-label')).toHaveText('Docente');
-  await page.screenshot({ fullPage: true, style: 'app-dashboard { visibility: hidden !important; }', path: `docs/testing/evidence/R20261104-profile-functions/${info.project.name}.png` });
+  await page.screenshot({ fullPage: true, style: 'app-dashboard { visibility: hidden !important; }', path: `${evidenceRoot}/profile-functions/${info.project.name}.png` });
   await expect(page.getByRole('button', { name: 'Actualizar funciones' })).toHaveCount(0);
   await expect(page.locator('main').getByRole('link', { name: 'Administrar mi semillero' })).toHaveCount(0);
   managed = ['s2'];

@@ -1,9 +1,10 @@
+import { evidenceRoot } from './evidence';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, Page, test } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 // TD-T03, TD-T07, TD-T09, TD-T10, TU-T10 and TU-T11 on the public screens, with a simulated API.
-const dir = 'docs/testing/evidence/R2026111608-design';
+const dir = `${evidenceRoot}/design`;
 const screens = [
   { path: '/', nav: null },
   { path: '/nosotros', nav: 'Nosotros' },

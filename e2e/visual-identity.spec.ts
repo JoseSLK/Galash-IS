@@ -1,9 +1,10 @@
+import { evidenceRoot } from './evidence';
 import { expect, test } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 // PT-NF-01: captures each main screen and the computed typography and colors, to compare with report §11.4.2.
 const pages = ['/', '/semilleros', '/integrantes', '/proyectos', '/noticias', '/nosotros', '/unete', '/mi-solicitud'];
-const dir = 'docs/testing/evidence/R2026111604-visual';
+const dir = `${evidenceRoot}/visual`;
 
 test('main screens use one display font, one body font and the brand accent', async ({ page }, info) => {
   await page.route('**/api/**', route => new URL(route.request().url()).pathname === '/api/users/me'

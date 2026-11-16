@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy,Component,ElementRef,ViewChild,inject,output,signal} from '@angular/core';
 import {FormControl,FormGroup,ReactiveFormsModule,Validators} from '@angular/forms';
+import {FieldErrorDirective} from '../../shared/field-error.directive';
 import {firstValueFrom} from 'rxjs';
 import {Integrante,IntegrantesService,normalizar} from '../integrantes/integrantes.service';
 import {PROJECT_STATUSES,ResearchProject} from './project.model';
@@ -8,7 +9,7 @@ import {Seedbed,SeedbedsService} from '../seedbeds/seedbeds.service';
 import {ProjectsService} from './projects.service';
 const text=()=>new FormControl('',{nonNullable:true,validators:[Validators.required,Validators.pattern(/\S/)]});
 type TipoSeleccion = 'directores' | 'integrantes';
-@Component({selector:'app-project-editor',standalone:true,changeDetection:ChangeDetectionStrategy.OnPush,imports:[ReactiveFormsModule],templateUrl:'./project-editor.component.html',styleUrl:'./project-editor.component.css'})
+@Component({selector:'app-project-editor',standalone:true,changeDetection:ChangeDetectionStrategy.OnPush,imports:[ReactiveFormsModule,FieldErrorDirective],templateUrl:'./project-editor.component.html',styleUrl:'./project-editor.component.css'})
 export class ProjectEditorComponent {
  @ViewChild('dialog',{static:true}) dialog!:ElementRef<HTMLDialogElement>;
  private readonly store=inject(ProjectsService);

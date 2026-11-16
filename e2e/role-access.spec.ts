@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, Page, test } from '@playwright/test';
 
 // PT-TR-02: simulated session per role; account menu and direct access to guarded routes.
@@ -39,7 +40,7 @@ for (const role of roles) {
     await expect(menu.getByText('Comprobando acceso al semillero…')).toHaveCount(0);
     await expect(menu.getByRole('link', { name: /^Administración/ })).toHaveCount(role === 'admin' ? 1 : 0);
     await expect(menu.getByRole('link', { name: /Administrar mi semillero/ })).toHaveCount(role === 'delegado' ? 1 : 0);
-    await page.screenshot({ path: `docs/testing/evidence/R2026111603-roles/${role}-${info.project.name}.png` });
+    await page.screenshot({ path: `${evidenceRoot}/roles/${role}-${info.project.name}.png` });
   });
 
   test(`${role}: direct URL access to guarded routes`, async ({ page }) => {

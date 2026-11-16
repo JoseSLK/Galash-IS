@@ -1,9 +1,10 @@
+import { evidenceRoot } from './evidence';
 import { expect, Page, test } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { projectApi } from './project-api.fixture';
 
 // PT-NF-03: after an empty submit, every invalid field shows its message next to it and linked by aria-describedby.
-const dir = 'docs/testing/evidence/R2026111605-form-errors';
+const dir = `${evidenceRoot}/form-errors`;
 
 async function session(page: Page, role: string | null) {
   await page.route('**/api/**', route => {
@@ -38,15 +39,15 @@ async function invalidFields(page: Page, scope: string): Promise<Field[]> {
     }));
 }
 
-// Forms tagged with a defect show one form-level message instead of per-field errors (D005); test.fail() flags them until fixed.
+// A form tagged with a known defect is expected to fail (test.fail) until that defect is fixed.
 const forms: { name: string; role: string | null; defect?: string; open: (page: Page) => Promise<string> }[] = [
   { name: 'consulta-solicitud', role: 'visitante', open: async page => {
     await page.goto('/mi-solicitud'); await page.getByRole('button', { name: 'Consultar estado' }).click(); return 'form'; } },
   { name: 'unete', role: 'visitante', open: async page => {
     await page.goto('/unete'); await page.getByRole('button', { name: /Revisar solicitud|Enviar solicitud/ }).click(); return 'form'; } },
-  { name: 'crear-semillero', role: 'admin', defect: 'D005', open: async page => {
+  { name: 'crear-semillero', role: 'admin', open: async page => {
     await page.goto('/administracion'); await section(page, 'Semilleros'); await page.getByRole('button', { name: 'Crear semillero' }).click(); return 'form.seedbed-form'; } },
-  { name: 'noticia', role: 'admin', defect: 'D005', open: async page => {
+  { name: 'noticia', role: 'admin', open: async page => {
     await page.goto('/administracion'); await section(page, 'Noticias'); await page.getByRole('button', { name: '+ Nueva noticia' }).click();
     await page.getByRole('button', { name: 'Crear borrador' }).click(); return 'app-events-admin form'; } },
 ];
@@ -71,7 +72,6 @@ for (const form of forms) {
 }
 
 test('proyecto: validation errors are next to their fields', async ({ page }, info) => {
-  test.fail(true, 'D005: errores solo a nivel de formulario');
   await projectApi(page, 'admin');
   await page.goto('/administracion');
   await page.locator('#admin-sections').getByRole('button', { name: 'Proyectos', exact: true }).click();

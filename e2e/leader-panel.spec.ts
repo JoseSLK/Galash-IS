@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, test, type Page } from '@playwright/test';
 async function openAccountMenu(page: Page): Promise<void> {
   await expect(page.locator('app-dashboard .site-header')).toBeVisible();
@@ -50,7 +51,7 @@ test('leader enters own panel from profile and only loads scoped requests', asyn
   await page.goto('/mi-perfil');
   await openAccountMenu(page);
   await expect(page.locator('#header-auth-dropdown').getByRole('link', { name: 'Administrar mi semillero' })).toBeVisible();
-  await page.locator('#header-auth-dropdown').screenshot({ path: 'docs/testing/evidence/R20261104-leader-menu/account-menu.png' });
+  await page.locator('#header-auth-dropdown').screenshot({ path: `${evidenceRoot}/leader-menu/account-menu.png` });
   await page.locator('#header-auth-dropdown').getByRole('link', { name: 'Administrar mi semillero' }).click();
   await expect(page.locator('#admin-screen-title')).toHaveText('Solicitudes de ingreso');
   await expect(page.getByText('Solicitud propia', { exact: true })).toBeVisible();
@@ -133,5 +134,5 @@ test('leader manages own semillero, members, activities and creates and publishe
   await page.getByRole('button',{name:'Publicar',exact:true}).click();await expect(page.getByText('Estado de la noticia actualizado.')).toBeVisible();expect(event.status).toBe('publicado');
   await chooseSection(page, 'Solicitudes de ingreso');await chooseSection(page, 'Noticias');await expect(page.getByText('Encuentro propio',{exact:true})).toBeVisible();
   expect(calls.some(c=>c==='GET /api/events'||c.startsWith('GET /api/projects')||c.startsWith('GET /api/admin/members'))).toBe(false);
-  await page.locator('main').screenshot({style:'app-dashboard {visibility:hidden !important}',path:`docs/testing/evidence/R20261104-leader/${info.project.name}.png`});
+  await page.locator('main').screenshot({style:'app-dashboard {visibility:hidden !important}',path:`${evidenceRoot}/leader/${info.project.name}.png`});
 });

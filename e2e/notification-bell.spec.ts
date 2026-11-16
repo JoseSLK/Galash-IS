@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, Page, test } from '@playwright/test';
 
 const me = (role: string, managed: string[] = []) => ({ id: 'u1', name: 'Ana', last_name: 'Prueba', role, status: 'activo', email: 'ana@example.test', managed_seedbed_ids: managed });
@@ -27,7 +28,7 @@ test('admin bell counts open requests and pending reviews and links to each sect
   // Bell and panel stay inside the viewport on every device without opening the menu.
   const width = page.viewportSize()!.width;
   for (const box of [await bell.boundingBox(), await panel.boundingBox()]) { expect(box!.x).toBeGreaterThanOrEqual(0); expect(box!.x + box!.width).toBeLessThanOrEqual(width); }
-  await page.screenshot({ path: `docs/testing/evidence/R2026111306-bell/${info.project.name}.png` });
+  await page.screenshot({ path: `${evidenceRoot}/bell/${info.project.name}.png` });
   await panel.getByRole('link', { name: /1\s*Reseñas por moderar/ }).click();
   await expect(page).toHaveURL(/\/administracion\?section=reviews/);
   await expect(page.locator('[aria-current="true"], .current-section').filter({ hasText: /Reseñas/ }).first()).toBeVisible();

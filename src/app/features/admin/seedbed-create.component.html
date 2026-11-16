@@ -2,17 +2,17 @@
   <h2 id="seedbed-create-title">Crear semillero</h2>
   <p class="hint">Se crea en estado <strong>Borrador</strong>. El docente responsable lo revisa y publica desde «Administrar mi semillero».</p>
   <div class="fields">
-    <label>Nombre *<input type="text" formControlName="name" maxlength="120" required /></label>
-    <label>Línea de investigación *<input type="text" formControlName="researchLine" required /></label>
+    <label>Nombre *<input type="text" formControlName="name" maxlength="120" required galashFieldError="Ingresa el nombre del semillero." /></label>
+    <label>Línea de investigación *<input type="text" formControlName="researchLine" required galashFieldError="Ingresa la línea de investigación." /></label>
     <label>Docente responsable *
-      <select formControlName="responsibleTeacherId" required>
+      <select formControlName="responsibleTeacherId" required galashFieldError="Selecciona el docente responsable.">
         <option value="" disabled>Selecciona un docente activo</option>
         @for (teacher of teachers(); track teacher.id) {<option [value]="teacher.id">{{ teacher.name }}</option>}
       </select>
     </label>
-    <label>Correo de contacto *<input type="email" formControlName="contactEmail" required /></label>
-    <label class="wide">Descripción *<textarea rows="3" formControlName="description" required></textarea></label>
-    <label class="wide">Objetivo *<textarea rows="3" formControlName="objective" required></textarea></label>
+    <label>Correo de contacto *<input type="email" formControlName="contactEmail" required galashFieldError="Ingresa un correo válido, por ejemplo semillero@uptc.edu.co." /></label>
+    <label class="wide">Descripción *<textarea rows="3" formControlName="description" required galashFieldError="Describe el semillero."></textarea></label>
+    <label class="wide">Objetivo *<textarea rows="3" formControlName="objective" required galashFieldError="Indica el objetivo."></textarea></label>
   </div>
   @if (teachersError()) {<p class="error" role="alert">{{ teachersError() }} <button type="button" class="secondary" (click)="loadTeachers()">Reintentar</button></p>}
 
@@ -20,7 +20,7 @@
     <legend>Temas <small>(opcional, hasta {{ maxTopics }})</small></legend>
     @for (item of form.controls.topics.controls; track item; let i = $index) {
       <div class="topic" [formGroupName]="i">
-        <label>Título *<input type="text" formControlName="title" maxlength="60" required /></label>
+        <label>Título *<input type="text" formControlName="title" maxlength="60" required galashFieldError="Ingresa el título del tema." /></label>
         <label>Frase<input type="text" formControlName="phrase" maxlength="160" /></label>
         <button type="button" class="secondary" [attr.aria-label]="'Quitar tema ' + (i + 1)" (click)="removeTopic(i)">Quitar</button>
       </div>

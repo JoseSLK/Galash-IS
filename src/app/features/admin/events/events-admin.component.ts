@@ -1,6 +1,7 @@
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { FieldErrorDirective } from '../../../shared/field-error.directive';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventData, EventStatus, EventsAdminService, ManagedEvent } from './events-admin.service';
@@ -19,7 +20,7 @@ function localDate(value: string | null | undefined): string {
 }
 @Component({
   selector: 'app-events-admin', standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, FieldErrorDirective],
   templateUrl: './events-admin.component.html', styleUrl: './events-admin.component.css'
 })
 export class EventsAdminComponent implements OnInit {

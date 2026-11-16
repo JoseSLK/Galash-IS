@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, test } from '@playwright/test';
 
 test('mobile menu panel is opaque so the page behind does not show through', async ({ page }, info) => {
@@ -12,5 +13,5 @@ test('mobile menu panel is opaque so the page behind does not show through', asy
   await expect(nav).toBeVisible();
   const background = await nav.evaluate(el => getComputedStyle(el).backgroundColor);
   expect(background).toBe('rgb(16, 35, 50)');
-  await page.screenshot({ path: `docs/testing/evidence/R2026111307-menu/${info.project.name}.png` });
+  await page.screenshot({ path: `${evidenceRoot}/menu/${info.project.name}.png` });
 });
