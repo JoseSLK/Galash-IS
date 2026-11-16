@@ -89,7 +89,7 @@ export class RegisterComponent implements AfterViewInit, OnInit {
       this.completed.emit();
     } catch (error: unknown) {
       if (error instanceof RegistrationConflictError) {
-        this.errorMessage = this.matchChoice ? 'No se pudo vincular el perfil: puede haber sido reclamado o tus datos ya pertenecen a otra cuenta. Revisa tu elección e inténtalo de nuevo.' : 'El documento o el código estudiantil ya pertenecen a otra cuenta.';
+        this.errorMessage = this.matchChoice ? 'No se pudo vincular el perfil: puede haber sido reclamado o tus datos ya pertenecen a otra cuenta. Revisa tu elección e inténtalo de nuevo.' : 'El documento, el código estudiantil o el correo ya pertenecen a otra cuenta.';
       } else if (error instanceof RegistrationSessionError) {
         this.errorMessage = 'El registro se guardó, pero no se pudo iniciar la sesión. Intenta continuar con Google de nuevo.';
       } else if (error instanceof RegistrationSaveError) {
