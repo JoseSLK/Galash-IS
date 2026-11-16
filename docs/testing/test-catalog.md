@@ -55,6 +55,8 @@ spec name.
 |T045|accessibility|glitch background honors prefers-reduced-motion|Counts animation frames on the home: under reduce the WebGL hero background draws one static frame (no rAF loop) and it resumes or stops when the preference changes|`e2e/glitch-reduced-motion.spec.ts`|PT-NF-06|
 |T2026111601|members|`teacher profile shows a valid CvLAC link that opens safely in a new tab`|Perfil docente muestra 'Ver CvLAC' con href exacto, target _blank y rel noopener.|`e2e/cvlac-profile.spec.ts`|PT-INT-03|
 |T2026111602|members|`teacher profile hides the CvLAC link when it is removed/unsafe`|Sin enlace o con javascript: no hay enlace y se muestra '[Enlace CvLAC pendiente]'.|`e2e/cvlac-profile.spec.ts`|PT-INT-03|
+|T2026111603|roles|`<rol>: account menu matches the role`|Para anónimo, visitante, estudiante, docente, delegado y admin: Mi perfil solo con sesión, Administración solo admin, Administrar mi semillero solo delegado.|`e2e/role-access.spec.ts`|PT-TR-02|
+|T2026111604|roles|`<rol>: direct URL access to guarded routes`|Acceso directo: /administracion solo admin (adminGuard), /mi-perfil y /gestion-semillero redirigen a / sin sesión (profileGuard); sin semillero asignado no se muestra el panel.|`e2e/role-access.spec.ts`|PT-TR-02|
 
 ## Build tests
 

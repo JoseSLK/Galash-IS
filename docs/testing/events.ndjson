@@ -659,3 +659,8 @@
 {"v": 1, "id": "R2026111602", "t": "run", "at": "2026-11-16T16:55:00Z", "area": "members", "mode": "automated", "by": "agent", "cmd": "npx playwright test e2e/cvlac-profile.spec.ts --workers=3 (desktop, tablet, mobile)"}
 {"v": 1, "id": "X2026111603", "t": "result", "run": "R2026111602", "test": "T2026111601", "s": "pass", "ev": ["docs/testing/evidence/R2026111602-cvlac/"]}
 {"v": 1, "id": "X2026111604", "t": "result", "run": "R2026111602", "test": "T2026111602", "s": "pass", "ev": ["docs/testing/evidence/R2026111602-cvlac/playwright.txt"]}
+{"v": 1, "id": "T2026111603", "t": "test", "area": "roles", "p": "must", "name": "Para anónimo, visitante, estudiante, docente, delegado y admin: Mi perfil solo con sesión, Administración solo admin, Administrar mi semillero solo delegado.", "matrix": "PT-TR-02"}
+{"v": 1, "id": "T2026111604", "t": "test", "area": "roles", "p": "must", "name": "Acceso directo: /administracion solo admin (adminGuard), /mi-perfil y /gestion-semillero redirigen a / sin sesión (profileGuard); sin semillero asignado no se muestra el panel.", "matrix": "PT-TR-02"}
+{"v": 1, "id": "R2026111603", "t": "run", "at": "2026-11-16T17:30:00Z", "area": "roles", "mode": "automated", "by": "agent", "cmd": "npx playwright test e2e/role-access.spec.ts --workers=4"}
+{"v": 1, "id": "X2026111605", "t": "result", "run": "R2026111603", "test": "T2026111603", "s": "pass", "ev": ["docs/testing/evidence/R2026111603-roles/"]}
+{"v": 1, "id": "X2026111606", "t": "result", "run": "R2026111603", "test": "T2026111604", "s": "pass", "ev": ["docs/testing/evidence/R2026111603-roles/playwright.txt"]}
