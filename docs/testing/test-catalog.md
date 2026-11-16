@@ -58,6 +58,7 @@ spec name.
 |T2026111603|roles|`<rol>: account menu matches the role`|Para anónimo, visitante, estudiante, docente, delegado y admin: Mi perfil solo con sesión, Administración solo admin, Administrar mi semillero solo delegado.|`e2e/role-access.spec.ts`|PT-TR-02|
 |T2026111604|roles|`<rol>: direct URL access to guarded routes`|Acceso directo: /administracion solo admin (adminGuard), /mi-perfil y /gestion-semillero redirigen a / sin sesión (profileGuard); sin semillero asignado no se muestra el panel.|`e2e/role-access.spec.ts`|PT-TR-02|
 |T2026111605|visual|`main screens use one display font, one body font and the brand accent`|Captura 8 pantallas públicas y sus estilos computados; una fuente de títulos, una de texto y acento #F7C500 en todas.|`e2e/visual-identity.spec.ts`|PT-NF-01, TD-T05|
+|T2026111607|forms|`<formulario>: validation errors are next to their fields`|Tras enviar vacío, cada campo inválido tiene mensaje visible, enlazado por aria-describedby y a ≤100 px. Cubre consulta de solicitud, Únete, crear semillero, noticia y proyecto; los marcados con D005 usan test.fail().|`e2e/form-errors.spec.ts`|PT-NF-03, TD-T06|
 
 ## Build tests
 

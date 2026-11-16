@@ -1,0 +1,38 @@
+[
+  {
+    "field": "name",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "researchLine",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "responsibleTeacherId",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "contactEmail",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "description",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "objective",
+    "message": "",
+    "linked": false,
+    "distance": null
+  }
+]
