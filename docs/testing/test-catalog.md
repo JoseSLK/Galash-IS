@@ -65,6 +65,7 @@ spec name.
 |T2026111613|accessibility|`public screens pass axe WCAG A/AA and keep a visible focus ring`|axe WCAG 2.1 A/AA en 7 pantallas (solo se acepta D009) y anillo o cambio visible de foco en los primeros 15 Tab.|`e2e/design-quality.spec.ts`|TD-T10, TU-T10|
 |T2026111614|accessibility|`200% zoom keeps public screens usable`|Con zoom 200 % (640 px de ancho) no hay desbordamiento horizontal y el h1 es visible.|`e2e/design-quality.spec.ts`|TU-T10|
 |T2026111615|visual|`<ruta> matches the approved screenshot`|Regresión visual con toHaveScreenshot de 5 pantallas contra la línea base aprobada (desktop; omitida en CI).|`e2e/visual-regression.spec.ts`|TD-T14|
+|T2026111619|projects,events|`project editor sends updatedAt…` / `news editor sends updatedAt…`|Los editores de proyectos y noticias envían el updatedAt cargado y muestran el aviso del 409 sin sobrescribir cambios ajenos.|`e2e/stale-edit.spec.ts`|TDB-T11|
 
 ## Build tests
 

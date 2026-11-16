@@ -1,0 +1,62 @@
+[
+  {
+    "field": "request-birthPlace",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-address",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-education",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-undergraduateTitle",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-affiliation",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-cvlac",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-orcid",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-researcherCategory",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-call",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  },
+  {
+    "field": "request-seedbed",
+    "message": "Este campo es obligatorio",
+    "linked": true,
+    "distance": 7
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "field": "request-code",
+    "message": "Ingresa un código válido: letras, números y guiones.",
+    "linked": true,
+    "distance": 22
+  }
+]

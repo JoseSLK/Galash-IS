@@ -1,0 +1,38 @@
+[
+  {
+    "field": "name",
+    "message": "Ingresa el nombre del semillero.",
+    "linked": true,
+    "distance": 12
+  },
+  {
+    "field": "researchLine",
+    "message": "Ingresa la línea de investigación.",
+    "linked": true,
+    "distance": 12
+  },
+  {
+    "field": "responsibleTeacherId",
+    "message": "Selecciona el docente responsable.",
+    "linked": true,
+    "distance": 12
+  },
+  {
+    "field": "contactEmail",
+    "message": "Ingresa un correo válido, por ejemplo semillero@uptc.edu.co.",
+    "linked": true,
+    "distance": 12
+  },
+  {
+    "field": "description",
+    "message": "Describe el semillero.",
+    "linked": true,
+    "distance": 12
+  },
+  {
+    "field": "objective",
+    "message": "Indica el objetivo.",
+    "linked": true,
+    "distance": 12
+  }
+]
