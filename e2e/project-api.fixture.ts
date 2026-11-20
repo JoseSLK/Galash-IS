@@ -3,7 +3,7 @@ import {Page} from '@playwright/test';
 export async function projectApi(page: Page, role: string | null = null) {
  const state = {role, userId:'admin-1', calls:[] as string[], writes:[] as any[], projects:[
   {id:'p1',seedbedId:'s1',title:'Proyecto activo de prueba',summary:'Investigación de seguridad',researchLine:'Seguridad',status:'Activo',responsibleIds:['teacher'],memberIds:['student'],startDate:'2026-11-01T00:00:00Z',endDate:null,progress:62,updatedAt:'2026-11-06T12:00:00Z'},
-  {id:'p2',seedbedId:'s2',title:'Proyecto radicado de prueba',summary:'Investigación de modelos',researchLine:'Modelos',status:'Radicado',responsibleIds:['teacher'],memberIds:[],startDate:'2026-11-01T00:00:00Z',endDate:null,progress:8,updatedAt:'2026-11-06T12:00:00Z'},
+  {id:'p2',seedbedId:'s2',title:'Proyecto de modelos de prueba',summary:'Investigación de modelos',researchLine:'Modelos',status:'Activo',responsibleIds:['teacher'],memberIds:[],startDate:'2026-11-01T00:00:00Z',endDate:null,progress:8,updatedAt:'2026-11-06T12:00:00Z'},
   {id:'p3',seedbedId:'s1',title:'Proyecto finalizado de prueba',summary:'Investigación concluida',researchLine:'Seguridad',status:'Finalizado',responsibleIds:['teacher'],memberIds:[],startDate:'2026-01-01T00:00:00Z',endDate:'2026-10-31T00:00:00Z',progress:100,updatedAt:'2026-11-06T12:00:00Z'}
  ]};
  await page.route('**/api/**',async route=>{

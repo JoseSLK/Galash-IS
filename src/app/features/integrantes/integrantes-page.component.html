@@ -2,6 +2,7 @@
 <div [inert]="header.registrationOpen">
   <main id="contenido" class="integrantes-page">
     <header class="directory-heading"><div><p class="eyebrow">COMUNIDAD GALASH / DIRECTORIO</p><h1>El conocimiento<br>tiene <span>rostro.</span></h1></div><div class="intro"><p>Integrantes</p><p>Docentes y estudiantes que construyen nuestra comunidad de investigación.</p></div></header>
+    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- only records scroll before a card link opens; links stay keyboard operable -->
     <section aria-label="Directorio de integrantes" (click)="guardarScroll()">
       <app-integrantes-toolbar [filtros]="filtros()" [personas]="personas()" [total]="filtrados().length" (busqueda)="buscar($event)" (cambio)="actualizar($event)" (limpiar)="limpiar()" />
       @switch (state()) {

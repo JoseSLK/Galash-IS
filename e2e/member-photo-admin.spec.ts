@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, Page, test } from '@playwright/test';
 
 const member = { id: 'm1', name: 'Laura', last_name: 'Gómez', role: 'docente', status: 'activo', visible_publicly: true, seedbed_ids: [], photo_url: '' };
@@ -37,7 +38,7 @@ test('admin edits a member photo through an image link and can remove it', async
   await page.getByRole('button', { name: 'Guardar' }).click();
   await expect(page.getByRole('img', { name: 'Retrato de Laura Gómez' })).toHaveAttribute('src', 'https://images.example.test/laura.png');
   expect(puts).toEqual([{ id: 'm1', body: { photo_url: 'https://images.example.test/laura.png' } }]);
-  await page.screenshot({ path: `docs/testing/evidence/R2026111308-member-photo/${info.project.name}.png` });
+  await page.screenshot({ path: `${evidenceRoot}/member-photo/${info.project.name}.png` });
   await page.getByRole('button', { name: 'Editar foto de Laura Gómez' }).click();
   await page.getByRole('button', { name: 'Quitar foto' }).click();
   await expect(page.getByRole('img', { name: 'Foto pendiente de Laura Gómez' })).toBeVisible();

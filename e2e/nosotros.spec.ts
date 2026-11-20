@@ -1,8 +1,18 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+const officialLinks = [
+  ['Instagram', 'redes-sociales', 'https://www.instagram.com/galash.example'],
+  ['Facebook', 'redes-sociales', 'https://www.facebook.com/galash.example'],
+  ['CvLAC', 'cvlac', 'https://scienti.minciencias.gov.co/cvlac/example'],
+  ['GrupLAC', 'gruplac', 'https://scienti.minciencias.gov.co/gruplac/example'],
+].map(([name, category, url], order) => ({ id: `l${order}`, name, description: name, url, category, visible: true, order, status: 'activo' }));
+
 test.beforeEach(async ({ page }) => {
-  await page.route('**/api/**', route => route.fulfill({ status: 401 }));
+  // Anonymous visitor; institutional content and links come empty from the API, so the page shows its defaults.
+  await page.route('**/api/**', route => new URL(route.request().url()).pathname === '/api/users/me'
+    ? route.fulfill({ status: 401, json: { error: 'sesión requerida' } })
+    : route.fulfill({ json: { pages: [], links: officialLinks, seedbeds: [], members: [], projects: [] } }));
 });
 
 test('public universe content is reachable, responsive, keyboard operable and accessible', async ({ page }, info) => {
@@ -10,10 +20,12 @@ test('public universe content is reachable, responsive, keyboard operable and ac
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/nosotros');
   await expect(page.getByRole('heading', { name: 'Grupo de investigación en', exact: true })).toBeVisible();
-  for (const id of ['mision-vision', 'objetivos', 'galeria', 'areas', 'enlaces', 'colaborar']) {
+  for (const id of ['mision-vision', 'objetivos', 'galeria', 'areas', 'enlaces']) {
     await expect(page.locator('#' + id).getByRole('heading', { level: 2 })).toHaveCount(1);
   }
-  await expect(page.locator('.hero-foot, .hero-copy .u-actions, .hero-copy > p, .u-section > .u-label, .area-callout .u-label')).toHaveCount(0);
+  await expect(page.locator('.hero-foot, .hero-copy .u-actions, .hero-copy > p, .area-callout .u-label')).toHaveCount(0);
+  // Without published institutional content the only section label is the provisional-text notice.
+  await expect(page.locator('.u-section > .u-label')).toHaveText(['Texto provisional']);
   await expect(page.locator('.hero-emblem img')).toHaveAttribute('src', '/assets/galash-emblema-sin-fondo.svg');
   await expect(page.locator('.universe-mark')).toHaveCount(0);
   await expect(page.locator('#objetivos .animated-purpose-icon')).toHaveCount(3);
@@ -51,20 +63,13 @@ test('public universe content is reachable, responsive, keyboard operable and ac
     return { corner: data[3], hasLines: data.some((value, index) => index % 4 === 3 && value > 0) };
   });
   expect(alpha).toEqual({ corner: 0, hasLines: true });
-  const email = page.getByRole('textbox', { name: 'Tu correo electrónico' });
-  await email.fill('invalido'); await page.getByRole('button', { name: 'Enviar', exact: true }).click();
-  await expect(email).toHaveAttribute('aria-invalid', 'true');
-  await expect(page.locator('#collab-result')).toContainText('válido');
-  const transmissions: string[] = [];
-  page.on('request', request => { if (request.method() !== 'GET') transmissions.push(request.url()); });
-  await email.fill('ejemplo@example.test'); await page.getByRole('button', { name: 'Enviar', exact: true }).click();
-  await expect(page.locator('#collab-result')).toContainText('no se ha enviado');
-  expect(transmissions).toEqual([]);
+  // The collaboration e-mail form was removed with the #colaborar section (contact is out of scope, D036).
+  await expect(page.getByRole('textbox', { name: 'Tu correo electrónico' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Dónde nos encontramos' })).toHaveCount(1);
   await expect(page.locator('.location-map')).toHaveAttribute('src', /google.com\/maps\?q=.+output=embed/);
   await expect(page.locator('.location-copy address')).toContainText('15-134');
-  await expect(page.locator('.location-copy .official-entry')).toHaveCount(4);
-  await expect(page.locator('.location-copy .official-entry strong')).toHaveText(['Instagram', 'Facebook', 'CvLAC', 'GrupLAC']);
+  await expect(page.locator('#enlaces .official-entry')).toHaveCount(4);
+  await expect(page.locator('#enlaces .official-entry strong')).toHaveText(['Instagram', 'Facebook', 'CvLAC', 'GrupLAC']);
   await expect(page.locator('#enlaces')).not.toContainText('GALASH en comunidad');
   await expect(page.locator('#enlaces')).not.toContainText('Minciencias');
   await expect(page.locator('#enlaces')).not.toContainText('Repositorios');
@@ -133,6 +138,9 @@ test('gallery slides automatically and can be paused while distinct icons animat
  expect(cards[1]).toBeGreaterThan(cards[0]+50);
  expect(cards[2]).toBeCloseTo(cards[0],0);
  await page.getByRole('button',{name:'Pausar galería',exact:true}).click();
+ // Read the position only once the pause is rendered (button state + one frame), not in the frame of the click.
+ await expect(page.getByRole('button',{name:'Reanudar galería',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
  const before=await track.evaluate(el=>getComputedStyle(el).transform);
  await page.mouse.move(0,0);await page.waitForTimeout(700);
  expect(await track.evaluate(el=>getComputedStyle(el).transform)).toBe(before);
@@ -155,19 +163,19 @@ test('gallery slides automatically and can be paused while distinct icons animat
 test('interactive hero supports manual letters, keyboard, motion preference and automatic cycle',async({page})=>{
  test.setTimeout(45000);
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/nosotros');
- const hero=page.locator('app-hero-acronimo');const card=hero.locator('.letter-card');
+ const hero=page.locator('app-hero-acronimo');const card=hero.locator('.letter-display');
  await expect(hero.getByRole('button',{name:'Auditoría',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(hero.getByRole('button',{name:'Reproducir',exact:true})).toBeVisible();
  await expect(card).toHaveAttribute('aria-live','polite');
  await hero.getByRole('button',{name:'Hardware',exact:true}).focus();await page.keyboard.press('Enter');
- await expect(card.getByRole('heading')).toHaveText('Hardware');
+ await expect(card.getByRole('heading')).toHaveText('Arquitectura de Hardware');
  await hero.getByRole('button',{name:'Grupo',exact:true}).focus();await page.keyboard.press('Space');
- await expect(card.getByRole('heading')).toHaveText('Grupo');
+ await expect(card.getByRole('heading')).toHaveText('Auditoría, Lógica y Arquitectura de Software y Hardware');
  await page.emulateMedia({reducedMotion:'no-preference'});
  await hero.getByRole('button',{name:'Pausar',exact:true}).focus();await page.mouse.move(0,0);
  await expect(card.getByRole('heading')).toHaveText('Auditoría',{timeout:5000});
  await expect(card).toHaveAttribute('aria-live','off');
- await hero.locator('.letter-card').hover();const current=await card.getByRole('heading').textContent();
+ await card.hover();const current=await card.getByRole('heading').textContent();
  await page.waitForTimeout(3300);expect(await card.getByRole('heading').textContent()).toBe(current);
  await page.mouse.move(0,0);await expect(card.getByRole('heading')).not.toHaveText(current!,{timeout:5000});
  await hero.getByRole('button',{name:'Pausar',exact:true}).click();const stopped=await card.getByRole('heading').textContent();

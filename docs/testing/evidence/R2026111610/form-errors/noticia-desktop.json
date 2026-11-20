@@ -1,0 +1,26 @@
+[
+  {
+    "field": "title",
+    "message": "Ingresa el título.",
+    "linked": true,
+    "distance": 22
+  },
+  {
+    "field": "description",
+    "message": "Ingresa la descripción.",
+    "linked": true,
+    "distance": 26
+  },
+  {
+    "field": "type",
+    "message": "Indica el tipo, por ejemplo Taller.",
+    "linked": true,
+    "distance": 22
+  },
+  {
+    "field": "startAt",
+    "message": "Indica la fecha y hora de inicio.",
+    "linked": true,
+    "distance": 22
+  }
+]

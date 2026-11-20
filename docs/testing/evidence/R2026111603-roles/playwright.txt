@@ -1,0 +1,1 @@
+npx playwright test e2e/role-access.spec.ts: 36 passed (6 roles x 2 pruebas x desktop/tablet/mobile)

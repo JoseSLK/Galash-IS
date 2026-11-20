@@ -41,3 +41,6 @@ h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 600; } /* Sora y Plex Sans 
   outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--galash-bg); /* separa el anillo de fondos Jonquil */
 }
+
+/* Validation message placed next to its field by FieldErrorDirective (PT-NF-03). */
+.field-error { display: block; margin-top: 4px; color: var(--galash-error); font: 400 12px/1.4 var(--font-body); text-align: left; }

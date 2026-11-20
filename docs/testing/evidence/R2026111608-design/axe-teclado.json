@@ -1,0 +1,44 @@
+{
+  "/": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  },
+  "/nosotros": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  },
+  "/semilleros": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  },
+  "/proyectos": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  },
+  "/noticias": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  },
+  "/integrantes": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  },
+  "/unete": {
+    "violations": [
+      "label-content-name-mismatch (serious, 1)"
+    ],
+    "focusWithoutRing": []
+  }
+}

@@ -1,3 +1,4 @@
+import { evidenceRoot } from './evidence';
 import { expect, test } from '@playwright/test';
 
 test('admin assigns a member as delegate and teacher as leader from user management', async ({ page }, info) => {
@@ -38,5 +39,5 @@ test('admin assigns a member as delegate and teacher as leader from user managem
   await panel.getByRole('button', { name: 'Guardar función' }).click();
   await expect(panel.getByText('Función actual: Líder de semillero.')).toBeVisible();
   expect(seedbed.responsibleTeacherId).toBe('teacher');
-  await panel.screenshot({ style: 'app-dashboard { visibility: hidden !important; }', path: `docs/testing/evidence/R20261104-assignments/${info.project.name}.png` });
+  await panel.screenshot({ style: 'app-dashboard { visibility: hidden !important; }', path: `${evidenceRoot}/assignments/${info.project.name}.png` });
 });
