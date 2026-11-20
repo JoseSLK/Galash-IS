@@ -1,0 +1,26 @@
+[
+  {
+    "field": "title",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "description",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "type",
+    "message": "",
+    "linked": false,
+    "distance": null
+  },
+  {
+    "field": "startAt",
+    "message": "",
+    "linked": false,
+    "distance": null
+  }
+]

@@ -51,6 +51,7 @@
         </div>
         <app-profile-photo-editor />
         <section class="my-projects-section" aria-labelledby="my-projects-title"><h2 id="my-projects-title">Mi proyecto</h2><p class="my-projects-intro">Proyectos donde tu cuenta figura como integrante o responsable.</p><app-projects-page [embedded]="true" [personal]="true"/></section>
+        @if (auth.hasRole('docente')) {<section class="my-projects-section" aria-labelledby="my-notices-title"><h2 id="my-notices-title">Comunicados</h2><p class="my-projects-intro">Directrices publicadas para los docentes. Abre cada comunicado para leerlo y confirmar su lectura.</p><app-comunicados-admin /></section>}
       </div>
     } @else {
       <div class="session-message" role="alert"><h1>No pudimos comprobar tu sesión</h1><p>Vuelve a iniciar sesión desde el menú para consultar tu perfil.</p></div>

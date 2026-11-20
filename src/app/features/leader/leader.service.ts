@@ -1,9 +1,11 @@
 import { inject, Injectable } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from '../../core/services/api.service';
 import { AssignmentSeedbed } from '../admin/seedbed-assignments.service';
 import { AssignmentMember } from '../admin/seedbed-assignments.service';
 
-export interface LeaderSeedbed extends AssignmentSeedbed { status: string; visibility: string; }
+// director: the user is responsibleTeacherId; otherwise an active delegate (requests, activities, events, calendar only).
+export interface LeaderSeedbed extends AssignmentSeedbed { status: string; visibility: string; director?: boolean; }
 export interface LeaderActivity { id: string; seedbedId: string; title: string; description: string; status: string; date: string | null; responsibleIds: string[] | null; evidence: string[] | null; }
 export interface MemberCandidate { id: string; name: string; last_name: string; role: string; }
 @Injectable({ providedIn: 'root' })
@@ -11,10 +13,12 @@ export class LeaderService {
   private readonly api = inject(ApiService);
   async owned(): Promise<LeaderSeedbed[]> {
     const user = await this.api.get<{ id: string; managed_seedbed_ids?: string[] }>('/users/me');
-    const results = await Promise.all((user.managed_seedbed_ids ?? []).map(id => this.api.get<LeaderSeedbed>(`/seedbeds/${encodeURIComponent(id)}`).catch(() => null)));
-    const owned = results.filter((item): item is LeaderSeedbed => !!item && item.responsibleTeacherId === user.id);
-    if (!owned.length && results.some(item => !item)) throw new Error('No se pudieron comprobar los semilleros asignados.');
-    return owned;
+    // managed_seedbed_ids covers directed and delegated seedbeds. A delegate gets 404 on an unpublished one: no access, not a failure.
+    const results = await Promise.all((user.managed_seedbed_ids ?? []).map(id => this.api.get<LeaderSeedbed>(`/seedbeds/${encodeURIComponent(id)}`)
+      .catch((error: unknown) => error instanceof HttpErrorResponse && error.status === 404 ? undefined : null)));
+    const managed = results.filter((item): item is LeaderSeedbed => !!item).map(item => ({ ...item, director: item.responsibleTeacherId === user.id }));
+    if (!managed.length && results.some(item => item === null)) throw new Error('No se pudieron comprobar los semilleros asignados.');
+    return managed;
   }
   detail(id: string): Promise<LeaderSeedbed> { return this.api.get(`/seedbeds/${encodeURIComponent(id)}`); }
   async update(id: string, fields: { name: string; description: string; researchLine: string; objective: string; contactEmail: string }): Promise<LeaderSeedbed> {

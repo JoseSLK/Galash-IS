@@ -6,10 +6,11 @@ import { SocialLinksComponent } from '../../shared/components/social-links/socia
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AuthService, RegistrationRequiredError } from '../../core/services/auth.service';
 import { RegisterComponent } from '../auth/register/register.component';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 import { ApiService } from '../../core/services/api.service';
 import { Seedbed, SeedbedsService, seedbedAbbreviation } from '../seedbeds/seedbeds.service';
 import { GlitchBackgroundComponent } from '../../shared/components/glitch-background/glitch-background.component';
-import { INITIAL_HEADER_SCROLL, nextHeaderState } from './header-scroll';
+import { INITIAL_HEADER_SCROLL, nextHeaderState, lastIndexAbove } from './header-scroll';
 import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
 
 const MEMBER_COUNT_LIMIT = 100;
@@ -17,7 +18,7 @@ const MEMBER_COUNT_LIMIT = 100;
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RegisterComponent, SiteFooterComponent, SocialLinksComponent, GlitchBackgroundComponent, ScrollStackComponent],
+  imports: [RouterLink, NotificationBellComponent, RegisterComponent, SiteFooterComponent, SocialLinksComponent, GlitchBackgroundComponent, ScrollStackComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -26,6 +27,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() headerOnly = false;
   @Input() activePage = 'semilleros';
   @ViewChild('mobileNav') private mobileNav?: ElementRef<HTMLElement>;
+  @ViewChild('seedbedBlocks') private seedbedBlocks?: ElementRef<HTMLElement>;
   @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('authMenu') private authMenu?: ElementRef<HTMLElement>;
   @ViewChild('authMenuTrigger') private authMenuTrigger?: ElementRef<HTMLButtonElement>;
@@ -56,8 +58,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private scrollFrame = 0;
   private removeScrollListener?: () => void;
 
-  get seedbedIcon(): string {
-    const name = this.currentSeedbed?.name.toLocaleLowerCase('es') ?? '';
+  iconFor(seedbed: Seedbed): string {
+    const name = seedbed.name.toLocaleLowerCase('es');
     if (name.includes('big data') || name.includes('cloud')) return 'cloud';
     if (name.includes('ciber')) return 'security';
     if (name.includes('algor')) return 'algorithm';
@@ -68,8 +70,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return 'research';
   }
 
-  get currentSeedbed(): Seedbed | undefined { return this.seedbeds()[this.activeSeedbed]; }
-
   /** Runs once per frame outside Angular; re-enters the zone only when the header state changes. */
   private syncHeader(): void {
     this.scrollFrame = 0;
@@ -78,8 +78,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const scrolled = y > 80;
     const section = this.activeSection;
     this.updateActiveSection();
-    if (this.headerState.compact !== this.headerCompact || scrolled !== this.headerScrolled || section !== this.activeSection) {
+    const seedbed = this.seedbedFromScroll();
+    if (this.headerState.compact !== this.headerCompact || scrolled !== this.headerScrolled || section !== this.activeSection || seedbed !== this.activeSeedbed) {
       this.zone.run(() => {
+        this.activeSeedbed = seedbed;
         this.headerCompact = this.headerState.compact;
         this.headerScrolled = scrolled;
         this.changeDetector.markForCheck();
@@ -120,21 +122,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.removeScrollListener?.();
   }
 
-  selectSeedbed(index: number): void { this.activeSeedbed = index; }
-  navigateSeedbeds(event: KeyboardEvent, index: number): void {
-    const count = this.seedbeds().length;
-    if (!count) return;
-    let next: number;
-    switch (event.key) {
-      case 'ArrowRight': next = (index + 1) % count; break;
-      case 'ArrowLeft': next = (index - 1 + count) % count; break;
-      case 'Home': next = 0; break;
-      case 'End': next = count - 1; break;
-      default: return;
-    }
-    event.preventDefault();
-    this.selectSeedbed(next);
-    (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+  private seedbedBlockList(): HTMLElement[] {
+    return Array.from(this.seedbedBlocks?.nativeElement.children ?? []) as HTMLElement[];
+  }
+  /** El semillero activo del índice lateral es el último bloque que cruzó la mitad de la ventana. */
+  private seedbedFromScroll(): number {
+    return lastIndexAbove(this.seedbedBlockList().map(block => block.getBoundingClientRect().top), window.innerHeight / 2);
+  }
+  selectSeedbed(index: number): void {
+    const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    this.seedbedBlockList()[index]?.scrollIntoView({ behavior, block: 'center' });
   }
 
   toggleMenu(): void {

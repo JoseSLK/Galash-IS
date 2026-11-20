@@ -1,7 +1,12 @@
+import { evidenceRoot } from './evidence';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, Page } from '@playwright/test';
 
 async function prepare(page: Page, authenticated: boolean, role = 'admin'): Promise<void> {
+  const reviews = [
+    ...['Las sesiones me ayudaron a escribir mi primer artículo.', 'El acompañamiento docente es constante.', 'Aprendí a trabajar con datos reales.'].map((text, i) => ({ id: `p${i}`, seedbedId: 's1', authorId: `a${i}`, author: `Integrante ${i + 1}`, text, status: 'publicada', createdAt: '2026-10-01T10:00:00Z' })),
+    { id: 'q1', seedbedId: 's1', authorId: 'a9', author: 'Integrante 9', text: 'Propuesta pendiente de revisión.', status: 'pendiente', createdAt: '2026-11-01T10:00:00Z' },
+  ];
   await page.route('**/api/**', async route => {
     const url = new URL(route.request().url());
     if (url.pathname === '/api/users/me') return route.fulfill(authenticated
@@ -13,6 +18,15 @@ async function prepare(page: Page, authenticated: boolean, role = 'admin'): Prom
     if (url.pathname.endsWith('/members')) return route.fulfill({ json: { members: [] } });
     if (url.pathname === '/api/projects') return route.fulfill({ json: { projects: [] } });
     if (url.pathname === '/api/events') return route.fulfill({ json: { events: [] } });
+    // In-memory reviews API (contract M4): public list of published reviews, submission and admin moderation.
+    const method = route.request().method();
+    const own = url.pathname.match(/^\/api\/seedbeds\/([^/]+)\/reviews$/);
+    if (own && method === 'GET') return route.fulfill({ json: { reviews: reviews.filter(r => r.seedbedId === own[1] && r.status === 'publicada').map(r => ({ ...r, authorName: r.author })) } });
+    if (own && method === 'POST') { const item = { id: `r${reviews.length + 1}`, seedbedId: own[1], authorId: 'demo-admin', author: 'Administradora de prueba', text: route.request().postDataJSON().text, status: 'pendiente', createdAt: '2026-11-16T10:00:00Z' }; reviews.push(item); return route.fulfill({ status: 201, json: item }); }
+    if (url.pathname === '/api/admin/seedbed-reviews') return route.fulfill({ json: { reviews: reviews.filter(r => r.status === (url.searchParams.get('status') ?? 'pendiente')) } });
+    const moderation = url.pathname.match(/^\/api\/admin\/seedbed-reviews\/([^/]+)\/moderation$/);
+    if (moderation) { const item = reviews.find(r => r.id === moderation[1])!; item.status = route.request().postDataJSON().status; return route.fulfill({ json: item }); }
+    if (url.pathname.startsWith('/api/members/')) return route.fulfill({ json: { name: 'Integrante', last_name: 'de prueba' } });
     return route.fulfill({ status: 401 });
   });
   await page.goto('/semilleros?id=s1');
@@ -46,7 +60,7 @@ test('anonymous visitors see demo reviews below projects without a submission fi
   expect(reviews!.y).toBeGreaterThanOrEqual(projects!.y + projects!.height);
   const audit = await new AxeBuilder({ page }).include('app-seedbed-reviews').withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(audit.violations).toEqual([]);
-  await page.locator('app-seedbed-reviews').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `docs/testing/evidence/R20261101-SEM08-motion/public-${info.project.name}.png` });
+  await page.locator('app-seedbed-reviews').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `${evidenceRoot}/SEM08-motion/public-${info.project.name}.png` });
 });
 
 test('local submissions update admin notification, approval and moderation across navigation', async ({ page }, info) => {
@@ -61,7 +75,7 @@ test('local submissions update admin notification, approval and moderation acros
   await expect(page.getByRole('button', { name: 'Enviar reseña' })).toBeDisabled();
   await field.fill(text);
   await page.getByRole('button', { name: 'Enviar reseña' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Reseña enviada' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Reseña enviada a revisión' })).toBeVisible();
   await expect(page.locator('.review-grid')).not.toContainText(text);
   await goAdmin(page);
   await expect(page.getByText('2 reseñas pendientes de revisión')).toBeVisible();
@@ -74,7 +88,7 @@ test('local submissions update admin notification, approval and moderation acros
   await expect(card).toContainText('Publicada');
   const audit = await new AxeBuilder({ page }).include('app-reviews-admin').withTags(['wcag2a', 'wcag2aa']).analyze();
   expect(audit.violations).toEqual([]);
-  await page.locator('app-reviews-admin').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `docs/testing/evidence/R20261101-SEM08/admin-${info.project.name}.png` });
+  await page.locator('app-reviews-admin').screenshot({ style: '.site-header { visibility: hidden !important; }', path: `${evidenceRoot}/SEM08/admin-${info.project.name}.png` });
   await goSeedbed(page);
   await expect(page.locator('.review-grid')).toContainText(text);
   await page.getByRole('button', { name: 'Ciberseguridad', exact: true }).click();
@@ -86,12 +100,13 @@ test('local submissions update admin notification, approval and moderation acros
   await expect(card).toContainText('Rechazada');
   await goSeedbed(page);
   await expect(page.locator('.review-grid')).not.toContainText(text);
-  expect(reviewCalls).toEqual([]);
+  expect(reviewCalls.some(call => call.includes('/moderation'))).toBe(true);
   await page.reload();
   await expect(page.locator('.review-grid .review-original')).toHaveCount(3);
   await goAdmin(page);
   await expect(page.getByText('1 reseña pendiente de revisión')).toBeVisible();
-  await expect(page.locator('.moderation-grid')).not.toContainText(text);
+  // Moderation is persisted by the API: after a reload the rejected review is still listed as such.
+  await expect(page.locator('.moderation-grid .review-card').filter({ hasText: text })).toContainText('Rechazada');
 });
 
 
@@ -99,7 +114,7 @@ test('registered students can submit while administrative moderation stays prote
   await prepare(page, true, 'estudiante');
   await page.getByLabel('Tu voz también cuenta').fill('Una aportación de prueba.');
   await page.getByRole('button', { name: 'Enviar reseña' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Reseña enviada' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: 'Reseña enviada a revisión' })).toBeVisible();
   await page.goto('/administracion');
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('app-reviews-admin')).toHaveCount(0);

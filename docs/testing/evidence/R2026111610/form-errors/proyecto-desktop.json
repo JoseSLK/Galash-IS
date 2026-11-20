@@ -1,0 +1,26 @@
+[
+  {
+    "field": "title",
+    "message": "Ingresa el título del proyecto.",
+    "linked": true,
+    "distance": 13
+  },
+  {
+    "field": "summary",
+    "message": "Ingresa la sinopsis.",
+    "linked": true,
+    "distance": 13
+  },
+  {
+    "field": "seedbedId",
+    "message": "Selecciona el semillero.",
+    "linked": true,
+    "distance": 13
+  },
+  {
+    "field": "startDate",
+    "message": "Indica la fecha de inicio.",
+    "linked": true,
+    "distance": 13
+  }
+]

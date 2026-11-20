@@ -10,6 +10,17 @@ export interface AssignmentSeedbed {
   contactEmail: string;
   responsibleTeacherId: string;
 }
+export interface SeedbedTopic { title: string; phrase: string; }
+export interface NewSeedbed {
+  name: string;
+  description: string;
+  researchLine: string;
+  objective: string;
+  responsibleTeacherId: string;
+  contactEmail: string;
+  topics?: SeedbedTopic[];
+}
+export interface TeacherOption { id: string; name: string; }
 export interface AssignmentMember {
   userId: string;
   name: string;
@@ -31,6 +42,17 @@ export class SeedbedAssignmentsService {
       all.push(...items);
       if (items.length < 100) return all;
     }
+  }
+  // POST /seedbeds (M2): created as Borrador; backend validates unique name and active Docente.
+  create(seedbed: NewSeedbed): Promise<AssignmentSeedbed & { status: string }> {
+    return this.api.post('/seedbeds', seedbed);
+  }
+  async teachers(): Promise<TeacherOption[]> {
+    const { users } = await this.api.get<{ users: { id: string; name: string; last_name: string; role: string; status: string }[] | null }>('/admin/members');
+    return (users ?? [])
+      .filter(user => user.status === 'activo' && ['docente', 'profesor'].includes(user.role.toLowerCase()))
+      .map(user => ({ id: user.id, name: [user.name, user.last_name].filter(Boolean).join(' ') }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'es'));
   }
   detail(id: string): Promise<AssignmentSeedbed> {
     return this.api.get(`/seedbeds/${encodeURIComponent(id)}`);

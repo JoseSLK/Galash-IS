@@ -48,4 +48,22 @@ describe('SeedbedAssignmentsService', () => {
     http.expectOne('/api/seedbeds/s1/members').flush({ members: [{ userId: 'student', leftAt: '2026-01-01', delegate: false }] });
     await expect(save).rejects.toThrow('integrante activo');
   });
+  it('creates a seedbed with POST /seedbeds', async () => {
+    const body = { name: 'IA', description: 'd', researchLine: 'l', objective: 'o', responsibleTeacherId: 't1', contactEmail: 'ia@example.test' };
+    const save = service.create(body);
+    const request = http.expectOne({ method: 'POST', url: '/api/seedbeds' });
+    expect(request.request.body).toEqual(body);
+    request.flush({ ...body, id: 's9', status: 'Borrador' });
+    await expect(save).resolves.toMatchObject({ id: 's9', status: 'Borrador' });
+  });
+  it('lists only active teachers as responsible candidates', async () => {
+    const load = service.teachers();
+    http.expectOne('/api/admin/members').flush({ users: [
+      { id: 'b', name: 'Beatriz', last_name: 'Ruiz', role: 'docente', status: 'activo' },
+      { id: 'a', name: 'Ana', last_name: '', role: 'Profesor', status: 'activo' },
+      { id: 'c', name: 'Carlos', last_name: '', role: 'docente', status: 'inactivo' },
+      { id: 'd', name: 'Diana', last_name: '', role: 'estudiante', status: 'activo' }
+    ] });
+    await expect(load).resolves.toEqual([{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Beatriz Ruiz' }]);
+  });
 });

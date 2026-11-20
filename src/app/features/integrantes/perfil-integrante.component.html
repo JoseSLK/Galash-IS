@@ -7,10 +7,31 @@
       @case ('ready') {
         @if (persona(); as p) {
           <section class="profile-layout" [attr.aria-label]="'Perfil de ' + p.nombre">
-            <div class="portrait" [attr.data-person]="p.id">
-              @if (p.fotoUrl && !imageFailed()) {<img [src]="p.fotoUrl" [alt]="'Retrato de ' + p.nombre" (error)="imageFailed.set(true)" />}
-              @else {<div class="placeholder" role="img" [attr.aria-label]="'Foto pendiente de ' + p.nombre"><svg viewBox="0 0 200 240" aria-hidden="true"><circle cx="100" cy="84" r="38"/><path d="M24 240v-38a76 76 0 0 1 152 0v38"/></svg><span>[FOTO]</span></div>}
+            <div class="portrait-column">
+            <div class="portrait" [class.portrait--low]="lowWidth()" [attr.data-person]="p.id">
+              @if (foto(); as src) { @if (!imageFailed()) {
+                @if (lowWidth()) {<img class="portrait-backdrop" [src]="src" alt="" aria-hidden="true" referrerpolicy="no-referrer" />}
+                <img #photo class="portrait-photo" [style.width.px]="lowWidth() || null" [src]="src" [alt]="'Retrato de ' + p.nombre" referrerpolicy="no-referrer" (load)="onPhotoLoad(photo)" (error)="imageFailed.set(true)" />} }
+              @if (!foto() || imageFailed()) {<div class="placeholder" role="img" [attr.aria-label]="'Foto pendiente de ' + p.nombre"><svg viewBox="0 0 200 240" aria-hidden="true"><circle cx="100" cy="84" r="38"/><path d="M24 240v-38a76 76 0 0 1 152 0v38"/></svg><span>[FOTO]</span></div>}
               <span class="portrait-number" aria-hidden="true">{{ numero(index() + 1) }}</span>
+              @if (auth.isAdmin() && !editandoFoto()) {<button id="edit-photo-button" type="button" class="photo-edit" [attr.aria-label]="'Editar foto de ' + p.nombre" title="Editar foto" (click)="abrirEdicionFoto()"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>}
+            </div>
+            @if (auth.isAdmin() && editandoFoto()) {
+              <form class="photo-form" novalidate aria-labelledby="photo-form-title" (submit)="$event.preventDefault(); guardarFoto(photoUrl.value)">
+                <h2 id="photo-form-title">Foto de {{ p.nombre }}</h2>
+                <label for="photo-url">Enlace de la imagen</label>
+                <input #photoUrl id="photo-url" type="url" inputmode="url" placeholder="https://" maxlength="2048" [value]="enlaceFoto()" (input)="enlaceFoto.set(photoUrl.value)" [disabled]="guardandoFoto()" aria-describedby="photo-url-help photo-url-warning">
+                <p id="photo-url-help">Solo se guarda el enlace; la imagen debe estar publicada en internet.</p>
+                <p id="photo-url-warning" class="photo-warning" aria-live="polite">@if (enlaceTemporal(enlaceFoto())) {{{ avisoEnlaceTemporal }}}</p>
+                @if (errorFoto()) {<p class="photo-error" role="alert">{{ errorFoto() }}</p>}
+                <div class="photo-actions">
+                  <button type="submit" class="primary" [disabled]="guardandoFoto()">{{ guardandoFoto() ? 'Guardando…' : 'Guardar' }}</button>
+                  @if (p.fotoUrl) {<button type="button" [disabled]="guardandoFoto()" (click)="guardarFoto('')">Quitar foto</button>}
+                  <button type="button" [disabled]="guardandoFoto()" (click)="cerrarEdicionFoto()">Cancelar</button>
+                </div>
+              </form>
+            }
+            <p class="visually-hidden" role="status">{{ avisoFoto() }}</p>
             </div>
             <div class="profile-copy">
               <div class="topline"><a routerLink="/integrantes" [queryParams]="params">← Volver a integrantes</a><span class="eyebrow">{{ numero(index() + 1) }} / {{ numero(personas().length) }}</span></div>

@@ -3,8 +3,11 @@ import { ComunicadosAdminComponent } from './comunicados/comunicados-admin.compo
 import { ProjectsPageComponent } from '../projects/projects-page.component';
 import { IntegrantesAdminComponent } from './integrantes/integrantes-admin.component';
 import { ReviewsAdminComponent } from './reviews/reviews-admin.component';
+import { AuditAdminComponent } from './audit/audit-admin.component';
+import { SeedbedCreateComponent } from './seedbed-create.component';
 import { SeedbedReviewsService } from '../seedbeds/reviews/seedbed-reviews.service';
 import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -21,12 +24,14 @@ import { EventsAdminComponent } from './events/events-admin.component';
 import { SeedbedAssignmentsComponent } from './seedbed-assignments.component';
 import { LeaderSeedbed, LeaderService } from '../leader/leader.service';
 import { LeaderToolsComponent } from '../leader/leader-tools.component';
-type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar' | 'communications' | 'content';
+type AdminSection = 'users' | 'requests' | 'events' | 'reviews' | 'projects' | 'seedbed' | 'members' | 'activities' | 'calendar' | 'communications' | 'content' | 'audit' | 'seedbeds';
+
+const DIRECTOR_SECTIONS: AdminSection[] = ['seedbed', 'members', 'projects'];
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ContentAdminComponent,LeaderToolsComponent, SeedbedAssignmentsComponent, ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
+  imports: [AuditAdminComponent, SeedbedCreateComponent, ContentAdminComponent,LeaderToolsComponent, SeedbedAssignmentsComponent, ComunicadosAdminComponent, ProjectsPageComponent, IntegrantesAdminComponent, ReviewsAdminComponent, DashboardComponent, SiteFooterComponent, PeopleDirectoryComponent, ReactiveFormsModule, RegistrationRequestsComponent, EventsAdminComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -39,6 +44,8 @@ export class AdminComponent implements OnDestroy {
   readonly scopeLoading = signal(this.leaderMode);
   readonly scopeError = signal('');
   readonly scopedSeedbed = computed(() => this.scopedSeedbeds().find(item => item.id === this.scopeId()) ?? null);
+  // In leader mode a delegate (not director) only handles requests, activities, events and calendar.
+  readonly isDirector = computed(() => !this.leaderMode || !!this.scopedSeedbed()?.director);
   readonly canManage = computed(() => this.leaderMode ? !!this.scopedSeedbed() : this.auth.isAdmin());
   readonly menuOpen = signal(true);
   readonly activeSection = signal<AdminSection>(this.leaderMode ? 'requests' : 'users');
@@ -64,6 +71,11 @@ export class AdminComponent implements OnDestroy {
 
   constructor() {
     if (this.leaderMode) void this.loadScope();
+    // Deep link from the notification bell; re-read when the route is reused with a new section.
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params => {
+      const section = params.get('section');
+      if (section === 'requests' || section === 'reviews') this.showSection(section);
+    });
     effect(() => {
       if (this.auth.sessionStatus() !== 'checking' && (this.leaderMode ? !this.auth.isAuthenticated() : !this.auth.isAdmin())) void this.router.navigateByUrl('/');
       if (!this.leaderMode && this.auth.isAdmin() && !this.initialLoadStarted) {
@@ -85,16 +97,22 @@ export class AdminComponent implements OnDestroy {
       const items = await this.leaderService.owned(); this.scopedSeedbeds.set(items);
       const requested = this.route.snapshot.queryParamMap.get('seedbedId');
       const chosen = requested ? items.find(item => item.id === requested) : items[0];
-      if (requested && !chosen) this.scopeError.set('No tienes acceso como líder a este semillero.');
-      else if (!chosen) this.scopeError.set('No tienes semilleros asignados como líder.');
+      if (requested && !chosen) this.scopeError.set('No diriges este semillero ni eres su delegado.');
+      else if (!chosen) this.scopeError.set('No tienes semilleros asignados como líder o delegado.');
       this.scopeId.set(chosen?.id ?? '');
     } catch { this.scopeError.set('No pudimos comprobar tus semilleros. Inténtalo de nuevo.'); }
     finally { this.scopeLoading.set(false); }
   }
 
   showSection(section: AdminSection): void {
-    if (this.leaderMode && (section === 'users' || section === 'communications' || section === 'reviews' || section === 'content')) return;
+    if (this.leaderMode && (section === 'users' || section === 'communications' || section === 'reviews' || section === 'content' || section === 'audit' || section === 'seedbeds')) return;
+    if (!this.isDirector() && DIRECTOR_SECTIONS.includes(section)) return;
     this.activeSection.set(section);
+  }
+
+  chooseScope(id: string): void {
+    this.scopeId.set(id);
+    if (!this.isDirector() && DIRECTOR_SECTIONS.includes(this.activeSection())) this.activeSection.set('requests');
   }
 
   queueSearch(query: string): void {

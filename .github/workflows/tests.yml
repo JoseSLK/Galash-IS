@@ -20,6 +20,10 @@ jobs:
       - run: npm ci
       # environment.ts is gitignored; placeholder Firebase config is enough because tests mock the backend.
       - run: cp src/environments/environment.example.ts src/environments/environment.ts
+      - name: Lint
+        run: npm run lint
+      - name: Dependency audit
+        run: npm audit --audit-level=high
       - name: Build
         run: npm run build
       - name: Unit tests

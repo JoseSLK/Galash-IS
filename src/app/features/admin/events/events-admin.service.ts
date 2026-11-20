@@ -28,7 +28,8 @@ export class EventsAdminService {
   }
   detail(id: string): Promise<ManagedEvent> { return this.api.get(`/events/${encodeURIComponent(id)}`); }
   create(data: EventData): Promise<ManagedEvent> { return this.api.post('/events', data); }
-  update(id: string, data: EventData): Promise<ManagedEvent> { const { seedbedId, ...fields } = data; return this.api.patch(`/events/${encodeURIComponent(id)}`, fields); }
+  // updatedAt is the version the editor loaded; the API answers 409 if the event changed since (D039).
+  update(id: string, data: EventData, updatedAt?: string): Promise<ManagedEvent> { const { seedbedId, ...fields } = data; return this.api.patch(`/events/${encodeURIComponent(id)}`, updatedAt ? { ...fields, updatedAt } : fields); }
   action(id: string, action: 'publish' | 'hide' | 'cancel'): Promise<ManagedEvent> {
     return this.api.post(`/events/${encodeURIComponent(id)}/${action}`, {});
   }

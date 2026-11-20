@@ -1,0 +1,63 @@
+<section aria-label="Bitácora de auditoría">
+  <fieldset class="audit-query" [disabled]="loading()">
+    <legend>Consulta <small>(máximo {{ maxDays }} días por petición)</small></legend>
+    <label>Desde<input type="date" [max]="today" [value]="from()" (change)="setQuery('from', $any($event.target).value)" /></label>
+    <label>Hasta<input type="date" [max]="today" [value]="to()" (change)="setQuery('to', $any($event.target).value)" /></label>
+    <label>Actor<select [value]="actor()" (change)="setQuery('actor', $any($event.target).value)">
+      <option value="">Todos los actores</option>
+      @for (person of actors(); track person.id) {<option [value]="person.id">{{ person.name }}</option>}
+    </select></label>
+    <button type="button" [disabled]="!!rangeError() || !!pending()" (click)="prepare()">Preparar consulta</button>
+  </fieldset>
+  @if (rangeError()) {<p class="audit-error" role="alert">{{ rangeError() }}</p>}
+  @if (notice()) {<p class="audit-status" role="status">{{ notice() }}</p>}
+
+  @if (pending(); as query) {
+    <div class="audit-confirm" role="alertdialog" aria-labelledby="audit-confirm-title">
+      <p id="audit-confirm-title"><strong>¿Confirmas la consulta?</strong> Se pedirá al servidor la bitácora del {{ query.from }} al {{ query.to }} para {{ actorLabel(query.actor) }}.</p>
+      <div class="audit-actions">
+        <button type="button" [disabled]="loading()" (click)="confirm()">{{ loading() ? 'Consultando…' : 'Confirmar consulta' }}</button>
+        <button class="secondary" type="button" [disabled]="loading()" (click)="pending.set(null)">Cancelar</button>
+      </div>
+    </div>
+  }
+  @if (error()) {<p class="audit-error" role="alert">{{ error() }}</p>}
+
+  @if (loaded()) {
+    <fieldset class="audit-local">
+      <legend>Filtrar resultados <small>(sin nuevas peticiones)</small></legend>
+      <label>Módulo<select [value]="module()" (change)="setLocal('module', $any($event.target).value)"><option value="">Todos</option>@for (item of moduleOptions(); track item) {<option [value]="item">{{ item }}</option>}</select></label>
+      <label>Operación<select [value]="operation()" (change)="setLocal('operation', $any($event.target).value)"><option value="">Todas</option><option>Creación</option><option>Actualización</option><option>Eliminación</option></select></label>
+      <label>Resultado<select [value]="result()" (change)="setLocal('result', $any($event.target).value)"><option value="">Todos</option><option value="success">Éxito</option><option value="failure">Fallo</option></select></label>
+      <label>Buscar<input type="search" placeholder="Actor, ruta, ID u origen" [value]="text()" (input)="setLocal('text', $any($event.target).value)" /></label>
+      <button class="secondary" type="button" (click)="clearLocal()">Limpiar filtros</button>
+    </fieldset>
+    <p class="audit-status" role="status">{{ filtered().length }} de {{ logs().length }} registros · {{ failures() }} {{ failures() === 1 ? 'fallo' : 'fallos' }}</p>
+    <div class="audit-table-wrap">
+      <table class="audit-table">
+        <thead><tr><th scope="col">Fecha</th><th scope="col">Actor</th><th scope="col">Módulo</th><th scope="col">Operación</th><th scope="col">Resultado</th><th scope="col">Origen</th></tr></thead>
+        <tbody>
+          @for (row of visible(); track row.id) {
+            <tr>
+              <td><time [attr.datetime]="row.date">{{ row.date | date:'dd/MM/yyyy, HH:mm:ss' }}</time></td>
+              <td>{{ row.actorName }}</td>
+              <td>{{ row.module }}<small>{{ row.entity }}</small></td>
+              <td>{{ row.operation }}<small>{{ row.action.split(' ')[0] }}</small></td>
+              <td><span class="audit-badge" [class.failure]="row.result !== 'success'">{{ row.result === 'success' ? 'Éxito' : 'Fallo' }}</span></td>
+              <td>{{ row.origin || '—' }}</td>
+            </tr>
+          } @empty {<tr><td colspan="6">No hay registros con estos filtros.</td></tr>}
+        </tbody>
+      </table>
+    </div>
+    @if (pages() > 1) {
+      <nav class="audit-pager" aria-label="Páginas de la bitácora">
+        <button class="secondary" type="button" [disabled]="page() === 0" (click)="page.set(page() - 1)">Anterior</button>
+        <span>Página {{ page() + 1 }} de {{ pages() }}</span>
+        <button class="secondary" type="button" [disabled]="page() + 1 >= pages()" (click)="page.set(page() + 1)">Siguiente</button>
+      </nav>
+    }
+  } @else if (!pending()) {
+    <p class="audit-status">Elige el periodo y confirma la consulta para ver la bitácora.</p>
+  }
+</section>

@@ -20,7 +20,7 @@
         </button>
         @if (abierto() === menu.key) {
           <div class="backdrop" (click)="cerrar()" aria-hidden="true"></div>
-          <div class="filter-menu" [id]="'filtro-' + menu.key" role="menu" [attr.aria-label]="menu.label" (keydown)="navegar($event, menu.key)">
+          <div class="filter-menu" [id]="'filtro-' + menu.key" role="menu" tabindex="-1" [attr.aria-label]="menu.label" (keydown)="navegar($event, menu.key)">
             <button type="button" role="menuitem" (click)="elegir(menu.key, '')">Todos <span aria-hidden="true">{{ !filtros()[menu.key] ? '✓' : '' }}</span></button>
             @for (opcion of opciones()[menu.key]; track opcion.value) {
               <button type="button" role="menuitem" [class.chosen]="filtros()[menu.key] === opcion.value" (click)="elegir(menu.key, opcion.value)">{{ opcion.label }} <span aria-hidden="true">{{ filtros()[menu.key] === opcion.value ? '✓' : '' }}</span></button>

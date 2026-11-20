@@ -15,9 +15,7 @@ test.beforeEach(async ({ page }) => {
 test('public home renders main content', async ({ page }) => {
   await expect(page).toHaveTitle(/GALASH/);
   await expect(page.locator('main#contenido')).toBeVisible();
-  await expect(page.locator('.home-stats > div').first()).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-  const figureSize = await page.locator('.home-stats dd').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
-  expect(figureSize).toBeLessThanOrEqual(52);
+  await expect(page.locator('.hero-demo')).toHaveAttribute('aria-label', /semilleros, .* integrantes, .* proyectos/);
   await expect(page.locator('.hero-section app-glitch-background')).toHaveCSS('mask-image', /linear-gradient/);
   const toggle = page.locator('.menu-toggle');
   const authButton = page.locator('#header-auth-button');
