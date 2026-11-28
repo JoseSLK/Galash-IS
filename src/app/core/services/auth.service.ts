@@ -58,6 +58,9 @@ export class RegistrationRequiredError extends Error {}
 export class RegistrationSaveError extends Error {}
 export class RegistrationConflictError extends Error {}
 export class RegistrationSessionError extends Error {}
+export class EmailLinkNeedsEmailError extends Error {}
+
+const EMAIL_LINK_STORAGE_KEY = 'galash_email_signin';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -123,8 +126,42 @@ export class AuthService {
     const { signInWithPopup, GoogleAuthProvider, auth } = await this.firebase();
     const credential = await signInWithPopup(auth, new GoogleAuthProvider());
     this.currentUser.set(credential.user);
+    await this.establishBackendSession(credential.user);
+  }
+
+  async sendEmailSignInLink(email: string): Promise<void> {
+    const { sendSignInLinkToEmail, auth } = await this.firebase();
+    const address = email.trim();
+    await sendSignInLinkToEmail(auth, address, { url: window.location.href, handleCodeInApp: true });
+    window.localStorage.setItem(EMAIL_LINK_STORAGE_KEY, address);
+  }
+
+  /** True when the current URL is the return of a sign-in link sent by email. */
+  async pendingEmailLinkLogin(): Promise<boolean> {
+    const { isSignInWithEmailLink, auth } = await this.firebase();
+    return isSignInWithEmailLink(auth, window.location.href);
+  }
+
+  storedEmailLinkAddress(): string {
+    return window.localStorage.getItem(EMAIL_LINK_STORAGE_KEY) ?? '';
+  }
+
+  async loginWithEmailLink(email?: string): Promise<void> {
+    const { isSignInWithEmailLink, signInWithEmailLink, auth } = await this.firebase();
+    if (!isSignInWithEmailLink(auth, window.location.href)) throw new EmailLinkNeedsEmailError();
+    const address = email?.trim() || this.storedEmailLinkAddress();
+    if (!address) throw new EmailLinkNeedsEmailError();
+    const credential = await signInWithEmailLink(auth, address, window.location.href);
+    window.localStorage.removeItem(EMAIL_LINK_STORAGE_KEY);
+    // The link is consumed; drop the oobCode params so a refresh does not retry it.
+    window.history.replaceState({}, document.title, window.location.pathname);
+    this.currentUser.set(credential.user);
+    await this.establishBackendSession(credential.user);
+  }
+
+  private async establishBackendSession(user: User): Promise<void> {
     try {
-      await this.createBackendSession(credential.user);
+      await this.createBackendSession(user);
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === 403) {
         // Firebase identity is kept on purpose: registration completes with it.

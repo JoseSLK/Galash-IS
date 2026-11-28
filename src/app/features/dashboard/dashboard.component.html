@@ -57,6 +57,18 @@
                 <span class="google-mark" aria-hidden="true">G</span>
                 {{ authLoading ? 'Conectando…' : 'Iniciar sesión con Google' }}
               </button>
+              @if (emailLinkSent && !emailLinkNeedsEmail) {
+                <p class="auth-status" role="status">Te enviamos un enlace a {{ emailAddress }}. Ábrelo en este dispositivo para entrar.</p>
+              } @else {
+                <div class="email-login">
+                  <label class="email-login-label" for="auth-email">{{ emailLinkNeedsEmail ? 'Confirma tu correo para entrar' : 'O entra con tu correo institucional' }}</label>
+                  <input id="auth-email" class="email-login-input" type="email" autocomplete="email" placeholder="nombre.apellido@uptc.edu.co"
+                    [disabled]="authLoading" (input)="emailAddress = $any($event.target).value" />
+                  <button class="dropdown-action" type="button" [disabled]="authLoading || !emailAddress.trim()" (click)="submitEmailLogin()">
+                    {{ authLoading ? 'Un momento…' : (emailLinkNeedsEmail ? 'Entrar con el enlace' : 'Enviar enlace de acceso') }}
+                  </button>
+                </div>
+              }
               @if (authErrorMessage) {
                 <p class="auth-error" role="alert">{{ authErrorMessage }}</p>
               }
