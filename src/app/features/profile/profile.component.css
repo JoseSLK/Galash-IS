@@ -23,3 +23,20 @@ dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px 18
 .profile-assignments span, .profile-assignments p, .profile-assignments li, .profile-assignments small { font-size: 12px; line-height: 1.6; }
 
 .profile-avatar{overflow:hidden}.profile-avatar img{width:100%;height:100%;object-fit:cover}
+
+.card-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+.card-title-row h2 { margin: 0; }
+.edit-toggle { padding: 6px 14px; border: 1px solid var(--galash-border-strong); border-radius: 20px; background: transparent; color: var(--galash-text-strong); font: 500 12px var(--fuente-texto); cursor: pointer; }
+.edit-toggle:hover { border-color: var(--galash-accent); }
+.profile-edit-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 14px; }
+.profile-edit-form label { display: grid; gap: 6px; color: #8da6b5; font-size: 11px; }
+.profile-edit-form input[type="text"], .profile-edit-form input[type="tel"], .profile-edit-form input[type="url"], .profile-edit-form input[type="date"] { width: 100%; box-sizing: border-box; padding: 9px 11px; border: 1px solid var(--galash-border); border-radius: 8px; background: #0a1420; color: #e2edf2; font: 13px var(--fuente-texto); color-scheme: dark; }
+.profile-edit-form input:focus { outline: none; border-color: var(--galash-accent); }
+.visible-check { grid-column: 1 / -1; display: flex !important; align-items: center; gap: 9px; font-size: 12px !important; }
+.edit-error { grid-column: 1 / -1; margin: 0; color: #ff9d9d; font-size: 12px; }
+.edit-actions { grid-column: 1 / -1; display: flex; gap: 10px; }
+.edit-save, .edit-cancel { padding: 9px 20px; border-radius: 8px; font: 600 13px var(--fuente-texto); cursor: pointer; }
+.edit-save { border: 1px solid var(--galash-accent); background: var(--galash-accent); color: #0a1420; }
+.edit-save:disabled { opacity: .55; cursor: default; }
+.edit-cancel { border: 1px solid var(--galash-border); background: transparent; color: #c3ccd4; }
+@media (max-width: 380px) { .profile-edit-form { grid-template-columns: 1fr; } }

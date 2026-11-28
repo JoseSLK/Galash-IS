@@ -19,17 +19,45 @@
         </section>
         <div class="profile-grid">
           <section class="information-card" aria-labelledby="personal-title">
-            <p class="eyebrow">Tu información</p><h2 id="personal-title">Datos personales</h2>
-            <dl>
-              <div><dt>Nombres</dt><dd>{{ auth.backendUser()?.name || 'No disponible' }}</dd></div>
-              <div><dt>Apellidos</dt><dd>{{ auth.backendUser()?.last_name || 'No disponible' }}</dd></div>
-              <div class="full-width"><dt>Correo electrónico</dt><dd>{{ auth.profileEmail() || 'No disponible' }}</dd></div>
-              <div><dt>Tipo de documento</dt><dd>{{ auth.backendUser()?.document_type || 'No disponible' }}</dd></div>
-              <div><dt>Número de documento</dt><dd>{{ auth.backendUser()?.document_number || 'No disponible' }}</dd></div>
-              <div><dt>Teléfono</dt><dd>{{ auth.backendUser()?.phone || 'No disponible' }}</dd></div>
-              <div><dt>Fecha de nacimiento</dt><dd>{{ auth.backendUser()?.birth_date ? (auth.backendUser()?.birth_date ?? '').split('-').reverse().join('/') : 'No disponible' }}</dd></div>
-              <div><dt>Código estudiantil</dt><dd>{{ auth.backendUser()?.student_code || 'No registrado' }}</dd></div>
-            </dl>
+            <p class="eyebrow">Tu información</p>
+            <div class="card-title-row">
+              <h2 id="personal-title">Datos personales</h2>
+              @if (!editing()) {<button type="button" class="edit-toggle" (click)="startEdit()">Editar</button>}
+            </div>
+            @if (editing()) {
+              <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-edit-form" novalidate>
+                <label>Teléfono<input type="tel" formControlName="phone" autocomplete="tel"></label>
+                <label>Fecha de nacimiento<input type="date" formControlName="birth_date"></label>
+                <label>Área de investigación<input type="text" formControlName="area"></label>
+                <label>Formación<input type="text" formControlName="formation"></label>
+                <label>ORCID<input type="text" formControlName="orcid" placeholder="0000-0000-0000-0000"></label>
+                <label>Enlace CvLAC<input type="url" formControlName="cvlac" placeholder="https://..."></label>
+                <label>Enlace Google Scholar<input type="url" formControlName="google_scholar" placeholder="https://scholar.google.com/..."></label>
+                <label class="visible-check"><input type="checkbox" formControlName="visible_publicly"> Visible públicamente en el directorio de integrantes</label>
+                @if (saveError()) {<p class="edit-error" role="alert">{{ saveError() }}</p>}
+                <div class="edit-actions">
+                  <button type="submit" class="edit-save" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+                  <button type="button" class="edit-cancel" (click)="cancelEdit()" [disabled]="saving()">Cancelar</button>
+                </div>
+              </form>
+            } @else {
+              <dl>
+                <div><dt>Nombres</dt><dd>{{ auth.backendUser()?.name || 'No disponible' }}</dd></div>
+                <div><dt>Apellidos</dt><dd>{{ auth.backendUser()?.last_name || 'No disponible' }}</dd></div>
+                <div class="full-width"><dt>Correo electrónico</dt><dd>{{ auth.profileEmail() || 'No disponible' }}</dd></div>
+                <div><dt>Tipo de documento</dt><dd>{{ auth.backendUser()?.document_type || 'No disponible' }}</dd></div>
+                <div><dt>Número de documento</dt><dd>{{ auth.backendUser()?.document_number || 'No disponible' }}</dd></div>
+                <div><dt>Teléfono</dt><dd>{{ auth.backendUser()?.phone || 'No disponible' }}</dd></div>
+                <div><dt>Fecha de nacimiento</dt><dd>{{ auth.backendUser()?.birth_date ? (auth.backendUser()?.birth_date ?? '').split('-').reverse().join('/') : 'No disponible' }}</dd></div>
+                <div><dt>Código estudiantil</dt><dd>{{ auth.backendUser()?.student_code || 'No registrado' }}</dd></div>
+                <div><dt>Área de investigación</dt><dd>{{ memberProfile()?.area || 'No registrada' }}</dd></div>
+                <div><dt>Formación</dt><dd>{{ memberProfile()?.formation || 'No registrada' }}</dd></div>
+                <div><dt>ORCID</dt><dd>{{ memberProfile()?.orcid || 'No registrado' }}</dd></div>
+                <div><dt>CvLAC</dt><dd>{{ memberProfile()?.cvlac || 'No registrado' }}</dd></div>
+                <div><dt>Google Scholar</dt><dd>{{ memberProfile()?.google_scholar || 'No registrado' }}</dd></div>
+                <div><dt>Visibilidad pública</dt><dd>{{ memberProfile()?.visible_publicly ? 'Visible en el directorio' : 'Oculto del directorio' }}</dd></div>
+              </dl>
+            }
           </section>
           <section class="information-card account-card" aria-labelledby="account-title">
             <p class="eyebrow">Tu acceso</p><h2 id="account-title">Cuenta GALASH</h2>

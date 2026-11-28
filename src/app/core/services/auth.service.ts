@@ -122,6 +122,10 @@ export class AuthService {
     return this.authInitialized;
   }
 
+  refreshBackendSession(): Promise<void> {
+    return this.restoreBackendSession();
+  }
+
   async loginWithGoogle(): Promise<void> {
     const { signInWithPopup, GoogleAuthProvider, auth } = await this.firebase();
     const credential = await signInWithPopup(auth, new GoogleAuthProvider());

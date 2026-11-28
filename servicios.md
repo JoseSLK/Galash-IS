@@ -49,6 +49,7 @@ fecha de nacimiento. Rutas en `internal/adapters/inbound/http/handler.go`.
 | POST | `/auth/sessions` | crea sesion | M1 | [x] |
 | DELETE | `/auth/sessions/current` | cierra sesion | M1 | [x] |
 | GET | `/users/me` | perfil y roles | M1 | [x] |
+| PATCH | `/users/me` | edita datos propios: teléfono, fecha nacimiento, área, formación, orcid, cvlac, google_scholar, visibilidad | M1 | [x] |
 | PUT | `/users/me/photo` | guarda URL de foto de perfil | M1 | [x] |
 | PUT | `/users/{userId}/photo` | Admin reemplaza o quita (`""`) la URL de foto de otra cuenta | M1 | [x] |
 | GET | `/members` | dir. publico | M5 | [x] |
