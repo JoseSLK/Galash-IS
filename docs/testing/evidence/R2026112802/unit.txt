@@ -1,0 +1,105 @@
+Output from command in shell d8e99b:
+npm notice run src@0.0.0 npx
+npm notice run 'ng' test
+NOTE: The "unit-test" builder is currently EXPERIMENTAL and not ready for production use.
+❯ Building...
+✔ Building...
+Initial chunk files                                                | Names                                                           |  Raw size
+chunk-7D4LLMWS.js                                                  | -                                                               |   2.02 MB | 
+chunk-5JGBMIBD.js                                                  | -                                                               | 509.33 kB | 
+chunk-3ZKSROW6.js                                                  | -                                                               | 256.02 kB | 
+chunk-RHAKDSMS.js                                                  | -                                                               | 194.91 kB | 
+spec-app-features-nosotros-nosotros-page.component.spec.js         | spec-app-features-nosotros-nosotros-page.component.spec         | 159.89 kB | 
+polyfills.js                                                       | polyfills                                                       | 156.69 kB | 
+spec-app-features-projects-projects-page.component.spec.js         | spec-app-features-projects-projects-page.component.spec         | 154.50 kB | 
+chunk-GRFLNZIO.js                                                  | -                                                               | 109.52 kB | 
+chunk-6BVFQF76.js                                                  | -                                                               | 100.76 kB | 
+spec-app-features-events-events.component.spec.js                  | spec-app-features-events-events.component.spec                  |  49.90 kB | 
+chunk-MEG44XEQ.js                                                  | -                                                               |  49.90 kB | 
+chunk-WQLGZVFG.js                                                  | -                                                               |  43.52 kB | 
+spec-app-features-admin-audit-audit-admin.component.spec.js        | spec-app-features-admin-audit-audit-admin.component.spec        |  40.02 kB | 
+chunk-NPLD35JT.js                                                  | -                                                               |  32.52 kB | 
+spec-app-features-admin-seedbed-create.component.spec.js           | spec-app-features-admin-seedbed-create.component.spec           |  26.64 kB | 
+init-testbed.js                                                    | init-testbed                                                    |  22.10 kB | 
+chunk-XZVZO37F.js                                                  | -                                                               |  12.72 kB | 
+chunk-YKR22AQZ.js                                                  | -                                                               |  12.17 kB | 
+spec-app-features-seedbeds-reviews-seedbed-reviews.service.spec.js | spec-app-features-seedbeds-reviews-seedbed-reviews.service.spec |   8.83 kB | 
+chunk-P263CFO2.js                                                  | -                                                               |   7.30 kB | 
+chunk-T2MFQCPP.js                                                  | -                                                               |   6.95 kB | 
+chunk-ZOWGGZDY.js                                                  | -                                                               |   6.79 kB | 
+spec-app-features-projects-projects.service.spec.js                | spec-app-features-projects-projects.service.spec                |   6.20 kB | 
+spec-app-features-admin-seedbed-assignments.service.spec.js        | spec-app-features-admin-seedbed-assignments.service.spec        |   5.26 kB | 
+spec-app-features-admin-comunicados-comunicados.service.spec.js    | spec-app-features-admin-comunicados-comunicados.service.spec    |   5.23 kB | 
+spec-app-features-profile-profile-assignments.service.spec.js      | spec-app-features-profile-profile-assignments.service.spec      |   4.86 kB | 
+spec-app-features-join-request-join-request.service.spec.js        | spec-app-features-join-request-join-request.service.spec        |   4.86 kB | 
+spec-app-features-leader-leader.service.spec.js                    | spec-app-features-leader-leader.service.spec                    |   4.69 kB | 
+spec-app-features-admin-admin-services.spec.js                     | spec-app-features-admin-admin-services.spec                     |   4.64 kB | 
+chunk-VTVMEGW7.js                                                  | -                                                               |   4.61 kB | 
+chunk-DXQXWSW2.js                                                  | -                                                               |   4.59 kB | 
+spec-app-features-nosotros-institucional.service.spec.js           | spec-app-features-nosotros-institucional.service.spec           |   4.02 kB | 
+chunk-WDH3EH6C.js                                                  | -                                                               |   3.85 kB | 
+chunk-2I6Y6YJL.js                                                  | -                                                               |   3.72 kB | 
+styles.css                                                         | styles                                                          |   3.62 kB | 
+chunk-LX3A6S7K.js                                                  | -                                                               |   3.24 kB | 
+spec-app-features-seedbeds-seedbeds.service.spec.js                | spec-app-features-seedbeds-seedbeds.service.spec                |   3.08 kB | 
+spec-app-features-integrantes-integrantes.service.spec.js          | spec-app-features-integrantes-integrantes.service.spec          |   3.05 kB | 
+chunk-GVGUKHP4.js                                                  | -                                                               |   2.65 kB | 
+chunk-EQWWOL4C.js                                                  | -                                                               |   2.54 kB | 
+spec-app-core-services-api.service.spec.js                         | spec-app-core-services-api.service.spec                         |   2.13 kB | 
+spec-app-features-admin-audit-audit-logs.service.spec.js           | spec-app-features-admin-audit-audit-logs.service.spec           |   2.01 kB | 
+chunk-JDZZ7ABU.js                                                  | -                                                               |   1.67 kB | 
+spec-app-features-dashboard-header-scroll.spec.js                  | spec-app-features-dashboard-header-scroll.spec                  |   1.51 kB | 
+chunk-XHGDQUKE.js                                                  | -                                                               |   1.48 kB | 
+chunk-W7GTHXSN.js                                                  | -                                                               | 972 bytes | 
+spec-app-shared-css-color.spec.js                                  | spec-app-shared-css-color.spec                                  | 884 bytes | 
+chunk-WDSM7BBL.js                                                  | -                                                               | 829 bytes | 
+chunk-UN3ETZAA.js                                                  | -                                                               | 683 bytes | 
+
+                                                                   | Initial total                                                   |   4.07 MB
+
+Lazy chunk files                                                   | Names                                                           |  Raw size
+chunk-JWRI6UMX.js                                                  | three-module                                                    |   1.86 MB | 
+chunk-72YWP3BT.js                                                  | client                                                          |   1.13 MB | 
+chunk-GFCF7AS3.js                                                  | -                                                               | 396.52 kB | 
+chunk-BGZBIH5R.js                                                  | -                                                               |  47.59 kB | 
+chunk-H5NVNNVK.js                                                  | ScrollStack                                                     |  26.98 kB | 
+chunk-WLKSRAJQ.js                                                  | index-esm                                                       |   3.94 kB | 
+chunk-JPBKS3GX.js                                                  | firebase-config                                                 |   1.76 kB | 
+chunk-OJ5JLZYI.js                                                  | index                                                           | 160 bytes | 
+
+Application bundle generation complete. [3.413 seconds] - 2026-11-28T18:08:18.167Z
+
+
+ RUN  v3.2.7 /home/jose/repositories/Galash-Twice/Galash-IS
+
+ ✓ |src| spec-app-features-admin-comunicados-comunicados.service.spec.js (4 tests) 20ms
+ ✓ |src| spec-app-features-seedbeds-reviews-seedbed-reviews.service.spec.js (6 tests) 21ms
+ ✓ |src| spec-app-features-join-request-join-request.service.spec.js (1 test) 45ms
+ ✓ |src| spec-app-features-projects-projects.service.spec.js (6 tests) 25ms
+ ✓ |src| spec-app-features-profile-profile-assignments.service.spec.js (3 tests) 56ms
+ ✓ |src| spec-app-features-admin-seedbed-assignments.service.spec.js (7 tests) 76ms
+ ✓ |src| spec-app-features-admin-audit-audit-admin.component.spec.js (3 tests) 58ms
+ ✓ |src| spec-app-features-admin-seedbed-create.component.spec.js (3 tests) 80ms
+ ✓ |src| spec-app-features-nosotros-nosotros-page.component.spec.js (3 tests) 11ms
+ ✓ |src| spec-app-features-events-events.component.spec.js (2 tests) 56ms
+ ✓ |src| spec-app-features-projects-projects-page.component.spec.js (3 tests) 72ms
+ ✓ |src| spec-app-features-seedbeds-seedbeds.service.spec.js (4 tests) 68ms
+ ✓ |src| spec-app-features-admin-admin-services.spec.js (4 tests) 61ms
+ ✓ |src| spec-app-features-leader-leader.service.spec.js (7 tests) 86ms
+ ✓ |src| spec-app-features-dashboard-header-scroll.spec.js (4 tests) 5ms
+ ✓ |src| spec-app-shared-css-color.spec.js (2 tests) 137ms
+ ✓ |src| spec-app-features-nosotros-institucional.service.spec.js (3 tests) 18ms
+ ✓ |src| spec-app-core-services-api.service.spec.js (3 tests) 40ms
+ ✓ |src| spec-app-features-integrantes-integrantes.service.spec.js (2 tests) 44ms
+ ✓ |src| spec-app-features-admin-audit-audit-logs.service.spec.js (2 tests) 44ms
+
+ Test Files  20 passed (20)
+      Tests  72 passed (72)
+   Start at  13:08:18
+   Duration  4.22s (transform 1.99s, setup 16.65s, collect 4.60s, tests 1.02s, environment 15.67s, prepare 1.80s)
+
+
+
+Exit code: 0
+
+`| tail -6` was parsed out (6 of 99 total lines shown).

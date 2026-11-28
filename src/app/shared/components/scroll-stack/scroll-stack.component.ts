@@ -43,9 +43,13 @@ export class ScrollStackComponent implements OnDestroy {
   private async mountReact(mount: HTMLDivElement): Promise<void> {
     this.mounting = true;
     try {
-    const [{ createElement: h }, { createRoot }, { default: ScrollStack, ScrollStackItem }] = await Promise.all([
+    // react and react-dom ship CJS facades: in the production bundle their named
+    // exports may be missing, so resolve them from the module's default export.
+    const [reactModule, clientModule, { default: ScrollStack, ScrollStackItem }] = await Promise.all([
       import('react'), import('react-dom/client'), import('./ScrollStack.js')
     ]);
+    const h = reactModule.createElement ?? reactModule.default?.createElement;
+    const createRoot = clientModule.createRoot ?? clientModule.default?.createRoot;
     if (this.destroyed) return;
     this.zone.runOutsideAngular(() => {
       const cards = [
