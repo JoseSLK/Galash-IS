@@ -68,7 +68,7 @@
         @if (submitError) {<p class="error" role="alert">{{ submitError }}</p>}
         <div class="form-actions"><div>@if (step > 0) {<button class="secondary" type="button" (click)="edit()" [disabled]="loading">← Volver</button>}</div><div class="advance"><span class="missing" aria-live="polite">@if (step === 0) {{{ missing }} campos obligatorios por completar}</span><button type="submit" class="primary" [disabled]="loading">{{ loading ? 'Enviando…' : step === 1 ? 'Enviar solicitud' : 'Revisar solicitud →' }}</button></div></div>
         <p class="privacy">Tus datos personales solo los verán quienes evalúan tu solicitud.</p>
-        <p class="notice">Los catálogos de formación, vinculación y convocatorias son temporales.</p>
+        <p class="notice">Los catálogos de formación y vinculación son temporales.</p>
       </form>
     </section>
   }
