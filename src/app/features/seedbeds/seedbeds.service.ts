@@ -52,6 +52,7 @@ export interface PublicEvent {
   imageUrl?: string;
   registrationUrl?: string;
   organizerName?: string;
+  seedbedId?: string;
 }
 
 export interface Project {

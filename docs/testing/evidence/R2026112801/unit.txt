@@ -1,0 +1,12 @@
+Application bundle generation complete. [3.303 seconds] - 2026-11-28T17:49:45.228Z
+
+
+ RUN  v3.2.7 /home/jose/repositories/Galash-Twice/Galash-IS
+
+ ✓ |src| spec-app-features-events-events.component.spec.js (2 tests) 25ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  12:49:45
+   Duration  1.87s (transform 977ms, setup 933ms, collect 295ms, tests 25ms, environment 409ms, prepare 54ms)
+
