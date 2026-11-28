@@ -24,6 +24,7 @@
               <h2 id="personal-title">Datos personales</h2>
               @if (!editing()) {<button type="button" class="edit-toggle" (click)="startEdit()">Editar</button>}
             </div>
+            @if (saveError() && !editing()) {<p class="edit-error" role="alert">{{ saveError() }}</p>}
             @if (editing()) {
               <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-edit-form" novalidate>
                 <label>Teléfono<input type="tel" formControlName="phone" autocomplete="tel"></label>
@@ -50,12 +51,12 @@
                 <div><dt>Teléfono</dt><dd>{{ auth.backendUser()?.phone || 'No disponible' }}</dd></div>
                 <div><dt>Fecha de nacimiento</dt><dd>{{ auth.backendUser()?.birth_date ? (auth.backendUser()?.birth_date ?? '').split('-').reverse().join('/') : 'No disponible' }}</dd></div>
                 <div><dt>Código estudiantil</dt><dd>{{ auth.backendUser()?.student_code || 'No registrado' }}</dd></div>
-                <div><dt>Área de investigación</dt><dd>{{ memberProfile()?.area || 'No registrada' }}</dd></div>
-                <div><dt>Formación</dt><dd>{{ memberProfile()?.formation || 'No registrada' }}</dd></div>
-                <div><dt>ORCID</dt><dd>{{ memberProfile()?.orcid || 'No registrado' }}</dd></div>
-                <div><dt>CvLAC</dt><dd>{{ memberProfile()?.cvlac || 'No registrado' }}</dd></div>
-                <div><dt>Google Scholar</dt><dd>{{ memberProfile()?.google_scholar || 'No registrado' }}</dd></div>
-                <div><dt>Visibilidad pública</dt><dd>{{ memberProfile()?.visible_publicly ? 'Visible en el directorio' : 'Oculto del directorio' }}</dd></div>
+                <div><dt>Área de investigación</dt><dd>{{ memberLoadFailed() ? 'No disponible' : (memberProfile()?.area || 'No registrada') }}</dd></div>
+                <div><dt>Formación</dt><dd>{{ memberLoadFailed() ? 'No disponible' : (memberProfile()?.formation || 'No registrada') }}</dd></div>
+                <div><dt>ORCID</dt><dd>{{ memberLoadFailed() ? 'No disponible' : (memberProfile()?.orcid || 'No registrado') }}</dd></div>
+                <div><dt>CvLAC</dt><dd>{{ memberLoadFailed() ? 'No disponible' : (memberProfile()?.cvlac || 'No registrado') }}</dd></div>
+                <div><dt>Google Scholar</dt><dd>{{ memberLoadFailed() ? 'No disponible' : (memberProfile()?.google_scholar || 'No registrado') }}</dd></div>
+                <div><dt>Visibilidad pública</dt><dd>{{ memberLoadFailed() ? 'No disponible' : (memberProfile()?.visible_publicly ? 'Visible en el directorio' : 'Oculto del directorio') }}</dd></div>
               </dl>
             }
           </section>

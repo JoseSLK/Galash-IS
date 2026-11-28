@@ -2,6 +2,7 @@ import {ProfilePhotoEditorComponent} from './profile-photo-editor.component';
 import {ProjectsPageComponent} from '../projects/projects-page.component';
 import {ComunicadosAdminComponent} from '../admin/comunicados/comunicados-admin.component';
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -28,6 +29,7 @@ export class ProfileComponent {
   readonly assignmentsError = signal('');
   private assignmentRequest = 0;
   readonly memberProfile = signal<MemberProfile | null>(null);
+  readonly memberLoadFailed = signal(false);
   readonly editing = signal(false);
   readonly saving = signal(false);
   readonly saveError = signal('');
@@ -84,25 +86,39 @@ export class ProfileComponent {
   private async loadMemberProfile(id: string): Promise<void> {
     try {
       this.memberProfile.set(await this.profileData.ownMemberProfile(id));
-    } catch {
+    } catch (e) {
+      if (e instanceof HttpErrorResponse && e.status !== 404) this.memberLoadFailed.set(true);
+      else this.memberLoadFailed.set(false);
       this.memberProfile.set(null);
     }
   }
 
-  startEdit(): void {
-    const member = this.memberProfile();
+  async startEdit(): Promise<void> {
     const user = this.auth.backendUser();
+    if (!user || this.editing()) return;
+    this.saveError.set('');
+    let member: MemberProfile | null = null;
+    try {
+      member = await this.profileData.ownMemberProfile(user.id);
+      this.memberProfile.set(member);
+      this.memberLoadFailed.set(false);
+    } catch (e) {
+      if (!(e instanceof HttpErrorResponse && e.status === 404)) {
+        this.memberLoadFailed.set(true);
+        this.saveError.set('No se pudo cargar tu perfil actual. Inténtalo de nuevo.');
+        return;
+      }
+    }
     this.profileForm.setValue({
-      phone: user?.phone ?? '',
-      birth_date: user?.birth_date ?? '',
+      phone: user.phone ?? '',
+      birth_date: user.birth_date ?? '',
       area: member?.area ?? '',
       formation: member?.formation ?? '',
       orcid: member?.orcid ?? '',
       cvlac: member?.cvlac ?? '',
       google_scholar: member?.google_scholar ?? '',
-      visible_publicly: member?.visible_publicly ?? true
+      visible_publicly: member?.visible_publicly ?? false
     });
-    this.saveError.set('');
     this.editing.set(true);
   }
 
