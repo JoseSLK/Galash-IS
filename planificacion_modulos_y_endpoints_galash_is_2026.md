@@ -36,6 +36,7 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 | `DELETE` | `/auth/sessions/current` | Invalida la sesión actual. | Must / Estudiante, Docente o Admin | HU-AUTH-02 |
 | `GET` | `/users/me` | Devuelve el perfil mínimo (incluidos los datos básicos del alta) y los roles y permisos efectivos del usuario autenticado. | Must / Estudiante, Docente o Admin | HU-AUTH-01, HU-TR-02 |
 | `PUT` | `/users/me/photo` | Guarda el enlace (URL) de la imagen de perfil del usuario autenticado; reemplaza el anterior. | Must / Estudiante, Docente o Admin | — |
+| `PATCH` | `/users/me` | Edita datos personales no identitarios del perfil propio: `phone`, `birth_date`, `area`, `formation`, `orcid`, `cvlac`, `google_scholar`, `visible_publicly`. Campo omitido no cambia; `""` limpia el valor. `cvlac` y `google_scholar` deben ser URL http(s). No modifica identidad, rol, estado ni semilleros. | Must / Estudiante, Docente o Admin | — |
 | `PUT` | `/users/{userId}/photo` | Reemplaza o quita el enlace (URL) de la imagen de perfil de otra cuenta; solo se almacena el enlace. | Must / Admin | — |
 | `POST` | `/auth/password-recovery-requests` | Solicita recuperación por correo; la respuesta no revela si el correo está registrado. | Should / Visitante | HU-AUTH-03 |
 | `POST` | `/auth/password-resets` | Cambia la contraseña con un token vigente, de un solo uso. | Should / Visitante con token | HU-AUTH-03 |
@@ -49,6 +50,8 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 **Foto de perfil en `PUT /users/me/photo`:** requiere sesión activa y cuerpo JSON `{"photo_url":"<url>"}`; la URL debe ser absoluta `http` o `https` con host y de máximo 2048 caracteres. El enlace queda asociado al usuario de la sesión (nunca a un id enviado por el cliente) y reemplaza el anterior. Responde `200` con `{"photo_url":"<url>"}`. Errores: `400` para JSON inválido o URL inválida, `401` sin sesión o con sesión inválida/expirada y `500` si falla el guardado; formato de error `{"error":"<mensaje>"}`.
 
 **Foto de una cuenta por Admin en `PUT /users/{userId}/photo`:** `userId` es el `id` de la cuenta (el mismo de `GET /members`). Requiere sesión `Admin` y cuerpo JSON `{"photo_url":"<url>"}`, con las mismas reglas de URL que `PUT /users/me/photo`; `""` quita la foto. Solo se guarda el enlace. Responde `200` con `{"photo_url":"<url>"}`. Errores: `400` para JSON inválido, `photo_url` ausente o URL inválida, `401` sin sesión o con sesión inválida/expirada, `403` si no es `Admin`, `404` si la cuenta no existe y `500` si falla el guardado; formato de error `{"error":"<mensaje>"}`.
+
+**Autogestión del perfil en `PATCH /users/me`:** requiere sesión activa y cuerpo JSON con cualquier subconjunto de `{"phone":"<tel>","birth_date":"AAAA-MM-DD","area":"<área>","formation":"<formación>","orcid":"<orcid>","cvlac":"<url>","google_scholar":"<url>","visible_publicly":true|false}`. Campo ausente conserva el valor; `""` lo deja vacío. `cvlac` y `google_scholar` no vacíos deben ser URL absoluta `http`/`https`; `birth_date` no vacío debe ser fecha válida `AAAA-MM-DD`. Nunca modifica `firebase_uid`, nombre, apellido, correo, documento, código estudiantil, rol, estado ni asociación a semilleros. Responde `200` con el perfil completo del integrante (formato de `GET /members/{id}`). Errores `{error}`: `400` JSON inválido o dato inválido, `401` sin sesión o sesión inválida/expirada, `404` si la cuenta no existe y `500` si falla el guardado.
 
 **Reglas clave:** las contraseñas se almacenan con hash seguro; las sesiones expiran y se revocan al cerrar sesión. Solo `Admin` puede asignar o retirar los cuatro roles permitidos.
 
@@ -150,11 +153,13 @@ Esta propuesta organiza las historias de usuario en módulos funcionales y defin
 | `GET` | `/members` | Busca y filtra integrantes por tipo, semillero o área; excluye perfiles inactivos de la vista pública. | Must / Visitante | HU-INT-02 |
 | `POST` | `/members` | Crea perfil de `Estudiante` o `Docente` y valida campos obligatorios. `409` si el correo (sin distinguir mayúsculas), el documento o el código estudiantil ya pertenecen a otra cuenta. | Must / Admin | HU-INT-01 |
 | `GET` | `/members/{id}` | Consulta el perfil público o, con permiso, los campos internos. | Must / Visitante o rol autorizado | HU-INT-02 |
-| `PATCH` | `/members/{id}` | Edita datos, asociación a semilleros, visibilidad y enlace CvLAC. `cvlac` omitido no cambia el enlace; `""` lo quita; otro valor debe ser URL http(s). `409` si el correo, el documento o el código ya pertenecen a otra cuenta. | Must / Admin | HU-INT-01, HU-INT-03 |
+| `PATCH` | `/members/{id}` | Edita datos, asociación a semilleros, visibilidad y enlaces CvLAC y Google Scholar. `cvlac` y `google_scholar` omitidos no cambian el enlace; `""` lo quita; otro valor debe ser URL http(s). `409` si el correo, el documento o el código ya pertenecen a otra cuenta. | Must / Admin | HU-INT-01, HU-INT-03 |
 | `PATCH` | `/members/{id}/status` | Activa o desactiva perfil sin borrar historial relacionado. | Must / Admin | HU-INT-01 |
 | `GET` | `/members/{id}/publications` | Consulta artículos y publicaciones asociados al perfil cuando existan. | Must / Visitante según visibilidad | HU-INT-02 |
 
 **Foto en perfiles de integrantes:** `GET /members` y `GET /members/{id}` incluyen `photo_url` en cada perfil: el enlace guardado con `PUT /users/me/photo` (cadena vacía si no hay). Es un dato público del perfil y se muestra también en el directorio.
+
+**Enlaces académicos en perfiles de integrantes:** las respuestas de perfil (`GET /members`, `GET /members/{id}`, `PATCH /members/{id}` y `PATCH /users/me`) incluyen `orcid`, `cvlac` y `google_scholar` cuando tienen valor (`omitempty`). En `PATCH /members/{id}`, `google_scholar` sigue la misma regla tri-estado que `cvlac`.
 
 ### Módulo 6. Eventos, talleres y convocatorias
 
