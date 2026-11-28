@@ -49,6 +49,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   registrationOpen = false;
   authLoading = false;
   authErrorMessage = '';
+  emailAddress = '';
+  emailLinkSent = false;
+  emailLinkNeedsEmail = false;
   headerScrolled = false;
   headerCompact = false;
   activeSection = 'nosotros';
@@ -90,6 +93,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // The email sign-in link returns to this URL; every page embeds this header.
+    void this.finishPendingEmailLink();
     // Every page embeds this component as its header; only the home page shows this content.
     if (this.headerOnly) return;
     this.seedbedsService.list().then(items => { this.seedbeds.set(items); this.seedbedCount.set(String(items.length).padStart(2, '0')); }, () => undefined);
@@ -182,6 +187,64 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.authErrorMessage = error instanceof HttpErrorResponse && error.status === 0
           ? 'No hay conexión con el servicio de acceso. Inténtalo de nuevo.'
           : 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.';
+      }
+    } finally {
+      this.authLoading = false;
+    }
+  }
+
+  async submitEmailLogin(): Promise<void> {
+    if (this.authLoading || this.authService.sessionStatus() === 'checking' || this.authService.isAuthenticated()) return;
+
+    this.authLoading = true;
+    this.authErrorMessage = '';
+    const completing = this.emailLinkNeedsEmail;
+    try {
+      if (completing) {
+        await this.authService.loginWithEmailLink(this.emailAddress);
+        this.emailLinkNeedsEmail = false;
+        this.authMenuOpen = false;
+      } else {
+        await this.authService.sendEmailSignInLink(this.emailAddress);
+        this.emailLinkSent = true;
+      }
+    } catch (error: unknown) {
+      if (error instanceof RegistrationRequiredError) {
+        this.openRegistration();
+      } else {
+        // Endpoint, status and CORS details stay out of the UI; they are only logged in development.
+        if (isDevMode()) console.warn('[auth] acceso por correo fallido', error);
+        this.emailLinkNeedsEmail = false;
+        this.emailLinkSent = false;
+        this.authErrorMessage = completing
+          ? 'El enlace venció o no coincide con ese correo. Solicita uno nuevo.'
+          : 'No se pudo enviar el enlace. Revisa el correo e inténtalo de nuevo.';
+      }
+    } finally {
+      this.authLoading = false;
+    }
+  }
+
+  private async finishPendingEmailLink(): Promise<void> {
+    if (this.authService.isAuthenticated() || !(await this.authService.pendingEmailLinkLogin())) return;
+
+    this.authMenuOpen = true;
+    // The link opened on a device without the stored address; ask for it once.
+    if (!this.authService.storedEmailLinkAddress()) {
+      this.emailLinkNeedsEmail = true;
+      return;
+    }
+    this.authLoading = true;
+    try {
+      await this.authService.loginWithEmailLink();
+      this.authMenuOpen = false;
+    } catch (error: unknown) {
+      if (error instanceof RegistrationRequiredError) {
+        this.openRegistration();
+      } else {
+        if (isDevMode()) console.warn('[auth] acceso por correo fallido', error);
+        this.emailLinkNeedsEmail = true;
+        this.authErrorMessage = 'El enlace venció o es inválido. Confirma tu correo o solicita uno nuevo.';
       }
     } finally {
       this.authLoading = false;
