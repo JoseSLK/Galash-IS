@@ -27,6 +27,23 @@
       <h2>Síguenos</h2>
       <app-social-links />
     </section>
-    <section class="welcome-panel"><h2>¡Te estamos esperando!</h2><p>© GALASH {{ year }} · UPTC Seccional Sogamoso</p></section>
+    <section class="welcome-panel"><h2>¡Te estamos esperando!</h2><p>© GALASH {{ year }} · UPTC Seccional Sogamoso</p><button type="button" class="authors-toggle" (click)="mostrarAutores = !mostrarAutores" [attr.aria-expanded]="mostrarAutores" aria-controls="footer-autores">{{ mostrarAutores ? 'Ocultar autores' : 'Autores' }}</button></section>
+    @if (mostrarAutores) {
+      <section id="footer-autores" class="authors-panel" aria-label="Autores del proyecto">
+        <h2>Autores</h2>
+        <ul class="authors-list">
+          @for (autor of autores; track autor.nombre) {
+            <li class="author">
+              <span class="author-photo" aria-hidden="true">
+                @if (autor.fotoUrl) {<img [src]="autor.fotoUrl" alt="" loading="lazy" />}
+                @else {<span class="author-initials">{{ iniciales(autor.nombre) }}</span>}
+              </span>
+              <span class="author-role">{{ autor.rol }}</span>
+              <span class="author-name">{{ autor.nombre }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
   </div>
 </footer>
