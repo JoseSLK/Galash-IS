@@ -21,8 +21,10 @@ export class EventsComponent {
   readonly selected = signal<PublicEvent | null>(null);
   readonly safeUrl = eventUrl;
   readonly filtered = computed(() => this.events().filter(event => this.filter() === 'all' || (Date.parse(event.startAt) >= this.now()) === (this.filter() === 'next')).sort((a, b) => this.filter() === 'past' ? Date.parse(b.startAt) - Date.parse(a.startAt) : Date.parse(a.startAt) - Date.parse(b.startAt)));
-  readonly featured = computed(() => this.filtered().find(event => Date.parse(event.startAt) >= this.now()) ?? null);
-  readonly cards = computed(() => this.filtered().filter(event => event.id !== this.featured()?.id));
+  readonly news = computed(() => this.filtered().filter(event => !!event.seedbedId));
+  readonly general = computed(() => this.filtered().filter(event => !event.seedbedId));
+  readonly featured = computed(() => this.news().find(event => Date.parse(event.startAt) >= this.now()) ?? null);
+  readonly cards = computed(() => this.news().filter(event => event.id !== this.featured()?.id));
   constructor() {
     const timer = setInterval(() => this.now.set(Date.now()), 60_000);
     inject(DestroyRef).onDestroy(() => clearInterval(timer));

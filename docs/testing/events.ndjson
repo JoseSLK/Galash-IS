@@ -722,3 +722,7 @@
 {"v": 1, "defect": "D007", "t": "defect", "test": "T2026111306", "run": "R2026111610", "s": "closed", "note": "La E2E usaba clock.runFor(61 s), que reproducía cada frame de animación; ahora usa fastForward. 36/36 en 3 repeticiones"}
 {"v": 1, "defect": "D008", "t": "defect", "test": "T2026111609", "run": "R2026111610", "s": "closed", "note": "LCP 0,6 s (Lighthouse 13.6) y Firebase Auth diferido (-98 kB de JS inicial)"}
 {"v": 1, "defect": "D009", "t": "defect", "test": "T2026111613", "run": "R2026111610", "s": "closed", "note": "El enlace de marca del pie usa su texto visible como nombre accesible; axe sin violaciones"}
+{"v": 1, "id": "T2026112801", "t": "test", "area": "events", "p": "must", "name": "La página Noticias separa en la sección \"Eventos de interés general\" los eventos publicados sin seedbedId; el spotlight y los filtros de fecha siguen aplicando a ambas listas."}
+{"v": 1, "id": "R2026112801", "t": "run", "at": "2026-11-28T17:49:45Z", "area": "events", "mode": "automated", "by": "agent", "cmd": "npx ng test --include='**/events.component.spec.ts'; npx ng test; npx ng lint; npx ng build", "note": "Spec nueva del split noticias/interés general: 2/2. Suite completa 72/72. Lint sin errores. Build OK."}
+{"v": 1, "id": "X2026112801", "t": "result", "run": "R2026112801", "test": "T2026112801", "s": "pass", "ev": ["docs/testing/evidence/R2026112801/unit.txt"]}
+{"v": 1, "id": "X2026112802", "t": "result", "run": "R2026112801", "test": "T2026111620", "s": "pass", "ev": ["docs/testing/evidence/R2026112801/lint.txt"]}

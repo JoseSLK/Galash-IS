@@ -1,0 +1,5 @@
+
+Linting "src"...
+
+All files pass linting.
+

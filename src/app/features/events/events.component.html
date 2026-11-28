@@ -7,8 +7,16 @@
   @else if (state() === 'error') {<div class="empty"><p role="alert">No pudimos cargar las noticias.</p><button class="retry" type="button" (click)="load()">Reintentar</button></div>}
   @else {
     <p class="sr-only" role="status">{{ filtered().length }} noticias encontradas.</p>
-    @if (featured(); as event) {<app-event-card [event]="event" [featured]="true" [now]="now()" (details)="showDetails($event, detailDialog)" />}
-    <div class="event-grid">@for (event of cards(); track event.id) {<app-event-card [event]="event" [now]="now()" (details)="showDetails($event, detailDialog)" />}</div>
+    @if (news().length) {
+      @if (featured(); as event) {<app-event-card [event]="event" [featured]="true" [now]="now()" (details)="showDetails($event, detailDialog)" />}
+      <div class="event-grid">@for (event of cards(); track event.id) {<app-event-card [event]="event" [now]="now()" (details)="showDetails($event, detailDialog)" />}</div>
+    }
+    @if (general().length) {
+      <section class="general-events" aria-labelledby="general-events-title">
+        <span class="eyebrow">Interés general</span><h2 id="general-events-title">Eventos de interés general</h2>
+        <div class="event-grid">@for (event of general(); track event.id) {<app-event-card [event]="event" [now]="now()" (details)="showDetails($event, detailDialog)" />}</div>
+      </section>
+    }
     @if (!filtered().length) {<div class="empty"><h2>No hay noticias {{ filter() === 'next' ? 'próximas' : filter() === 'past' ? 'anteriores' : 'publicadas' }}</h2><p>Consulta las otras fechas para explorar las noticias del grupo.</p></div>}
   }
 </main>
